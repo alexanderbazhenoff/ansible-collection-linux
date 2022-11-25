@@ -1,0 +1,413 @@
+---
+
+### patch zabbix-agent configs
+
+# re-configure, detect services and add related hostMetadata hashes:
+#
+# - 1. ff<platform_or_hardware_type> is for baremetal, containerization or virtualization subscription:
+#      baremetal server: ff6e6f6e65
+#      kvm: ff6b766d
+#      lxc: ff6c7863
+#      docker: ff646f636b6572
+#   etc...
+#
+# - 2. ee<hardware_feature_or_vendor> is for hardware features or vendor names (e.g. IPMI, server vendor):
+#      IPMI: ee69706d69
+#      Vendor 'Supermicro': ee53757065726d6963726f
+#      Vendor 'Advantech': ee416476616e74656368
+#   etc...
+#
+# - 3. dd<environment_name> is for runtime environments, binaries, daemons, languages (e.g. java, mysql):
+#      check hm_* variables
+
+
+## check/install required packages
+
+- name: "reconfigure zabbix agents | Install required packages (Centos 7)"
+  ansible.builtin.yum:
+    state: present
+    update_cache: True
+    name: "{{ item }}"
+  with_items:
+    - vim-common
+    - policycoreutils-python
+    - wget
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int <= 7
+
+- name: "reconfigure zabbix agents | Install required packages: wget, vim-common, util-linux (Debian family)"
+  ansible.builtin.apt:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - wget
+    - vim-common
+    - util-linux
+  when: ansible_os_family == "Debian"
+
+- name: "reconfigure zabbix agents | Install required xxd package (Ubuntu 18.04 or later)"
+  ansible.builtin.apt:
+    state: present
+    name: xxd
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 18
+
+- name: "reconfigure zabbix agents | Install required packages (Arch)"
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+    update_cache: True
+  with_items:
+    - wget
+    - vim
+  when: ansible_os_family == "Archlinux"
+
+## zabbix checks and init section
+
+- name: "reconfigure zabbix agents | Check zabbix agent version"
+  ansible.builtin.stat:
+    path: /etc/zabbix/zabbix_agent2.conf
+  register: stat_result
+
+- name: "reconfigure zabbix agents | Change conf and daemon names (when agent v2 detected)"
+  ansible.builtin.set_fact:
+    zabbix_agent_conf_name: zabbix_agent2
+    zabbix_agent_daemon_name: zabbix-agent2
+  when: stat_result.stat.exists
+
+- name: "reconfigure zabbix agents | Check zabbix server installed"
+  ansible.builtin.stat:
+    path: /etc/zabbix/zabbix_server.conf
+  register: stat2_result
+
+- name: "reconfigure zabbix agents | Append localhost to passive/active zabbix server(s)"
+  ansible.builtin.set_fact:
+    zabbix_servers_passive: "{{ zabbix_servers_passive }},127.0.0.1"
+    zabbix_servers_active: "{{ zabbix_servers_active }},127.0.0.1:10051"
+  when: stat2_result.stat.exists
+
+- name: "reconfigure zabbix agents | Allow 'sudonopass' group to have passwordless sudo"
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^zabbix'
+    line: 'zabbix   ALL=(ALL)   NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: "reconfigure zabbix agents | Set selinux permissive for zabbix_agent_t (Redhat)"
+  selinux_permissive:
+    name: zabbix_agent_t
+    permissive: True
+  when: ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled' and
+    ansible_distribution == "CentOS" and ansible_distribution_major_version | int == 7
+
+- name: "reconfigure zabbix agents | Set selinux booleans to allow zabbix user networking and sudo (Redhat)"
+  ansible.builtin.seboolean:
+    name: "{{ item }}"
+    state: True
+    persistent: True
+  with_items:
+    - zabbix_can_network
+    - zabbix_run_sudo
+  ignore_errors: True    # noqa ignore-errors
+  when: ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled' and
+    ansible_distribution == "CentOS" and ansible_distribution_major_version | int == 7
+
+
+## services/platform discovery section
+
+# hardware, ipmi, vendor
+- name: "reconfigure zabbix agents | Search systemd-detect-virt in the system"
+  ansible.builtin.stat:
+    path: /usr/bin/systemd-detect-virt
+  register: systemddetectvirtpackage
+
+- name: "reconfigure zabbix agents | Detect virtualization/containerization (with systemd)"
+  ansible.builtin.shell: systemd-detect-virt | tr -d '\n' | xxd -ps -c 200    # noqa 306
+  args:
+    executable: /bin/bash
+  register: detectvirt
+  when: systemddetectvirtpackage.stat.exists
+
+- name: "reconfigure zabbix agents | Detect virtualization/containerization (with lscpu)"   # noqa 306
+  ansible.builtin.shell: |
+    lscpu | grep "Hypervisor vendor:" | awk '{print tolower($3)}' | tr -d '\n' | xxd -ps -c 200 || true
+  args:
+    executable: /bin/bash
+  register: detectvirt_lscpu
+  when: not systemddetectvirtpackage.stat.exists
+
+- name: "reconfigure zabbix agents | Set fact for virtualization/containerization (with lscpu)"
+  ansible.builtin.set_fact:
+    detectvirt: "{{ detectvirt_lscpu }}"
+  when: not systemddetectvirtpackage.stat.exists
+
+- name: "reconfigure zabbix agents | Detect virtualization/containerization debug"
+  ansible.builtin.debug:
+    msg: "{{ detectvirt }}"
+  when: debug_mode
+
+- name: "reconfigure zabbix agents | Set fact for virtualization/containerization detection"
+  ansible.builtin.set_fact:
+    zabbix_host_metadata: "{{ zabbix_host_metadata }} ff{{ detectvirt.stdout }}"
+  when: detectvirt.stdout is defined
+
+- name: "reconfigure zabbix agents | Install baremetal related packages (RedHat family)"
+  ansible.builtin.yum:
+    state: present
+    update_cache: True
+    name: "{{ item }}"
+  with_items:
+    - dmidecode
+    - ipmitool
+    - smartmontools
+  when: ansible_os_family == "RedHat" and detectvirt.stdout == "6e6f6e65"
+
+- name: "reconfigure zabbix agents | Install baremetal related packages (Debian family)"
+  ansible.builtin.apt:
+    state: present
+    name: "{{ item }}"
+    update_cache: True
+  with_items:
+    - dmidecode
+    - ipmitool
+    - smartmontools
+  when: ansible_os_family == "Debian" and detectvirt.stdout == "6e6f6e65"
+
+- name: "reconfigure zabbix agents | Install baremetal related packages (Arch)"
+  community.general.pacman:
+    name:
+      - dmidecode
+      - ipmitool
+      - smartmontools
+    state: present
+    update_cache: True
+  when: ansible_os_family == "Archlinux" and detectvirt.stdout == "6e6f6e65"
+
+- name: "reconfigure zabbix agents | Detect IPMI interface"
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    ipmitool mc info &> /dev/zero && echo "ok" || echo "none"
+  args:
+    executable: /bin/bash
+  register: detectipmi
+  changed_when: detectipmi.stdout
+
+- name: "reconfigure zabbix agents | Detect IPMI debug"
+  ansible.builtin.debug:
+    msg: "{{ detectipmi }}"
+  when: debug_mode
+
+- name: "reconfigure zabbix agents | Detect vendor via IPMI tool"
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    ipmitool mc info | grep 'Manufacturer Name' | awk '{print $4$5$6}' | tr -d '\n' | xxd -ps -c 200
+  args:
+    executable: /bin/bash
+  register: ipmivendor
+  when: detectvirt.stdout == "6e6f6e65" and detectipmi.stdout == "ok"
+
+- name: "reconfigure zabbix agents | Set fact for IPMI and vendor"
+  ansible.builtin.set_fact:
+    zabbix_host_metadata: "{{ zabbix_host_metadata }} ee69706d69 ee{{ ipmivendor.stdout }}"
+  when: detectvirt.stdout == "6e6f6e65" and detectipmi.stdout == "ok" and detectvirt.stdout | length > 0
+
+# check binaries on the system
+- name: "reconfigure zabbix agents | Check installed binaries (whereis)"
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    if [[ $(whereis {{ item.name }} | awk '{print $2}') ]]; then printf '{{ item.hash }}'; fi
+  args:
+    executable: /bin/bash
+  with_items: "{{ binaries_tag_hashes }}"
+  register: checkbinaries
+  changed_when: checkbinaries.stdout
+
+- name: "reconfigure zabbix agents | Check installed binaries debug"
+  ansible.builtin.debug:
+    msg: "{{ checkbinaries.results }}"
+  when: debug_mode
+
+- name: "reconfigure zabbix agents | Appending hash tags of binaries hashes to host zabbix_host_metadata"
+  ansible.builtin.set_fact:
+    zabbix_host_metadata: "{{ zabbix_host_metadata }} {{ item.stdout }}"
+  with_items: "{{ checkbinaries.results }}"
+  when: item.rc == 0 and item.stdout is defined and item.stdout | length > 0
+
+  # check daemons on the system
+- name: "reconfigure zabbix agents | Check enabled daemons with systemctl"
+  ansible.builtin.command: systemctl is-enabled --quiet "{{ item.name }}"    # noqa 303
+  ignore_errors: True
+  with_items: "{{ daemon_tag_hashes }}"
+  register: services_enabled
+  changed_when: services_enabled.rc == 0
+
+- name: "reconfigure zabbix agents | Check enabled daemons with systemctl debug"
+  ansible.builtin.debug:
+    var: services_enabled.results
+  when: debug_mode
+
+- name: "reconfigure zabbix agents | Getting hash tags of existing services names"
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    echo "{{ item.item.tag }}" | tr -d '\n' | xxd -ps -c 200
+  args:
+    executable: /bin/bash
+  register: services_hashes
+  with_items: "{{ services_enabled.results }}"
+  when: item.rc == 0
+
+- name: "reconfigure zabbix agents | Getting hash tags of existing services names debug"
+  ansible.builtin.debug:
+    var: services_hashes
+  when: debug_mode
+
+- name: "reconfigure zabbix agents | Appending hash tags of existing services hashes to host's zabbix_host_metadata"
+  ansible.builtin.set_fact:
+    zabbix_host_metadata: "{{ zabbix_host_metadata }} dd{{ item.stdout }}"
+  with_items: "{{ services_hashes.results }}"
+  when: item.stdout is defined
+
+## write config and restart section
+
+- name: "reconfigure zabbix agents | Check zabbix-agent version via dpkg (Debian family)"
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    dpkg -s {{ zabbix_agent_daemon_name }} | grep "^Version" | sed -re "s/^.*:([0-9]+\.[0-9]+).*/\1/"
+  args:
+    executable: /bin/bash
+  register: zabbix_agent_version_debian
+  when: ansible_os_family == "Debian"
+
+- name: "reconfigure zabbix agents | Check zabbix-agent version via rpm (RedHat family)"
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    rpm -q {{ zabbix_agent_daemon_name }} | cut -f3 -d'-' | cut -f1,2 -d'.'
+  args:
+    executable: /bin/bash
+  register: zabbix_agent_version_redhat
+  when: ansible_os_family == "RedHat"
+
+- name: "reconfigure zabbix agents | Check zabbix-agent version via dpkg (Archlinux family)"
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    pacman -Q | grep zabbix-agent | awk '{print $2}' | cut -f1 -d'-' | cut -f1,2 -d'.'
+  args:
+    executable: /bin/bash
+  register: zabbix_agent_version_archlinux
+  when: ansible_os_family == "Archlinux"
+
+- name: "reconfigure zabbix agents | Set fact for zabbix-agent version for (Debian Family)"
+  ansible.builtin.set_fact:
+    zabbix_agent_version: "{{ zabbix_agent_version_debian }}"
+  when: ansible_os_family == "Debian"
+
+- name: "reconfigure zabbix agents | Set fact for zabbix-agent version for (RedHat family)"
+  ansible.builtin.set_fact:
+    zabbix_agent_version: "{{ zabbix_agent_version_redhat }}"
+  when: ansible_os_family == "RedHat"
+
+- name: "reconfigure zabbix agents | Set fact for zabbix-agent version for (Archlinux family)"
+  ansible.builtin.set_fact:
+    zabbix_agent_version: "{{ zabbix_agent_version_archlinux }}"
+  when: ansible_os_family == "Archlinux"
+
+- name: "reconfigure zabbix agents | Zabbix agent version debug"
+  ansible.builtin.debug:
+    var: zabbix_agent_version
+  when: debug_mode
+
+- name: "reconfigure zabbix agents | Change hostMetadata in zabbix configs (if some services/platforms detected)"
+  ansible.builtin.lineinfile:
+    dest: "/etc/zabbix/{{ zabbix_agent_conf_name }}.conf"
+    regexp: "{{ item.var }}="
+    line: "{{ item.var }}={{ item.value }}"
+  with_items:
+    - { var: "HostMetadata", value: "{{ zabbix_host_metadata }}" }
+  when: zabbix_agent_version.stdout is defined and zabbix_host_metadata != "Linux" and
+    zabbix_agent_version.stdout | int >= 2.2
+
+- name: "reconfigure zabbix agents | Set EnableRemoteCommands/AllowKey line in zabbix configs"
+  ansible.builtin.set_fact:
+    remote_cmd_key: AllowKey
+    remote_cmd_value: system.run[*]
+  when: zabbix_agent_version.stdout is defined and zabbix_agent_version.stdout | int >= 5.0
+
+- name: "reconfigure zabbix agents | Change user parameters in configs"
+  ansible.builtin.lineinfile:
+    dest: "/etc/zabbix/{{ zabbix_agent_conf_name }}.conf"
+    regexp: "{{ item.var }}"
+    line: "{{ item.var }},{{ item.value }}"
+  with_items:
+    - { var: "UserParameter=hostmetadata", value: "echo '{{ zabbix_host_metadata }}'"}
+  notify:
+    - restart zabbix-agent svc
+    - restart zabbix-agent sysv
+  when: zabbix_agent_version.stdout is defined and zabbix_agent_version.stdout | int >= 2.2
+
+- name: "reconfigure zabbix agents | Check AllowRoot parameter exists in the config"
+  ansible.builtin.command: grep -Fq "# AllowRoot=" "/etc/zabbix/{{ zabbix_agent_conf_name }}.conf"
+  register: checkpath
+  ignore_errors: True
+  changed_when: False
+
+- name: "reconfigure zabbix agents | Change AllowRoot parameter in config (if exists)"
+  ansible.builtin.lineinfile:
+    dest: "/etc/zabbix/{{ zabbix_agent_conf_name }}.conf"
+    regexp: "{{ item.var }}="
+    line: "{{ item.var }}={{ item.value }}"
+    insertafter: "{{ item.insafter }}"
+    backrefs: True
+  with_items:
+    - { var: "AllowRoot", insafter: "# AllowRoot=0", value: "1" }
+  notify:
+    - restart zabbix-agent svc
+    - restart zabbix-agent sysv
+  when: zabbix_agent_version.stdout is defined and zabbix_agent_version.stdout | int >= 2.2 and checkpath.rc == 0
+
+- name: "reconfigure zabbix agents | Check zabbix_agent_conf includes directory"
+  ansible.builtin.stat:
+    path: "/etc/zabbix/{{ zabbix_agent_conf_name }}.d"
+  register: conf_incl_folder
+
+- name: "reconfigure zabbix agents | Create zabbix_agent_conf includes directory"
+  ansible.builtin.file:
+    path: "/etc/zabbix/{{ zabbix_agent_conf_name }}.d"
+    state: directory
+    mode: 0755
+    group: root
+    owner: root
+  when: not conf_incl_folder.stat.exists
+
+- name: "reconfigure zabbix agents | Register to delete include files inside of zabbix_agent's config directory"
+  ansible.builtin.find:
+    path: "/etc/zabbix/{{ zabbix_agent_conf_name }}.d/"
+    file_type: any
+    hidden: True
+  register: zabbix_agent_confd_files_to_delete
+  when: zabbix_agent_conf_incl_dir_clean
+
+- name: "reconfigure zabbix agents | Clean-up zabbix_agent_conf includes directory"
+  ansible.builtin.file:
+    state: absent
+    path: "{{ item.path }}"
+  with_items: "{{ zabbix_agent_confd_files_to_delete.files }}"
+  when: zabbix_agent_conf_incl_dir_clean
+
+- name: "reconfigure zabbix agents | Change lines in configs"
+  ansible.builtin.lineinfile:
+    dest: "/etc/zabbix/{{ zabbix_agent_conf_name }}.conf"
+    regexp: "{{ item.var }}="
+    line: "{{ item.var }}={{ item.value }}"
+  with_items:
+    - { var: "ServerActive", value: "{{ zabbix_servers_passive }}" }
+    - { var: "Server", value: "{{ zabbix_servers_passive }}" }
+    - { var: "RefreshActiveChecks", value: "60" }
+    - { var: "Timeout", value: "15" }
+    - { var: "Hostname", value: "{{ ansible_hostname }}" }
+    - { var: "HostMetadataItem", value: "system.uname" }
+    - { var: "{{ remote_cmd_key }}", value: "{{ remote_cmd_value }}" }
+    - { var: "{{ logfile_size_key }}", value: "{{ logfile_size_value }}" }
+    - { var: "Include", value: "/etc/zabbix/{{ zabbix_agent_conf_name }}.d/*.conf" }
+  notify:
+    - restart zabbix-agent svc
+    - restart zabbix-agent sysv
+  when: zabbix_agent_version.stdout is defined and zabbix_agent_version.stdout | int >= 2.2

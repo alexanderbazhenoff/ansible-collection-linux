@@ -1,0 +1,108 @@
+---
+
+bareos_packages:
+  fd:
+    - bareos-filedaemon
+  sd:
+    - bareos-storage
+  dir:
+    - bareos
+    - "{% if use_postgresql %}bareos-database-postgresql{% else %}bareos{% endif %}"
+    - bareos-database-tools
+    - bareos-bconsole
+  webui:
+    - bareos-webui
+  dir_webui:
+    - bareos
+    - bareos-webui
+    - "{% if use_postgresql %}bareos-database-postgresql{% else %}bareos{% endif %}"
+    - bareos-database-tools
+    - bareos-bconsole
+
+bareos_path:
+  fd:
+    - /etc/bareos/bareos-fd.d
+    - /etc/bareos/tray-monitor.d
+    - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
+      {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+  sd:
+    - /etc/bareos/bareos-sd.d
+    - /etc/bareos/tray-monitor.d
+    - "{% if (cleanup_storage_files) %}/var/lib/bareos{% else %}/etc/bareos/bareos-sd.d{% endif %}"
+    - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
+      {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+  dir:
+    - /etc/bareos/bareos-dir.d
+    - /etc/bareos/bareos-dir-export
+    - /etc/bareos/bareos-sd.d
+    - /etc/bareos/tray-monitor.d
+    - /etc/bareos/bareos-fd.d
+    - "{% if (cleanup_storage_files) %}/var/lib/bareos{% else %}/etc/bareos/bareos-sd.d{% endif %}"
+    - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
+      {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+  webui:
+    - /etc/bareos-webui
+    - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
+      {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+  dir_webui:
+    - /etc/bareos/bareos-dir.d
+    - /etc/bareos/bareos-dir-export
+    - /etc/bareos-webui
+    - /etc/bareos/bareos-sd.d
+    - /etc/bareos/tray-monitor.d
+    - /etc/bareos/bareos-fd.d
+    - "{% if (cleanup_storage_files) %}/var/lib/bareos{% else %}/etc/bareos/bareos-sd.d{% endif %}"
+    - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
+      {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+
+bareos_daemons:
+  fd:
+    - bareos-fd
+  sd:
+    - bareos-sd
+  dir:
+    - bareos-sd
+    - bareos-fd
+    - bareos-dir
+  webui:
+    - bareos-sd
+    - bareos-dir
+    - "{% if (ansible_os_family == 'RedHat') %}httpd{% elif (ansible_os_family == 'Debian') %}apache2{% endif %}"
+  dir_webui:
+    - bareos-sd
+    - bareos-fd
+    - bareos-dir
+    - "{% if (ansible_os_family == 'RedHat') %}httpd{% elif (ansible_os_family == 'Debian') %}apache2{% endif %}"
+
+bareos_ports:
+  fd:
+    - 9102
+  sd:
+    - 9103
+  dir:
+    - 9103
+    - 9102
+    - 9101
+  webui:
+    - 9103
+    - 9101
+    - 80
+  dir_webui:
+    - 9103
+    - 9102
+    - 9101
+    - 80
+
+postgresql_packages:
+  debian_psycopg2:
+    - "postgresql{{ '-' ~ postgresql_version | default('') }}"
+    - "python{{ (ansible_python.version.major == 3) | ternary('3', '') }}-psycopg2"
+  debian:
+    - "postgresql{{ '-' ~ postgresql_version | default('') }}"
+  redhat_psycopg2:
+    - epel-release
+    - "postgresql{{ postgresql_version | default('') }}-server"
+    - "python{{ ansible_python.version.major }}-psycopg2"
+  redhat:
+    - epel-release
+    - "postgresql{{ postgresql_version | default('') }}-server"

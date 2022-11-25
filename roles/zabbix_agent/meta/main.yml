@@ -1,0 +1,31 @@
+galaxy_info:
+  role_name: zabbix_agent
+  namespace: alexanderbazhenoff
+  author: Aleksandr Bazhenov
+  description: Installs zabbix agent and configure services, apps and platform autodiscovery.
+  license: MIT-0
+  min_ansible_version: 2.9.0
+  platforms:
+    - name: Ubuntu
+      versions:
+        - trusty
+        - xenial
+        - bionic
+        - focal
+        - jammy
+    - name: Debian
+      versions:
+        - bullseye
+        - buster
+        - stretch
+        - jessie
+    - name: ArchLinux
+      versions:
+        - all
+  galaxy_tags:
+    - monitoring
+    - zabbix
+    - infrastructure
+    - services
+    - discovery
+dependencies: []

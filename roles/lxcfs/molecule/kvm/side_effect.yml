@@ -1,0 +1,24 @@
+---
+
+- name: Side Effect
+  hosts: all
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    - name: "kvm >>> side effect | Include variable(s) for testing"
+      ansible.builtin.include_vars:
+        file: defaults/main.yml
+
+    - name: "kvm >>> side effect | Include lxc role"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.lxcfs
+      vars:
+        lxc_technology: lxcfs
+
+    - name: "kvm >>> side effect | Check {{ lxc_technology }} daemon"
+      include_tasks: verifications/check_daemon.yml
+
+    - name: "kvm >>> side effect | Check container creation"
+      include_tasks: verifications/check_lxc_main_functions.yml

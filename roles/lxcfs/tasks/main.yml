@@ -1,0 +1,34 @@
+---
+
+- name: "main | Include add fedora cloud repo (CentOS)"
+  include: add_fedora_cloud_repo_{{ ansible_distribution | lower }}{{ ansible_distribution_major_version | int }}.yml
+  when: ansible_distribution == "CentOS"
+
+- name: "main | install packages"
+  include: install_packages.yml
+
+- name: "main | Include change lxc-net"
+  include: change_lxc_net.yml
+  when: not ansible_check_mode
+
+- name: "main | append lines to /etc/lxc/default.conf"
+  include: append_default_lxc_conf.yml
+  when: append_default_lxc_config | length > 0 and not ansible_check_mode
+
+- name: "main | check host is lxc-ready"
+  ansible.builtin.command: lxc-checkconfig | grep -v "CONFIG_NF_NAT_IPV" | grep "missing"
+  register: lxc_errors
+  changed_when: lxc_errors.stdout | length == 0
+  when: check_host_is_lxc_ready
+
+- name: "main | Fail when host is not lxc-ready verification required, but didn't pass"
+  ansible.builtin.assert:
+    that:
+      - lxc_errors.stdout | length > 0
+    fail_msg: |
+      Is host lxc-ready checking enabled, but didn't pass. Please check your lxc-checkconfig command output:
+      {{ lxc_errors.stdout }}
+  when: check_host_is_lxc_ready
+
+- name: "main | Enable daemons"
+  include: enable_daemons.yml

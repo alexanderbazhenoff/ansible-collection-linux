@@ -1,0 +1,28 @@
+---
+
+- name: Side effect
+  hosts: all
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    - name: "default >>> side effect | Include zabbix_agent role to perform clean install of agent v1"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.zabbix_agent
+      vars:
+        zabbix_servers_passive: 127.0.0.1
+        zabbix_servers_active: 127.0.0.1:10051
+        agent_version: 5.0
+        force_install_agent_v1: True
+
+    - name: "default >>> side effect | Check there is no zabbix_agent2, but zabbix_agent process is running"
+      ansible.builtin.shell: "{{ item }}"   # noqa command-instead-of-shell
+      with_items:
+        - pgrep zabbix_agent2 || true
+        - ps aux | grep "zabbix_agent" | grep -v "grep"
+      args:
+        executable: /bin/bash
+      changed_when: False
+      register: zabbix_agent2_found
+      failed_when: zabbix_agent2_found | trim | length == 0

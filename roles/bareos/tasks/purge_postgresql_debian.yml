@@ -1,0 +1,24 @@
+---
+
+- name: "purge postgresql debian | Purge PostgreSQL server (and psycopg2)"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: absent
+    autoremove: True
+    purge: True
+  with_items:
+    - "{{ postgresql_packages |
+      json_query((ansible_os_family | lower) + (install_psycopg2 | ternary('_psycopg2', ''))) }}"
+
+- name: "purge postgresql debian | Remove PostgreSQL asc key and related files and folders"
+  ansible.builtin.file:
+    path: "{{ item | trim }}"
+    state: absent
+  with_items:
+    - /etc/apt/keyrings/dgdg.asc
+    - "/var/lib/postgresql/{{ postgresql_version }}"
+
+- name: "purge postgresql debian | Install debian repository"
+  ansible.builtin.apt_repository:
+    repo: "{{ postgresql_debian_repo }}"
+    state: absent

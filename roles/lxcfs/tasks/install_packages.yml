@@ -1,0 +1,11 @@
+---
+
+- name: "install packages | (debug) List packages for linux distribution"
+  ansible.builtin.debug:
+    msg: "{{ lxc_packages | json_query((ansible_distribution | lower) + ansible_distribution_major_version) }}"
+
+- name: "install packages | Install packages depending on linux distribution"
+  ansible.builtin.package:
+    name: "{{ item }}"
+  with_items:
+    - "{{ lxc_packages | json_query((ansible_distribution | lower) + ansible_distribution_major_version) }}"

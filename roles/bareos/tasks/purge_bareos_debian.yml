@@ -1,0 +1,10 @@
+---
+
+- name: "purge bareos debian | Cleanup Bareos packages depending on components to install selection"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: absent
+    autoremove: True
+    purge: True
+  with_items:
+    - "{{ bareos_packages | json_query(bareos_components) + install_additional_bareos_packages }}"

@@ -1,0 +1,104 @@
+---
+
+### Main role variables:
+
+# Role action to be performed. Possible values:
+#
+# install - install Bareos components,
+# uninstall - uninstall Bareos components,
+# access - create user profile to access Bareos Web UI,
+# add_cleint - add already installed client (Bareos file daemon) on Bareos server.
+role_action: install
+
+# Bareos components to install or uninstall:
+#
+# fd = Bareos file daemon
+# sd = Bareos Storage Daemon
+# dir = Bareos director
+# webui = Bareos Web UI
+# dir_webui = Bareos director and Web UI
+bareos_components: fd
+
+# Perform clean installation
+clean_install: True
+
+# Bareos release, e.g: 21, 20, 19.2, 18.2, etc (https://download.bareos.org/bareos/release/)
+bareos_release: 21
+
+# Bareos repository URL prefix to download from
+bareos_url: https://download.bareos.org/bareos/release/
+
+# More output for troubleshooting
+debug_mode: False
+
+
+### Firewall related parameters:
+
+# Add firewall rules (ufw or firewalld):
+firewall_control: True
+
+
+### Bareos related parameters:
+
+# Cleanup Bareos storage files on install or uninstall:
+cleanup_storage_files: True
+
+# Additional Bareos packages to install: [] or 	bareos-traymonitor, bareos-vmware-plugin etc...
+install_additional_bareos_packages:
+  - bareos-traymonitor
+
+# List of additional configs to copy on components install. Performs copying items from item.source to item.destination
+# with item.owner, item.group and item.mode, otherwise set this list to []
+bareos_configs_to_copy:
+  - source: etc/
+    destination: /etc
+    owner: bareos
+    group: bareos
+
+# Default access credentials for Web UI access for role_action == 'access'.
+#
+# All available profiles are stored in the directory /etc/bareos/bareos-dir.d/profile
+# More info: https://www.bareos.com/bareos-webui-installation-and-configuration/
+webui_username: Admin
+webui_password: admin
+# Access profile, e.g: webui-admin, webui-readonly, webui-limited, operator
+webui_profile: webui-admin
+webui_tls_enable: False
+
+# Default data to add client on Bareos server.
+#
+# Component name to display on Bareos server. If undefined FQDN or hostname will be taken.
+add_component_name: ''
+# Password to connect with Bareos server. If empty the random password will be generated.
+add_component_password: ''
+# Length of the password to generate.
+add_component_password_gen_length: 16
+# Use TLS to connect between storage and server.
+add_component_tls_enable: False
+# Bareos server IP address or hostname:
+add_component_server: 127.0.0.1
+
+
+### Database related parameters:
+
+# If you wish to use already preinstalled PostgreSQL. Mysql or Sqlite installations not supported in this role.
+preinstalled_postgresql: False
+# Enable to use Bareos with PostgreSQL, disable for sqlite.
+use_postgresql: True
+# PostgreSQL version to install by this role. Leave it '' for default version.
+postgresql_version: 14
+# Install psycopg2: https://pypi.org/project/psycopg2/
+install_psycopg2: True
+# Download PostgreSQL repository URL prefix.
+postgresql_url: https://download.postgresql.org/pub/
+postgresql_debian_key_url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+postgresql_debian_keys_dir: /etc/apt/keyrings
+postgresql_debian_key_destination: "{{ postgresql_debian_keys_dir }}/pgdg.asc"
+postgresql_debian_apt_repo_url_prefix: http://apt.postgresql.org/pub/repos/apt/
+postgresql_debian_repo: >
+  deb [signed-by={{ postgresql_debian_key_destination }}] {{ postgresql_debian_apt_repo_url_prefix }}
+  {{ ansible_distribution_release }}-pgdg main
+# PostgreSQL default user to init bareos database. Change when required for your custom database setup only.
+postgresql_become_user: postgres
+# Call database and tables creation scripts (required for old versions of Bareos)
+init_bareos_database: False

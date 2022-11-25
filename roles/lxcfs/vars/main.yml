@@ -1,0 +1,31 @@
+---
+
+lxc_packages:
+  centos7:
+    - lxc
+    - "{{ lxc_technology }}"
+    - bridge-utils
+    - dnsmasq
+    - debootstrap
+    - lxc-templates
+    - fuse
+    - libcap-devel
+    - libcgroup
+  ubuntu18:
+    - lxc
+    - "{{ lxc_technology }}"
+    - bridge-utils
+    - debootstrap
+    - lxc-templates
+    - fuse
+    - libcap-dev
+    - cgroup-bin
+  ubuntu20:
+    - lxc
+    - "{{ lxc_technology }}"
+    - bridge-utils
+    - debootstrap
+    - lxc-templates
+    - fuse
+    - libcap-dev
+    - cgroup-tools

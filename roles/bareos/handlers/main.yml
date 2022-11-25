@@ -1,0 +1,17 @@
+---
+
+- name: bconsole reload
+  ansible.builtin.command:
+    cmd: echo 'reload' | bconsole
+  register: bconsole_reload_results
+  ignore_errors: True
+  changed_when: not bconsole_reload_results.failed and bconsole_reload_results is defined and
+    'reloaded' in bconsole_reload_results.stdout
+  failed_when: not ('reloaded' in bconsole_reload_results.stdout) or bconsole_reload_results.failed
+
+- name: bareos daemons restart
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - "{{ bareos_daemons | json_query(bareos_components) }}"

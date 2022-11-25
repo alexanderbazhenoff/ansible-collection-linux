@@ -1,0 +1,17 @@
+---
+
+- name: Converge
+  hosts: bareos_servers
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    - name: "default >>> converge | Include bareos role to install bareos-dir, -ui, -fd and -sd"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.bareos
+      vars:
+        role_action: install
+        bareos_components: dir_webui
+        init_bareos_database: "{{ (ansible_distribution == 'CentOS') }}"
+        debug_mode: True

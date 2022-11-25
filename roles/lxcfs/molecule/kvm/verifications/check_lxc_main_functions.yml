@@ -1,0 +1,89 @@
+---
+
+# Anisble community.general includes lxc-python2 module to control, but it's a bit deprecated to use with python2:
+# https://docs.ansible.com/ansible/latest/collections/community/general/lxc_container_module.html
+# Testing with shell commands is a bit easier. Also --no-validate option to skip key checking is deprecated option on
+# Ubuntu 20.04 packages.
+
+- name: "verifications >>> check lxc main functions | Create lxc-instance container"
+  ansible.builtin.command: |
+    lxc-create -n lxc-instance -t download -- --dist ubuntu --release focal --arch amd64
+  environment:
+    DOWNLOAD_KEYSERVER: keyserver.ubuntu.com
+  register: lxc_create_results
+  changed_when: lxc_create_results.rc == 0
+  ignore_errors: True
+
+- name: "verifications >>> check lxc main functions | Start lxc-instance container"
+  ansible.builtin.command: lxc-start lxc-instance
+  register: lxc_start_results
+  changed_when: lxc_start_results.rc == 0
+  ignore_errors: True
+
+- name: "verifications >>> check lxc main functions | Wait for IP address obtaining and ping"  # noqa no-handler
+  block:
+    - name: "| Wait for container IP address obtaining"
+      ansible.builtin.command: lxc-ls lxc-instance -f
+      register: lxc_ls_results
+      changed_when: False
+      until:
+        - lxc_ls_results.stdout | length > 0
+        - ((lxc_ls_results.stdout.split('\n')[1] | regex_replace(' {1,}', ',')).split(',') | list)[4] | length > 1
+      delay: 3
+      retries: 40
+
+    - name: "| Set fact for container IP"
+      ansible.builtin.set_fact:
+        lxc_ip: "{{ ((lxc_ls_results.stdout.split('\n')[1] | regex_replace(' {1,}', ',')).split(',') | list)[4] }}"
+
+    - name: "Ping container IP"
+      block:
+        - name: "|| Ping container IP {{ lxc_ip }}"
+          ansible.builtin.command: ping {{ lxc_ip }} -c 1 -W 1
+          register: ping_results
+          changed_when: False
+          until: ping_results.rc == 0
+          delay: 1
+          retries: 20
+      when: lxc_ip | length > 1
+
+    - name: "verifications >>> check lxc main functions | Set fact from container params"
+      ansible.builtin.set_fact:
+        lxc_params: "{{ (lxc_ls_results.stdout.split('\n')[1] | regex_replace(' {1,}', ',')).split(',') | list }}"
+
+    - name: "verifications >>> check lxc main functions | Stop lxc-instance container"
+      ansible.builtin.command: lxc-stop lxc-instance
+      register: lxc_stop_results
+      changed_when: lxc_stop_results.rc == 0
+      ignore_errors: True
+  when: lxc_start_results.changed
+
+- name: "verifications >>> check lxc main functions | Destroy lxc-instance container"  # noqa no-handler
+  ansible.builtin.command: lxc-destroy lxc-instance
+  register: lxc_destroy_results
+  changed_when: lxc_destroy_results.rc == 0
+  ignore_errors: True
+  when: lxc_create_results.changed
+
+- name: "verifications >>> check lxc main functions | Check if lxc main functions works properly"
+  ansible.builtin.assert:
+    that:
+      - lxc_create_results.changed
+      - lxc_start_results.changed is defined and lxc_start_results.changed
+      - lxc_params[1] is defined and lxc_params[1] == "RUNNING"
+      - lxc_params[2] is defined and lxc_params[2] | int == 1
+      - lxc_params[4] is defined and lxc_params[4] | length > 1
+      - lxc_params[6] is defined and not lxc_params[6] | bool
+      - lxc_stop_results.changed is defined and lxc_stop_results.changed
+      - lxc_destroy_results.changed is defined and lxc_destroy_results.changed
+    fail_msg: >
+      Error. Check params and states:
+      lxc-create: {{ lxc_create_results.changed }},
+      Unprivileged: {{ lxc_params[6] | default('unknown') }},
+      lxc-start: {{ lxc_start_results.changed }},
+      Container state: {{ lxc_params[1] | default('unknown') }},
+      IP address: {{ lxc_params[4] | default('unknown') }},
+      lxc-stop: {{ lxc_stop_results.changed | default('skipped') }},
+      lxc-destroy: {{ lxc_destroy_results.changed | default('skipped') }}
+    success_msg: >
+      Assertions passed. Main lxc functions works properly.

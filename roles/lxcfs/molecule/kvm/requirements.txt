@@ -1,0 +1,5 @@
+jmespath
+libvirt-python
+molecule-libvirt
+molecule
+molecule[ansible-lint]

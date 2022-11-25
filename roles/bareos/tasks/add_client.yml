@@ -1,0 +1,70 @@
+---
+
+- name: "add client | Get fqdn or hostname for add_component_name when undefined"
+  ansible.builtin.set_fact:
+    add_component_name: >-
+      {% if (ansible_fqdn | length > 0) %}{{ ansible_fqdn }}{% else %}{{ ansible_hostname }}{% endif %}
+  when: add_component_name | length == 0
+
+- name: "add client | Cleanup previous client configs (clean install)"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  register: cleanup_client_configs_results
+  with_items:
+    - "/etc/bareos/bareos-dir.d/client/{{ add_component_name }}.conf"
+    - "/etc/bareos/bareos-dir-export/client/{{ add_component_name }}"
+  when: clean_install
+  delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
+
+- name: "add client | bconsole configure add {{ role_action.split('_') | last }}"
+  ansible.builtin.shell: >-
+    set -o pipefail;
+    echo 'reload' | bconsole;
+    echo 'configure add client name={{ add_component_name }} address={{ ansible_default_ipv4.address }}
+    password={% if (add_component_password | length > 0) %}{{ add_component_password }}{% else -%}
+    {{ lookup('password', '/dev/null length={{ add_component_password_gen_length | int }} chars=ascii_letters') -}}
+    {% endif %}
+    tlsenable={{ add_component_tls_enable | lower }}' | bconsole;
+    echo 'reload' | bconsole
+  args:
+    executable: /bin/bash
+  register: bconsole_add_results
+  changed_when: not bconsole_add_results.failed
+  failed_when: (bconsole_add_results.stdout is defined and 'configure error:' in bconsole_add_results.stdout) or
+    (bconsole_add_results.stdout is defined and bconsole_add_results.stdout |
+    regex_search('Resource.*with name.*already exists')) or bconsole_add_results.failed
+  delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
+  no_log: "{{ not (debug_mode | default(False)) }}"
+
+- name: "add client | (debug) bconsole cinfigure add results"
+  ansible.builtin.debug:
+    var: bconsole_add_results.stdout
+  when: (debug_mode | default(False)) and bconsole_add_results.stdout is defined
+
+- name: "add client | Insert TLS option in export content of the config on Bareos server"
+  ansible.builtin.lineinfile:
+    path: "/etc/bareos/bareos-dir-export/client/{{ add_component_name }}/bareos-fd.d/director/bareos-dir.conf"
+    insertbefore: '^}'
+    line: "  TlsEnable = {{ add_component_tls_enable | lower }}"
+  delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
+
+- name: "add client | Get export content of the config from Bareos server"
+  ansible.builtin.slurp:
+    src: "/etc/bareos/bareos-dir-export/client/{{ add_component_name }}/bareos-fd.d/director/bareos-dir.conf"
+  register: bareos_export_config_data
+  delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
+
+- name: "add client | (debug) Show export content of the config from Bareos server"
+  ansible.builtin.debug:
+    msg: "{{ bareos_export_config_data.content | b64decode }}"
+  when: debug_mode | default(False)
+
+- name: "add client | Export content of the config"
+  ansible.builtin.copy:
+    content: "{{ bareos_export_config_data.content | b64decode }}"
+    dest: /etc/bareos/bareos-fd.d/director/bareos-dir.conf
+    force: True
+    mode: 0640
+    owner: bareos
+    group: bareos

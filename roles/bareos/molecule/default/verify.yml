@@ -1,0 +1,41 @@
+---
+
+- name: Verify
+  hosts: bareos_servers
+  gather_facts: True
+  become: False
+
+  tasks:
+
+    ### DEBUG SECTION (uncomment to troubleshoot)
+    #
+    # - name: "default >>> verify | Pause to troubleshoot"
+    #   ansible.builtin.pause:
+    #     prompt: "Make sure everything was installed"
+
+    - name: "default >>> verify | Save get_url to file"
+      ansible.builtin.get_url:
+        url: "http://127.0.0.1/bareos-webui/"
+        dest: "/tmp/{{ inventory_hostname }}_bareos_ansible_molecule_testing"
+        mode: 0644
+        force: True
+      register: get_url_request_results
+
+    - name: "default >>> verify | Read get_url file content"
+      ansible.builtin.slurp:
+        src: "/tmp/{{ inventory_hostname }}_bareos_ansible_molecule_testing"
+      register: read_get_url_results
+
+    - name: "default >>> verify | Assert Bareos Web UI is working"
+      ansible.builtin.assert:
+        that:
+          - not get_url_request_results.failed
+          - read_get_url_results.content is defined and read_get_url_results.content | b64decode |
+            regex_search('value=.localhost-dir.+')
+        fail_msg: |
+          Error. {% if get_url_request_results.failed -%}
+          {{ inventory_hostname }} request: {% if (get_url_request_results.status_code is defined) -%}
+          {{ get_url_request_results.status_code }}{% else %}(unknown HTTP code){% endif %}{% endif %}
+          {% if (read_get_url_results.content is defined and read_get_url_results.content | b64decode |
+          regex_search('value=.localhost-dir.+')) %}Wrong webpage content. Is it Bareos login page?{% endif %}
+      when: inventory_hostname in groups["bareos_servers"]

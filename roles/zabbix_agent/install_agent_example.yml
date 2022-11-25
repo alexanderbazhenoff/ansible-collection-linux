@@ -1,0 +1,12 @@
+---
+
+### This is the example yml for Zabbix role
+
+- hosts: zabbix_clients
+  become: True
+  become_method: sudo
+  roles:
+    - role: alexanderbazhenoff.linux.zabbix_agent
+      install_v2_agent: True
+      force_install_agent_v1: False
+      customize_agent_only: False

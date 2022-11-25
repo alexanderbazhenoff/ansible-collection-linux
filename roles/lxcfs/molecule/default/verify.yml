@@ -1,0 +1,60 @@
+---
+
+- name: Verify
+  hosts: all
+  gather_facts: True
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    - name: "default >>> verify | Include default(s) for testing"
+      ansible.builtin.include_vars:
+        file: defaults/main.yml
+
+    - name: "default >>> verify | Include variable(s) for testing"
+      ansible.builtin.include_vars:
+        file: ../../vars/main.yml
+
+    - name: "default >>> verify | Set fact of installed packages"
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: "default >>> verify | Set fact for packages list to check"
+      ansible.builtin.set_fact:
+        packages_list: "{{ item }}"
+      with_items:
+        - "{{ lxc_packages | json_query((ansible_distribution | lower) + ansible_distribution_major_version) }}"
+
+    - name: "default >>> verify | Assert when package(s) not installed"
+      ansible.builtin.assert:
+        that:
+          - item in ansible_facts.packages
+        fail_msg: |
+          Error. {{ item }} wasn't installed on the system.
+      with_items:
+        - "{{ packages_list }}"
+
+    - name: "default >>> verify | Get active status of the daemon"  # noqa command-instead-of-module
+      ansible.builtin.command: systemctl is-active {{ lxc_technology }}
+      register: daemon_is_active_results
+      until: daemon_is_active_results.stdout == 'active'
+      delay: 3
+      retries: 20
+      ignore_errors: True
+      changed_when: False
+
+    - name: "default >>> verify | Get enabled status of the daemon"   # noqa command-instead-of-module
+      ansible.builtin.command: systemctl is-enabled {{ lxc_technology }}
+      register: daemon_is_enabled_results
+      ignore_errors: True
+      changed_when: False
+
+    - name: "default >>> verify | Assert when {{ lxc_technology }} is enabled and active"
+      ansible.builtin.assert:
+        that:
+          - daemon_is_active_results.stdout == 'active'
+          - daemon_is_enabled_results.stdout == 'enabled'
+        fail_msg: |
+          Error. {{ lxc_technology }} states: {{ daemon_is_enabled_results.stdout }} /
+          {{ daemon_is_active_results.stdout }}

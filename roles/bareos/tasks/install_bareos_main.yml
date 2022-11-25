@@ -1,0 +1,85 @@
+---
+
+- name: "install bareos main | Set fact for Bareos repo URL"
+  ansible.builtin.set_fact:
+    bareos_repo_url: >-
+      {% if (ansible_distribution == "CentOS") -%}
+      {{ bareos_url }}{{ bareos_release }}/{{ ansible_distribution }}_{{ ansible_distribution_major_version -}}
+      {% endif -%}
+      {% if (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 10) -%}
+      {{ bareos_url }}{{ bareos_release }}/{{ ansible_distribution }}_{{ ansible_distribution_major_version -}}
+      {% elif (ansible_distribution == "Debian" and ansible_distribution_major_version | int <= 9) -%}
+      {{ bareos_url }}{{ bareos_release }}/{{ ansible_distribution }}_{{ ansible_distribution_major_version -}}
+      .0{% endif -%}
+      {% if (ansible_distribution == "Ubuntu") -%}
+      {{ bareos_url }}{{ bareos_release }}/x{{ ansible_distribution }}_{{ ansible_distribution_major_version -}}
+      .04{% endif %}
+
+- name: "install bareos main | (debug) Show repo URL"
+  ansible.builtin.debug:
+    var: bareos_repo_url
+  when: debug_mode | default(False)
+
+- name: "install bareos main | Include add bareos repo tasks"
+  ansible.builtin.include_tasks: "add_bareos_repo_{{ ansible_os_family | lower }}.yml"
+
+- name: "install bareos main | Install packages depending on components to install and additional packages list"
+  ansible.builtin.package:
+    name: "{{ item }}"
+  with_items:
+    - "{{ bareos_packages | json_query(bareos_components) + install_additional_bareos_packages }}"
+  notify:
+    - bareos daemons restart
+  register: bareos_pkgs_results
+  until: bareos_pkgs_results is succeeded
+  retries: 5
+  delay: 5
+
+- name: "install bareos main | Copy missing directors.ini and configuration.ini config (Debian family)"
+  ansible.builtin.template:
+    src: "{{ item.source }}"
+    dest: "{{ item.destination }}"
+    mode: 0644
+  with_items:
+    - { source: directors.ini, destination: /etc/bareos-webui/directors.ini }
+    - { source: configuration.ini, destination: /etc/bareos-webui/configuration.ini }
+  when: ansible_os_family == 'Debian' and bareos_components == 'dir_webui'
+
+- name: "install bareos main | Set facts for firewall rule(s)"
+  ansible.builtin.set_fact:
+    firewalld_rules_state: enabled
+    ufw_rules_state: allow
+
+- name: "install bareos main | Include firewall control tasks to enable connection(s)"
+  ansible.builtin.include_tasks: firewall_control.yml
+  when: firewall_control and role_action == 'uninstall'
+
+# (To avoid python interpreter redefine it was done without ansible.posix.seboolean module)
+- name: "install bareos main | Enable httpd connect if selinux is enabled"
+  ansible.builtin.command:
+    cmd: setsebool -P httpd_can_network_connect on
+  register: setsebool_results
+  changed_when: not setsebool_results.failed
+  when: bareos_components | regex_search('webui') and ansible_facts.selinux.status == 'enabled' and
+    ansible_os_family == 'RedHat'
+
+- name: "install bareos main | Create bareos database, make bareos tables, grant privileges"
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    su {{ postgresql_become_user }} -c /usr/lib/bareos/scripts/create_bareos_database
+    su {{ postgresql_become_user }} -c /usr/lib/bareos/scripts/make_bareos_tables
+    su {{ postgresql_become_user }} -c /usr/lib/bareos/scripts/grant_bareos_privileges
+  args:
+    executable: /bin/bash
+  register: pgsql_user_and_database_create_and_grant_results
+  changed_when: not pgsql_user_and_database_create_and_grant_results.failed
+  when: init_bareos_database
+
+- name: "install bareos main | Enable and start daemons via systemctl (RedHat)"
+  ansible.builtin.command:
+    cmd: "{% if (ansible_os_family == 'RedHat') %}systemctl enable --now {{ item }}{% endif %}"
+  with_items:
+    - "{{ bareos_daemons | json_query(bareos_components) }}"
+  register: systemctl_results
+  changed_when: not systemctl_results.failed
+  when: ansible_os_family == 'RedHat'

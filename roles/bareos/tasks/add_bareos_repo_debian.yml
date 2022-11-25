@@ -1,0 +1,35 @@
+---
+
+- name: "add bareos repo debian | Install gnupg2 and apt-transport-https"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: True
+  with_items:
+    - gnupg2
+    - apt-transport-https
+  register: pkgs_apt_results
+  until: pkgs_apt_results is succeeded
+  retries: 5
+  delay: 5
+
+- name: "add bareos repo debian | Add Bareos GPG key"
+  ansible.builtin.apt_key:
+    url: "{{ bareos_repo_url | trim }}/Release.key"
+    state: present
+
+- name: "add bareos repo debian | Get bareos.list file"
+  ansible.builtin.get_url:
+    url: "{{ bareos_repo_url | trim }}/bareos.list"
+    dest: /etc/apt/sources.list.d/bareos.list
+    mode: 0644
+    owner: root
+    group: root
+
+- name: "add bareos repo debian | Update apt packages cache"
+  ansible.builtin.apt:
+    update_cache: True
+  register: apt_cache_results
+  until: apt_cache_results is succeeded
+  retries: 5
+  delay: 5

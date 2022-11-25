@@ -1,0 +1,50 @@
+---
+
+- name: "append default lxc conf | Append config string to dict"
+  ansible.builtin.set_fact:
+    apply_config_dict: "{{ dict(_keys | zip(_vals)) }}"
+  vars:
+    _arr: "{{ append_default_lxc_config.split('\n') | map('trim') | select() | list }}"
+    _keys: "{{ _arr | map('regex_replace', '^(.*?)=(.*)$', '\\1') | map('trim') | list }}"
+    _vals: "{{ _arr | map('regex_replace', '^(.*?)=(.*)$', '\\2') | map('trim') | list }}"
+
+- name: "append default lxc conf | Register existing lxc config"
+  ansible.builtin.command: cat /etc/lxc/default.conf
+  register: existing_config_raw
+  changed_when: existing_config_raw.stdout
+
+- name: "append default lxc conf | Set fact of existing lxc config"
+  ansible.builtin.set_fact:
+    existing_config: "{{ existing_config_raw.stdout }}\n"
+
+- name: "append default lxc conf | Existing lxc config string to dict"
+  ansible.builtin.set_fact:
+    existing_config_dict: "{{ dict(_keys | zip(_vals)) }}"
+  vars:
+    _arr: "{{ existing_config.split('\n') | map('trim') | select() | list }}"
+    _keys: "{{ _arr | map('regex_replace', '^(.*?)=(.*)$', '\\1') | map('trim') | list }}"
+    _vals: "{{ _arr | map('regex_replace', '^(.*?)=(.*)$', '\\2') | map('trim') | list }}"
+
+- name: "append default lxc conf | Re-arrange apply and existing configs dicts"
+  ansible.builtin.set_fact:
+    new_config: >
+      {{ existing_config_dict | combine(apply_config_dict) }}
+
+- name: "append default lxc conf | edit new config"
+  ansible.builtin.set_fact:
+    new_config_string: "{{ new_config.keys() | zip(new_config.values()) | map('join', ' = ') | join('\n') }}"
+
+- name: "append default lxc conf | Remove old config"
+  ansible.builtin.file:
+    path: /etc/lxc/default.conf
+    state: absent
+
+
+- name: "append default lxc conf | Save new config"
+  ansible.builtin.blockinfile:
+    path: /etc/lxc/default.conf
+    block: "{{ new_config_string }}"
+    create: True
+    mode: 0644
+    owner: root
+    group: root

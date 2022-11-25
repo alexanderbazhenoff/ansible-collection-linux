@@ -1,0 +1,7 @@
+Console {
+  Name = {{ webui_username }}
+  Password = "{{ webui_password }}"
+  Profile = "{{ webui_profile }}"
+  TLS Enable = {% if webui_tls_enable %}Yes{% else %}No{% endif %}
+
+}

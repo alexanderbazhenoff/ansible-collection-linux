@@ -1,0 +1,23 @@
+---
+
+- name: "purge postgresql redhat | Remove repository key"
+  ansible.builtin.rpm_key:
+    key: "{{ postgresql_url }}repos/yum/RPM-GPG-KEY-PGDG"
+    state: absent
+    validate_certs: False
+
+- name: "purge postgresql redhat | Purge PostgreSQL server package"
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: absent
+    autoremove: True
+  with_items:
+    - "{{ postgresql_packages |
+      json_query((ansible_os_family | lower) + (install_psycopg2 | ternary('_psycopg2', ''))) }}"
+
+- name: "purge postgresql redhat | Cleanup PostgreSQL-related files and folders"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "/var/lib/pgsql/{{ postgresql_version }}/data"

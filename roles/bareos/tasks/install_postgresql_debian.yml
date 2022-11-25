@@ -1,0 +1,34 @@
+---
+
+- name: "install postgresql debian | Create folder for keyring"
+  ansible.builtin.file:
+    path: "{{ postgresql_debian_keys_dir }}"
+    state: directory
+    mode: 0755
+
+- name: "install postgresql debian | Install package signing key"
+  ansible.builtin.get_url:
+    url: "{{ postgresql_debian_key_url }}"
+    dest: "{{ postgresql_debian_key_destination }}"
+    mode: 0755
+    validate_certs: False
+  register: postgresql_apt_key_results
+  until: postgresql_apt_key_results is succeeded
+  retries: 5
+  delay: 5
+
+- name: "install postgresql debian | Install debian repository"
+  ansible.builtin.apt_repository:
+    repo: "{{ postgresql_debian_repo }}"
+    update_cache: True
+
+- name: "install postgresql debian | Install PostgreSQL server packages"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ postgresql_packages |
+      json_query((ansible_os_family | lower) + (install_psycopg2 | ternary('_psycopg2', ''))) }}"
+  register: postgresql_apt_results
+  until: postgresql_apt_results is succeeded
+  retries: 5
+  delay: 5

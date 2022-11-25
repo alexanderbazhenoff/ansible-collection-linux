@@ -1,0 +1,24 @@
+---
+
+- name: Converge
+  hosts: bareos_servers
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    - name: "default >>> prepare | Create postgres group"
+      ansible.builtin.group:
+        name: postgres
+        state: present
+
+    - name: "default >>> prepare | Create postgres user"
+      ansible.builtin.user:
+        name: postgres
+        groups:
+          - postgres
+          - "{% if (ansible_os_family == 'RedHat') %}wheel{% elif (ansible_os_family == 'Debian') %}sudo{% endif %}"
+        comment: PostgreSQL administrator
+        state: present
+        shell: /bin/bash
+        home: /var/lib/postgresql

@@ -1,0 +1,1 @@
+# This Bareos installation was performed by bareos ansible role.

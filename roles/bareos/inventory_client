@@ -1,0 +1,32 @@
+[clients]
+## specify hosts for init_new_hypervisor.yml
+## e.g.
+## 10.10.1.1
+## 10.10.1.2
+## hostname.domain
+10.10.1.2
+
+[server]
+10.10.1.1
+
+[clients:vars]
+ansible_connection=ssh
+ansible_become_user=root
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+## Specify username, userpassword, rootpassword
+## of all virtual machines here
+ansible_ssh_user=
+ansible_ssh_pass=
+ansible_become_pass=
+
+[server:vars]
+ansible_connection=ssh
+ansible_become_user=root
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+## Specify username, userpassword, rootpassword
+## of all virtual machines here
+ansible_ssh_user=
+ansible_ssh_pass=
+ansible_become_pass=

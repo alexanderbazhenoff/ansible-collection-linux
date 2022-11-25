@@ -1,0 +1,34 @@
+---
+
+- name: Verify
+  hosts: all
+  gather_facts: False
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    - name: "kvm >>> verify | Include default(s) for testing"
+      ansible.builtin.include_vars:
+        file: defaults/main.yml
+
+    - name: "kvm >>> verify | Include variable(s) for testing"
+      ansible.builtin.include_vars:
+        file: ../../vars/main.yml
+
+    # TROUBLESHOOTING SECTION
+    # (uncomment to debug)
+    #
+    #  - name: "kvm >> verify | (debug) Get binaries in /usr/bin directory"
+    #    ansible.builtin.command: ls /usr/bin
+    #    register: ls_results
+    #
+    #  - name: "kvm >> verify | (debug) Show binaries in /usr/bin directory"
+    #    debug:
+    #      msg: "{{ ls_results }}"
+
+    - name: "kvm >>> side effect | Check {{ lxc_technology }} daemon"
+      include_tasks: verifications/check_daemon.yml
+
+    - name: "kvm >>> verify | Check container creation"
+      include_tasks: verifications/check_lxc_main_functions.yml

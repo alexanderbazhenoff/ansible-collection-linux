@@ -1,0 +1,21 @@
+---
+### ansible linter config
+###
+### more details:
+### - https://ansible-lint.readthedocs.io/en/latest/configuring/#configuration-file
+### Please keep in mind how to skip rule inside a playbook/role:
+### - https://ansible-lint.readthedocs.io/en/latest/rules/#false-positives-skipping-rules
+
+exclude_paths:
+  - .idea/
+  - .git/
+  - .scripts/
+  - .gilab-ci.yml
+  - .gitignore
+  - .gitmodules
+quiet: True
+verbosity: 1
+
+# skip_list:
+# enable_list:
+# warn_list:

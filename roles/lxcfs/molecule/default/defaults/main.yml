@@ -1,0 +1,15 @@
+---
+
+# Containers technology: lxc or lxcfs
+lxc_technology: lxc
+
+# Disable if you want to connect with host bridge, pass-through, etc..
+use_lxc_default_net: False
+
+# Check host is ready for lxc usage
+check_host_is_lxc_ready: False
+
+# Lines to append to default lxc config
+append_default_lxc_config: |
+  lxc.start.auto = 1
+  lxc.start.delay = 8

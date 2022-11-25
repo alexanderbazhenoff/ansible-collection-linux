@@ -1,0 +1,65 @@
+---
+
+dependency:
+  name: galaxy
+  options:
+    ignore-certs: True
+    ignore-errors: True
+driver:
+  name: delegated
+  qemu_path: /usr/bin/qemu-system-x86_64
+  images_path: /var/lib/libvirt/images/ansible
+platforms:
+  - name: centos7-instance
+    selinux_relabel: True
+    base_image: https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+    config_vm: True
+    no_log: False
+    become_pass: 12345678
+  - name: ubuntu1804-instance
+    base_image: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
+    config_vm: True
+    no_log: False
+    become_pass: 12345678
+    extra_vol: {'vdb':'2G'}
+    upload_files:
+      - local_path: files/50-cloud-init.yaml
+        remote_path: /etc/netplan/50-cloud-init.yaml
+  - name: ubuntu2004-instance
+    base_image: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+    config_vm: True
+    no_log: False
+    become_pass: 12345678
+    extra_vol: {'vdb':'2G'}
+    upload_files:
+      - local_path: files/50-cloud-init.yaml
+        remote_path: /etc/netplan/50-cloud-init.yaml
+scenario:
+  test_sequence:
+    - dependency
+    - lint
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - verify
+    - destroy
+    - create
+    - prepare
+    - side_effect
+    - destroy
+provisioner:
+  name: ansible
+  env:
+    PY_COLORS: '1'
+    ANSIBLE_FORCE_COLOR: '1'
+lint: |
+    export ANSIBLE_ROLES_PATH=${MOLECULE_PROJECT_DIRECTORY}/..
+    export PY_COLORS=1
+    export ANSIBLE_FORCE_COLOR=1
+    yamllint .
+    ansible-lint .
+    flake8 .
+verifier:
+  name: ansible

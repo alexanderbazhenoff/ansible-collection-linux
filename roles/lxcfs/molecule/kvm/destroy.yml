@@ -1,0 +1,20 @@
+---
+
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: False
+
+  tasks:
+
+    - name: "kvm >>> create | Call instance deletion job"
+      include_tasks: files/destroy_vm.yml
+      vars:
+        vm_name: "mlcl-{{ item.name }}"
+      loop: "{{ molecule_yml.platforms }}"
+      no_log: "{{ item.no_log | default(True) }}"
+
+    - name: "kvm >>> create | Remove instance config from disk"
+      ansible.builtin.file:
+        path: "{{ molecule_instance_config }}"
+        state: absent

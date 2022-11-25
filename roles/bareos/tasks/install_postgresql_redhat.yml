@@ -1,0 +1,53 @@
+---
+
+- name: "install postgresql redhat | Install repository key"
+  ansible.builtin.rpm_key:
+    key: "{{ postgresql_url }}repos/yum/RPM-GPG-KEY-PGDG"
+    state: present
+    validate_certs: False
+
+- name: "install postgresql redhat | Install repository package"
+  ansible.builtin.yum:
+    name: |
+      {{ postgresql_url }}repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-{{ ansible_architecture -}}
+      /pgdg-redhat-repo-latest.noarch.rpm
+    validate_certs: False
+  register: pgsql_repo_yum_results
+  until: pgsql_repo_yum_results is succeeded
+  retries: 5
+  delay: 5
+
+- name: "install postgresql redhat | Install epel-release for libzstd dependency download"
+  ansible.builtin.yum:
+    name: epel-release
+  register: epel_yum_results
+  until: epel_yum_results is succeeded
+  retries: 5
+  delay: 5
+
+- name: "install postgresql redhat | Install PostgreSQL server packages (RedHat)"
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    update_cache: True
+  with_items:
+    - "{{ postgresql_packages |
+      json_query((ansible_os_family | lower) + (install_psycopg2 | ternary('_psycopg2', ''))) }}"
+  register: postgresql_yum_results
+  until: postgresql_yum_results is succeeded
+  retries: 5
+  delay: 5
+
+- name: "install postgresql redhat | Check PostgreSQL data directory files"
+  ansible.builtin.find:
+    paths: /var/lib/pgsql/{{ postgresql_version }}/data
+  register: postgresql_data_files_found
+
+- name: "install postgresql redhat | Init database"
+  ansible.builtin.command:
+    cmd: |
+      {% if (ansible_distribution_major_version | int >= 7) -%}
+      /usr/pgsql-{{ postgresql_version }}/bin/postgresql-{{ postgresql_version }}-setup initdb{% else -%}
+      /sbin/service postgresql-{{ postgresql_version }} initdb{% endif %}
+  register: init_db_results
+  changed_when: not init_db_results.failed
+  when: postgresql_data_files_found.matched == 0

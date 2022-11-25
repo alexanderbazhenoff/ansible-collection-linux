@@ -1,0 +1,29 @@
+---
+
+# An example playbook to test and troubleshoot on developing. Try also:
+# rm -f *.tar.gz; ansible-galaxy collection build; ansible-galaxy collection install $(ls -1 | grep ".tar.gz") -f
+# ansible-playbook -i roles/bareos/inventory roles/bareos/install_bareos_fd_example.yml
+
+- hosts: all
+  become: True
+  become_method: sudo
+  gather_facts: True
+
+  tasks:
+
+    - name: "install bareos fd example | Include bareos role to install file daemon"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.bareos
+      vars:
+        bareos_components: fd
+        role_action: install
+      when: inventory_hostname in groups["clients"]
+
+    - name: "install bareos fd example | Include bareos role to add file daemon to Bareos server"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.bareos
+      vars:
+        role_action: add_client
+        add_component_server: "{{ groups.server[0] }}"
+        debug_mode: True
+      when: inventory_hostname in groups["clients"]

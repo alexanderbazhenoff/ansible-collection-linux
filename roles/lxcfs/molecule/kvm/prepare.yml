@@ -1,0 +1,48 @@
+---
+
+- name: Prepare
+  hosts: all
+  gather_facts: True
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    - name: "default >>> prepare | Install epel_repo (CentOS)"
+      ansible.builtin.yum:
+        name: epel-release
+      when: ansible_distribution == "CentOS"
+
+    - name: "default >>> prepare | Update yum cache (CentOS)"
+      ansible.builtin.yum:
+        update_cache: True
+      when: ansible_distribution == "CentOS"
+
+    - name: "default >> prepare | Prepare /dev/vdb and update apt cache (Ubuntu)"
+      block:
+        - name: "| Create ext4 partition on /dev/vdb for the tests"
+          community.general.parted:
+            device: /dev/vdb
+            number: 1
+            state: present
+            fs_type: ext4
+        - name: "Create a ext4 filesystem on /dev/vdb1"
+          community.general.filesystem:
+            fstype: ext4
+            dev: /dev/vdb1
+        - name: "| Make /var/lib/lxc folder for /dev/vdb mount"
+          ansible.builtin.file:
+            path: /var/lib/lxc
+            state: directory
+            mode: 0644
+        - name: "| Mount /dev/vdb"
+          ansible.posix.mount:
+            path: /var/lib/lxc
+            src: /dev/vdb1
+            fstype: ext4
+            opts: defaults
+            state: mounted
+        - name: "| Update apt cache (Ubuntu)"
+          ansible.builtin.apt:
+            update_cache: True
+      when: ansible_distribution == "Ubuntu"

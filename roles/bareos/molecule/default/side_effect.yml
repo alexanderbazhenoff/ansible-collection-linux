@@ -1,0 +1,53 @@
+---
+
+- name: Converge
+  hosts: all
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    ### DEBUG SECTION (uncomment to troubleshoot)
+    #
+    # - name: "default >>> verify | Pause to troubleshoot"
+    #   ansible.builtin.pause:
+    #     prompt: "Make sure everything was installed"
+
+    - name: "default >>> side_effect | Include bareos role to install bareos-client"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.bareos
+      vars:
+        role_action: install
+        bareos_components: fd
+        clean_install: False
+        debug_mode: True
+      when: inventory_hostname in groups["bareos_clients"]
+
+    ### DEBUG SECTION (uncomment to troubleshoot)
+    #
+    # - name: "default >>> side_effect | (debug) Show params on delegating hosts"
+    #   ansible.builtin.debug:
+    #     msg: "grep by {{ ansible_hostname }} on the host {{ hostvars[inventory_hostname].bareos_dir }}"
+    #   delegate_to: "{{ hostvars[inventory_hostname].bareos_dir }}"
+    #   delegate_facts: True
+    #   when: inventory_hostname in groups["bareos_clients"]
+
+    - name: "default >>> side_effect | Include bareos role to add bareos-client on bareos-dir"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.bareos
+      vars:
+        role_action: add_client
+        add_component_server: "{{ hostvars[inventory_hostname].bareos_dir }}"
+        debug_mode: True
+      when: inventory_hostname in groups["bareos_clients"]
+
+    - name: "default >>> side_effect | Check client was added on the server"
+      ansible.builtin.command:
+        cmd: "echo 'list clients' | bconsole | grep {{ ansible_hostname }}"
+      register: check_client_on_server_results
+      changed_when: False
+      failed_when: check_client_on_server_results.stdout is defined and
+        check_client_on_server_results.stdout | length == 0
+      delegate_to: "{{ hostvars[inventory_hostname].bareos_dir }}"
+      delegate_facts: True
+      when: inventory_hostname in groups["bareos_clients"]

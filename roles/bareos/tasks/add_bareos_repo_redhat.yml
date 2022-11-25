@@ -1,0 +1,16 @@
+---
+
+- name: "add bareos repo redhat | Add GPG key"
+  ansible.builtin.rpm_key:
+    key: "{{ bareos_repo_url | trim }}/RPM-GPG-KEY"
+    state: present
+    validate_certs: False
+
+- name: "add bareos repo redhat | Get bareos.repo file"
+  ansible.builtin.get_url:
+    url: "{{ bareos_repo_url | trim }}/bareos.repo"
+    dest: /etc/yum.repos.d/bareos.repo
+    validate_certs: False
+    mode: 0644
+    owner: root
+    group: root

@@ -1,0 +1,26 @@
+FROM archlinux:base-devel
+
+USER root
+WORKDIR /root
+
+# Install python, sudo and switch default target from graphical to multi-user.
+# Download packages directly without pacman due to pacman bug with error message:
+# 'could not find or read directory: /var/lib/pacman/'. So it's not possible to install in Dockerfile using pacman.
+# Check this: https://bbs.archlinux.org/viewtopic.php?id=191861
+# and https://unix.stackexchange.com/questions/34606/pacman-could-not-find-database
+RUN PYTHON_DL=python-3.9.9-1-x86_64.pkg.tar.zst && \
+    SUDO_DL=sudo-1.9.9-2-x86_64.pkg.tar.zst && \
+    curl -LO "https://archive.archlinux.org/packages/p/python/$PYTHON_DL" && \
+    curl -LO "https://archive.archlinux.org/packages/s/sudo/$SUDO_DL" && \
+    bsdtar -C / -xvf "$PYTHON_DL" && \
+    bsdtar -C / -xvf "$SUDO_DL" && \
+    systemctl set-default multi-user.target && \
+    python --version && \
+    cd /var/lib/pacman/sync && \
+    curl -LO "https://geo.mirror.pkgbuild.com/community/os/x86_64/community.db" && \
+    curl -LO "https://geo.mirror.pkgbuild.com/core/os/x86_64/core.db" && \
+    curl -lO "https://geo.mirror.pkgbuild.com/extra/os/x86_64/extra.db"
+
+VOLUME [ "/sys/fs/cgroup" ]
+
+CMD ["/lib/systemd/systemd"]

@@ -1,0 +1,20 @@
+---
+
+- name: "firewall control | Add firewalld rule(s) (Centos)"
+  ansible.posix.firewalld:
+    port: "{{ item }}/tcp"
+    permanent: True
+    immediate: True
+    state: "{{ firewalld_rules_state | default('disabled') }}"
+  with_items:
+    - "{{ bareos_ports | json_query(bareos_components) }}"
+  when: firewall_control and ansible_distribution == 'CentOS' and firewalld_state == 'running'
+
+- name: "firewall control | Add ufw rule(s) (Ubuntu)"
+  community.general.ufw:
+    rule: "{{ ufw_rules_state | default('reject') }}"
+    port: "{{ item }}"
+    proto: tcp
+  with_items:
+    - "{{ bareos_ports | json_query(bareos_components) }}"
+  when: firewall_control and ansible_distribution == 'Ubuntu'

@@ -1,0 +1,7 @@
+[flake8]
+ignore = E126,E131,E501,E303,E302,W391,W503,W292
+exclude =
+    .git,
+    __pycache__,
+    .venv
+    .tests_tmpl

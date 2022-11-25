@@ -1,0 +1,28 @@
+galaxy_info:
+  role_name: bareos
+  namespace: alexanderbazhenoff
+  author: Aleksandr Bazhenov
+  description: Install and configure Bareos components.
+  license: MIT-0
+  min_ansible_version: 2.9.0
+  platforms:
+    - name: Ubuntu
+      versions:
+        - trusty
+        - xenial
+        - bionic
+        - focal
+        - jammy
+    - name: Debian
+      versions:
+        - bullseye
+        - buster
+        - stretch
+        - jessie
+  galaxy_tags:
+    - bareos
+    - linux
+    - backup
+    - infrastructure
+    - services
+dependencies: []

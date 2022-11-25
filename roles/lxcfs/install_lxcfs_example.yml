@@ -1,0 +1,11 @@
+---
+- hosts: all
+  become: True
+  become_method: sudo
+  gather_facts: True
+
+  roles:
+
+    - role: lxcfs
+      lxc_technology: lxcfs
+      use_lxc_default_net: False

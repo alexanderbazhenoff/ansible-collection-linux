@@ -1,0 +1,35 @@
+---
+
+# Containers technology: lxc or lxcfs
+lxc_technology: lxc
+# Check host is ready for lxc usage
+check_host_is_lxc_ready: True
+
+
+### lxc-net settings ###
+
+# Disable if you want to connect with host bridge, pass-through, etc..
+use_lxc_default_net: False
+# Default lxc-net settings:
+lxc_default_net_bridge: "lxcbr0"
+lxc_default_net_addr: "10.0.3.1"
+lxc_default_net_netmask: "255.255.255.0"
+lxc_default_net_network: "10.0.3.0/24"
+lxc_default_net_dhcp_range: "10.0.3.2,10.0.3.254"
+lxc_default_net_dhcp_max: "253"
+
+
+### Default container settings ###
+
+# Lines to append to default lxc config
+append_default_lxc_config: |
+  lxc.net.0.type = veth
+  lxc.net.0.link = br0
+  lxc.net.0.name = eth0
+  lxc.net.0.flags = up
+  lxc.net.0.hwaddr = 00:16:3e:xx:xx:xx
+  lxc.net.0.veth.pair = 111-lxc
+  lxc.net.0.ipv4.address = 10.10.1.200/24
+  lxc.net.0.ipv4.gateway = 10.10.1.1
+  lxc.start.auto = 1
+  lxc.start.delay = 8

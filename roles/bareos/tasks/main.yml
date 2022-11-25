@@ -1,0 +1,65 @@
+---
+
+- name: "main | Check firewalld is running (Centos)"   # noqa command-instead-of-module
+  ansible.builtin.command: systemctl is-active firewalld
+  ignore_errors: True
+  register: firewalld_state
+  changed_when: False
+  when: (role_action == 'install' or role_action == 'uninstall') and ansible_distribution == 'CentOS'
+
+- name: "main | Cleanup Bareos component(s)"
+  block:
+    - name: "| Include cleanup bareos tasks"
+      ansible.builtin.include_tasks: "purge_bareos_{{ ansible_os_family | lower }}.yml"
+    - name: "| Cleanup Bareos-related files and folders"
+      ansible.builtin.file:
+        path: "{{ item | trim }}"
+        state: absent
+      with_items:
+        - "{{ bareos_path | json_query(bareos_components) }}"
+  when: (clean_install and role_action == 'install') or role_action == 'uninstall'
+
+- name: "main | Cleanup PostgreSQL"
+  ansible.builtin.include_tasks: "purge_postgresql_{{ ansible_os_family | lower }}.yml"
+  when: bareos_components | regex_search('dir') and role_action | regex_search('install') and clean_install and
+    not preinstalled_postgresql
+
+- name: "main | Cleanup firewall rules (or configure to reject connections)"
+  ansible.builtin.include_tasks: firewall_control.yml
+  when: firewall_control and role_action == 'uninstall'
+
+- name: "main | Install postgresql database"
+  ansible.builtin.include_tasks: install_postgresql_main.yml
+  when: bareos_components | regex_search('dir') and not preinstalled_postgresql and role_action == 'install'
+
+- name: "main | Install Bareos component(s)"
+  ansible.builtin.include_tasks: install_bareos_main.yml
+  when: role_action == 'install'
+
+- name: "install bareos main | Copy additional bareos configs"
+  ansible.builtin.copy:
+    src: "{{ item.source }}"
+    dest: "{{ item.destination }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: 0644
+  with_items:
+    - "{{ bareos_configs_to_copy }}"
+  notify:
+    - bareos daemons restart
+  when: (role_action == 'install' or role_action == 'copy_configs' ) and bareos_configs_to_copy | length > 0
+
+- name: "main | Create Bareos Web UI access profile"
+  ansible.builtin.template:
+    src: console.conf.j2
+    dest: /etc/bareos/bareos-dir.d/console/{{ webui_username }}.conf
+    mode: 0644
+    owner: bareos
+    group: bareos
+  notify:
+    - bconsole reload
+  when: role_action == 'access'
+
+- name: "main | Add client on Bareos server"
+  ansible.builtin.include_tasks: add_client.yml
+  when: role_action == 'add_client'

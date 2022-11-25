@@ -1,0 +1,16 @@
+---
+
+- name: Converge
+  hosts: all
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    - name: "default >>> converge | Include variable(s) for testing"
+      ansible.builtin.include_vars:
+        file: defaults/main.yml
+
+    - name: "default >>> converge | Include lxc role"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.lxcfs
