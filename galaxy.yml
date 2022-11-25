@@ -1,20 +1,21 @@
 namespace: alexanderbazhenoff
 name: linux
-version: 1.0.1
+version: 1.0.3
 readme: README.md
 authors:
 - Aleksandr Bazhenov <>
-description: Common linux setup
+description: Various roles for Linux
 license:
 - MIT-0
 tags:
   - linux
   - monitoring
   - containers
+  - backup
 dependencies:
   "community.general": "*"
-repository: https://github.com/alexanderbazhenoff/ansible-collection-common_linux
-documentation: https://github.com/alexanderbazhenoff/ansible-collection-common_linux
-homepage: https://galaxy.ansible.com/alexanderbazhenoff/common_linux
-issues: https://github.com/alexanderbazhenoff/ansible-collection-common_linux/issues
+repository: https://github.com/alexanderbazhenoff/ansible-collection-linux
+documentation: https://github.com/alexanderbazhenoff/ansible-collection-linux/wiki
+homepage: https://galaxy.ansible.com/alexanderbazhenoff/ansible-collection-linux
+issues: https://github.com/alexanderbazhenoff/ansible-collection-linux/issues
 build_ignore: []
