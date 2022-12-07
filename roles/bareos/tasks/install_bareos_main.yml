@@ -73,7 +73,7 @@
     executable: /bin/bash
   register: pgsql_user_and_database_create_and_grant_results
   changed_when: not pgsql_user_and_database_create_and_grant_results.failed
-  when: init_bareos_database
+  when: bareos_components | regex_search('dir') and init_bareos_database
 
 - name: "install bareos main | Enable and start daemons via systemctl (RedHat)"
   ansible.builtin.command:
