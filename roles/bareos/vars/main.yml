@@ -65,8 +65,6 @@ bareos_daemons:
     - bareos-fd
     - bareos-dir
   webui:
-    - bareos-sd
-    - bareos-dir
     - "{% if (ansible_os_family == 'RedHat') %}httpd{% elif (ansible_os_family == 'Debian') %}apache2{% endif %}"
   dir_webui:
     - bareos-sd
