@@ -3,8 +3,9 @@
 - name: "add client | Get fqdn or hostname for add_component_name when undefined"
   ansible.builtin.set_fact:
     add_component_name: >-
-      {% if (ansible_fqdn | length > 0) %}{{ ansible_fqdn }}{% else %}{{ ansible_hostname }}{% endif %}
-  when: add_component_name | length == 0
+      {% if ansible_fqdn is not none and ansible_fqdn | length > 0 %}{{ ansible_fqdn }}{% else %}{{ ansible_hostname -}}
+      {% endif %}
+  when: add_component_name is not none and add_component_name | length == 0
 
 - name: "add client | Cleanup previous client configs (clean install)"
   ansible.builtin.file:
@@ -22,7 +23,8 @@
     set -o pipefail;
     echo 'reload' | bconsole;
     echo 'configure add client name={{ add_component_name }} address={{ ansible_default_ipv4.address }}
-    password={% if (add_component_password | length > 0) %}{{ add_component_password }}{% else -%}
+    password={% if add_component_password is not none and add_component_password | length > 0 -%}
+    {{ add_component_password }}{% else -%}
     {{ lookup('password', '/dev/null length={{ add_component_password_gen_length | int }} chars=ascii_letters') -}}
     {% endif %}
     tlsenable={{ add_component_tls_enable | lower }}' | bconsole;
