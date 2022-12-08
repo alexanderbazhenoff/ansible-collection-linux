@@ -5,7 +5,7 @@
     add_component_name: >-
       {% if ansible_fqdn is not none and ansible_fqdn | length > 0 %}{{ ansible_fqdn }}{% else %}{{ ansible_hostname -}}
       {% endif %}
-  when: add_component_name is not none and add_component_name | length == 0
+  when: add_component_name is none or add_component_name | length == 0
 
 - name: "add client | Cleanup previous client configs (clean install)"
   ansible.builtin.file:
