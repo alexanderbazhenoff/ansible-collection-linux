@@ -70,3 +70,5 @@
     mode: 0640
     owner: bareos
     group: bareos
+  notify:
+    - bareos daemons restart
