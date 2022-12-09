@@ -62,4 +62,4 @@
 
 - name: "main | Add client on Bareos server"
   ansible.builtin.include_tasks: add_client.yml
-  when: role_action == 'add_client'
+  when: role_action == 'add_client' and bareos_components == 'fd'
