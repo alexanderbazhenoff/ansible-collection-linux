@@ -1,0 +1,16 @@
+Client {
+  Name = {{ add_component_name }}-fd
+  Maximum Concurrent Jobs = {{ add_component_max_jobs | default('1') }}
+  TLS Enable = {% if webui_tls_enable %}Yes{% else %}No{% endif %}
+
+  # remove comment from "Plugin Directory" to load plugins from specified directory.
+  # if "Plugin Names" is defined, only the specified plugins will be loaded,
+  # otherwise all storage plugins (*-fd.so) from the "Plugin Directory".
+  #
+  # Plugin Directory = /usr/lib64/bareos/plugins
+  # Plugin Names = ""
+
+  # if compatible is set to yes, we are compatible with bacula
+  # if set to no, new bareos features are enabled which is the default
+  # compatible = yes
+}
