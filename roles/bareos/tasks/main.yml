@@ -47,7 +47,7 @@
     - "{{ bareos_configs_to_copy }}"
   notify:
     - bareos daemons restart
-  when: (role_action == 'install' or role_action == 'copy_configs' ) and bareos_configs_to_copy | length > 0
+  when: (role_action == 'install' or role_action == 'copy_configs') and bareos_configs_to_copy | length > 0
 
 - name: "main | Create Bareos Web UI access profile"
   ansible.builtin.template:
@@ -59,6 +59,14 @@
   notify:
     - bconsole reload
   when: role_action == 'access'
+  
+- name: "main | Revoke Bareos Web UI access profile"
+  ansible.builtin.file:
+    path: /etc/bareos/bareos-dir.d/console/{{ webui_username }}.conf
+    state: absent
+  notify:
+    - bconsole reload
+  when: role_action == 'revoke_access' and webui_username | length > 0
 
 - name: "main | Add client on Bareos server"
   ansible.builtin.include_tasks: add_client.yml
