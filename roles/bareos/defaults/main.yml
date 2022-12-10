@@ -7,7 +7,8 @@
 # install - install Bareos components,
 # uninstall - uninstall Bareos components,
 # access - create user profile to access Bareos Web UI,
-# add_cleint - add already installed client (Bareos file daemon) on Bareos server.
+# revoke_access - revoke user profile access to Bareos Web UI,
+# add_cleint - add already installed client (Bareos file daemon support only) on Bareos server.
 role_action: install
 
 # Bareos components to install or uninstall:
