@@ -7,6 +7,8 @@ bareos_packages:
     - bareos-storage
   dir:
     - bareos
+    - bareos-storage
+    - bareos-filedaemon
     - "{% if use_postgresql %}bareos-database-postgresql{% else %}bareos{% endif %}"
     - bareos-database-tools
     - bareos-bconsole
@@ -14,6 +16,8 @@ bareos_packages:
     - bareos-webui
   dir_webui:
     - bareos
+    - bareos-storage
+    - bareos-filedaemon
     - bareos-webui
     - "{% if use_postgresql %}bareos-database-postgresql{% else %}bareos{% endif %}"
     - bareos-database-tools
@@ -22,12 +26,14 @@ bareos_packages:
 bareos_path:
   fd:
     - /etc/bareos/bareos-fd.d
-    - /etc/bareos/tray-monitor.d
+    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% else -%}
+      /etc/bareos/bareos-fd.d{% endif %}"
     - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
       {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
   sd:
     - /etc/bareos/bareos-sd.d
-    - /etc/bareos/tray-monitor.d
+    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% else -%}
+      /etc/bareos/bareos-sd.d{% endif %}"
     - "{% if (cleanup_storage_files) %}/var/lib/bareos{% else %}/etc/bareos/bareos-sd.d{% endif %}"
     - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
       {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
@@ -35,11 +41,13 @@ bareos_path:
     - /etc/bareos/bareos-dir.d
     - /etc/bareos/bareos-dir-export
     - /etc/bareos/bareos-sd.d
-    - /etc/bareos/tray-monitor.d
+    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% else -%}
+      /etc/bareos/bareos-sd.d{% endif %}"
     - /etc/bareos/bareos-fd.d
     - "{% if (cleanup_storage_files) %}/var/lib/bareos{% else %}/etc/bareos/bareos-sd.d{% endif %}"
     - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
       {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+    - /etc/bareos/bconsole.conf
   webui:
     - /etc/bareos-webui
     - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
@@ -49,11 +57,13 @@ bareos_path:
     - /etc/bareos/bareos-dir-export
     - /etc/bareos-webui
     - /etc/bareos/bareos-sd.d
-    - /etc/bareos/tray-monitor.d
+    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% else -%}
+      /etc/bareos/bareos-sd.d{% endif %}"
     - /etc/bareos/bareos-fd.d
     - "{% if (cleanup_storage_files) %}/var/lib/bareos{% else %}/etc/bareos/bareos-sd.d{% endif %}"
     - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
       {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+    - /etc/bareos/bconsole.conf
 
 bareos_daemons:
   fd:

@@ -52,7 +52,7 @@
 
 - name: "install bareos main | Include firewall control tasks to enable connection(s)"
   ansible.builtin.include_tasks: firewall_control.yml
-  when: firewall_control and role_action == 'uninstall'
+  when: firewall_control and role_action == 'install'
 
 # (To avoid python interpreter redefine it was done without ansible.posix.seboolean module)
 - name: "install bareos main | Enable httpd connect if selinux is enabled"
@@ -60,8 +60,8 @@
     cmd: setsebool -P httpd_can_network_connect on
   register: setsebool_results
   changed_when: not setsebool_results.failed
-  when: bareos_components | regex_search('webui') and ansible_facts.selinux.status == 'enabled' and
-    ansible_os_family == 'RedHat'
+  when: bareos_components | regex_search('webui') and ansible_facts.selinux.status is defined and
+    ansible_facts.selinux.status == 'enabled' and ansible_os_family == 'RedHat'
 
 - name: "install bareos main | Create bareos database, make bareos tables, grant privileges"
   ansible.builtin.shell: |

@@ -1,11 +1,18 @@
 ---
 
-- name: "main | Check firewalld is running (Centos)"   # noqa command-instead-of-module
+- name: "main | Check firewalld is running (CentOS)"   # noqa command-instead-of-module
   ansible.builtin.command: systemctl is-active firewalld
   ignore_errors: True
   register: firewalld_state
   changed_when: False
-  when: (role_action == 'install' or role_action == 'uninstall') and ansible_distribution == 'CentOS'
+  when: role_action | regex_search('install') and ansible_distribution == 'CentOS' and firewall_control
+
+- name: "main | Check ufw exists and running (Ubuntu)"
+  ansible.builtin.command: ufw status
+  ignore_errors: True
+  register: ufw_state
+  changed_when: False
+  when: role_action | regex_search('install') and ansible_distribution == 'Ubuntu' and firewall_control
 
 - name: "main | Cleanup Bareos component(s)"
   block:
@@ -59,7 +66,7 @@
   notify:
     - bconsole reload
   when: role_action == 'access'
-  
+
 - name: "main | Revoke Bareos Web UI access profile"
   ansible.builtin.file:
     path: /etc/bareos/bareos-dir.d/console/{{ webui_username }}.conf

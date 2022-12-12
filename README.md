@@ -13,7 +13,8 @@ apps and platform autodiscovery on
 [Zabbix Server side](https://github.com/alexanderbazhenoff/ansible-collection-linux/tree/main/roles/zabbix_agent#setup-on-zabbix-server-side).
 
 - [**bareos**](roles/bareos/README.md) - Installs and configures [Bareos](https://www.bareos.com/) and third-party
-components, adds Bareos file daemons to Bareos server, create user profiles and uploads configs to Bareos host.
+components, adds Bareos file daemons to Bareos server, create or revoke user profiles and uploads Bareos configs to the
+host (e.g. if you have predefined Bareos server, storage daemon etc).
 
 
 ## Installation.

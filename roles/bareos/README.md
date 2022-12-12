@@ -10,7 +10,7 @@ Normally this role is for the next cases:
 file daemon on the same host and upload predefined configs to `/etc` (optional, see 
 [**bareos_configs_to_copy** variable](#role-variables)). This type of installation is the most ready-to-use (see
 [example playbook](#1-install-bareos-director-web-ui-storage-file-daemon-on-the-same-host) for details).
-- Make client user profile to access Bareos Web UI (see
+- Create or revoke user profile to access Bareos Web UI (see
 [example playbook](#2-make-client-user-profile-to-access-bareos-web-ui) for details).
 - Typical installation of Bareos filedaemon and add them to Bareos director. This type of installation is also
 ready-to-use (check see [**role_action**](#role-variables) variable description and
@@ -117,6 +117,9 @@ speed up).
 
 You can set `webui-admin`, `operator`, `webui-limited` or `webui-readonly` access level (webui_profile)  
 [your profile needs](https://docs.bareos.org/IntroductionAndTutorial/BareosWebui.html#access-control-configuration).
+For revoke access replace the next line:
+
+            role_action: access
 
 If you wish to prompt user and password during playbook execution:
 
@@ -361,6 +364,7 @@ To add file daemon on Bareos server you could define the next variables:
 | add_component_password            | ''        | Password to connect with (leave '' to generate random password).  |
 | add_component_password_gen_length | 16        | Length of the password to generate.                               |
 | add_component_tls_enable          | False     | Use TLS to connect between storage and server.                    |
+| add_component_max_jobs            | 1         | Maximum concurrent jobs on avalialable on file daemon.            |
 | add_component_server              | 127.0.0.1 | Bareos server IP address, hostname or inventory item to delegate. |
 
 #### Database related parameters:

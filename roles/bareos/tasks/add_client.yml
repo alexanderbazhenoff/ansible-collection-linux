@@ -36,8 +36,17 @@
   failed_when: (bconsole_add_results.stdout is defined and 'configure error:' in bconsole_add_results.stdout) or
     (bconsole_add_results.stdout is defined and bconsole_add_results.stdout |
     regex_search('Resource.*with name.*already exists')) or bconsole_add_results.failed
+  ignore_errors: True
+  delegate_facts: True
   delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
   no_log: "{{ not (debug_mode | default(False)) }}"
+
+- name: "add cleint | warn when file daemon client already exists on Bareos server"
+  ansible.builtin.debug:
+    msg: "WARNINIG! {{ add_component_name }} alresy exists on
+      {{ add_component_server | default(ansible_default_ipv4.address) }}. All settings will be overwritten."
+  when: bconsole_add_results.stdout is defined and bconsole_add_results.stdout |
+    regex_search('Resource.*with name.*already exists')
 
 - name: "add client | (debug) bconsole cinfigure add results"
   ansible.builtin.debug:
@@ -72,7 +81,7 @@
     group: bareos
   notify:
     - bareos daemons restart
-  
+
 - name: "add client | Update config on file daemon"
   ansible.builtin.template:
     src: client.conf.j2
