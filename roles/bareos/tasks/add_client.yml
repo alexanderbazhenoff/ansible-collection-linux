@@ -21,7 +21,6 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
-  register: cleanup_client_configs_results
   with_items:
     - "/etc/bareos/bareos-dir.d/client/{{ add_component_name }}.conf"
     - "/etc/bareos/bareos-dir-export/client/{{ add_component_name }}"
