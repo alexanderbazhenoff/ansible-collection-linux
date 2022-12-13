@@ -80,6 +80,8 @@ add_component_tls_enable: False
 add_component_max_jobs: 1
 # Bareos server IP address or hostname:
 add_component_server: 127.0.0.1
+# Force try to add file daemon when already exists
+add_component_force: False
 
 
 ### Database related parameters:

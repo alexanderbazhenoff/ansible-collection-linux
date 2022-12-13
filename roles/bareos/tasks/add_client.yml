@@ -7,6 +7,16 @@
       {% endif %}
   when: add_component_name is none or add_component_name | length == 0
 
+- name: "add client | Get file daemons list from Bareos server"
+  ansible.builtin.shell: >-
+    set -o pipefail;
+    echo 'list clients' | bconsole
+  args:
+    executable: /bin/bash
+  register: bconsole_list_results
+  changed_when: False
+  delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
+
 - name: "add client | Cleanup previous client configs (clean install)"
   ansible.builtin.file:
     path: "{{ item }}"
@@ -15,8 +25,9 @@
   with_items:
     - "/etc/bareos/bareos-dir.d/client/{{ add_component_name }}.conf"
     - "/etc/bareos/bareos-dir-export/client/{{ add_component_name }}"
-  when: clean_install
   delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
+  when: bconsole_list_results.stdout is defined and add_component_name not in bconsole_list_results.stdout and
+    not add_component_force
 
 - name: "add client | bconsole configure add {{ role_action.split('_') | last }}"
   ansible.builtin.shell: >-
@@ -32,26 +43,27 @@
   args:
     executable: /bin/bash
   register: bconsole_add_results
-  changed_when: not bconsole_add_results.failed
   failed_when: (bconsole_add_results.stdout is defined and 'configure error:' in bconsole_add_results.stdout) or
-    (bconsole_add_results.stdout is defined and bconsole_add_results.stdout |
+    (not add_component_force and bconsole_add_results.stdout is defined and bconsole_add_results.stdout |
     regex_search('Resource.*with name.*already exists')) or bconsole_add_results.failed
+  changed_when: not bconsole_add_results.failed
   ignore_errors: True
-  delegate_facts: True
   delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
   no_log: "{{ not (debug_mode | default(False)) }}"
 
-- name: "add cleint | warn when file daemon client already exists on Bareos server"
+- name: "add cleint | Warn when file daemon client already exists on Bareos server"
   ansible.builtin.debug:
-    msg: "WARNINIG! {{ add_component_name }} alresy exists on
-      {{ add_component_server | default(ansible_default_ipv4.address) }}. All settings will be overwritten."
+    msg: "WARNINIG! {{ add_component_name }} already exists on
+      {{ add_component_server | default(ansible_default_ipv4.address) }}, trying to export an existing config."
   when: bconsole_add_results.stdout is defined and bconsole_add_results.stdout |
     regex_search('Resource.*with name.*already exists')
 
-- name: "add client | (debug) bconsole cinfigure add results"
-  ansible.builtin.debug:
-    var: bconsole_add_results.stdout
-  when: (debug_mode | default(False)) and bconsole_add_results.stdout is defined
+- name: "add client | Check file daemon config created or already exists on a server"
+  ansible.builtin.stat:
+    path: "/etc/bareos/bareos-dir-export/client/{{ add_component_name }}/bareos-fd.d/director/bareos-dir.conf"
+  register: check_bareos_fd_config
+  failed_when: not check_bareos_fd_config.stat.exists
+  delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
 
 - name: "add client | Insert TLS option in export content of the config on Bareos server"
   ansible.builtin.lineinfile:
