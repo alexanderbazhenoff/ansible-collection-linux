@@ -45,6 +45,10 @@ Role limitations:
 Bareos components or PostgreSQL are not included in this role.
 - No Bareos resources like devices, storages, jobs, pools are possible to add. Adding these features requires a lots of
 code to be written, so use copy predefined configs instead.
+- Remove file daemon from Bareos server using this role is not possible. Some existing job configs might be linked with
+this filedaemon. Bareos server will not start after force remove until you delete or change this job configs. Anyway
+there is no normal scenario when you want to remove file daemon from the server while you can change job configs and
+optionally disable on Bareos server.
 - Firewall rules will be applied only when firewalld (CentOS) or ufw (Ubuntu) enabled. This will not affect to iptables
 on Debian, so use external or manual iptables control.
 - TLS certificates and setting not supported in this role, but you can copy all required files setting up
@@ -366,6 +370,7 @@ To add file daemon on Bareos server you could define the next variables:
 | add_component_tls_enable          | False     | Use TLS to connect between storage and server.                    |
 | add_component_max_jobs            | 1         | Maximum concurrent jobs on avalialable on file daemon.            |
 | add_component_server              | 127.0.0.1 | Bareos server IP address, hostname or inventory item to delegate. |
+| add_component_force               | False     | Force try to add file daemon when already exists                  |
 
 #### Database related parameters:
 
