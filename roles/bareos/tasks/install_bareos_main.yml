@@ -77,7 +77,7 @@
 
 - name: "install bareos main | Enable and start daemons via systemctl (RedHat)"
   ansible.builtin.command:
-    cmd: "{% if (ansible_os_family == 'RedHat') %}systemctl enable --now {{ item }}{% endif %}"
+    cmd: "systemctl enable --now {{ item }}"
   with_items:
     - "{{ bareos_daemons | json_query(bareos_components) }}"
   register: systemctl_results
