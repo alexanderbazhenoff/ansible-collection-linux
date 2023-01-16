@@ -73,4 +73,5 @@ with detailed information, e.g:
 - Distribution and output of: `ansible --version`.
 - What did you expect?
 - What did you get?
+
 Thank you.
