@@ -1,0 +1,22 @@
+---
+
+- name: "databases | Rename, dump, restore, add or remove databases"
+  community.postgresql.postgresql_db:
+    name: "{{ item.name | mandatory }}"
+    owner: "{{ item.owner | default('') }}"
+    encoding: "{{ item.encoding | default(omit) }}"
+    lc_collate: "{{ item.lc_collate | default(omit) }}"
+    lc_ctype: "{{ item.lc_ctype | default(omit) }}"
+    template: "{{ item.template | default('') }}"
+    conn_limit: "{{ item.conn_limit | default(omit) }}"
+    tablespace: "{{ item.tablespace | default('') }}"
+    target: "{{ item.target | default('') }}"
+    target_opts: "{{ item.target_opts | default('') }}"
+    dump_extra_args: "{{ item.dump_extra_args | default(omit) }}"
+    ssl_mode: "{{ item.ssl_mode | default('prefer') }}"
+    ca_cert: "{{ item.ca_cert | default('') }}"
+    state: "{% if role_action == 'create' %}present{% elif role_action == 'drop' %}absent{% else %}{{ role_action -}}
+      {% endif %}"
+    trust_input: "{{ item.trust_input | default(True) }}"
+  with_items:
+    - "{{ postgresql_databases }}"

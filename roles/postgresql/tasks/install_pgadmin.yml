@@ -1,0 +1,37 @@
+---
+
+- name: "install pgadmin | Install pgadmin4"
+  block:
+    - name: "| Include uninstall pgadmin tasks"
+      ansible.builtin.include_tasks: uninstall_pgadmin.yml
+      when: clean_install
+
+    - name: "| Include pre requirements tasks"
+      ansible.builtin.include_tasks: pre_requirements.yml
+      when: role_subject == 'pgadmin'
+
+    - name: "| Include add pgadmin repo {{ ansible_os_family | lower }} tasks"
+      ansible.builtin.include_tasks: "add_pgadmin_repo_{{ ansible_os_family | lower }}.yml"
+      when: ansible_os_family == 'Debian'
+
+    - name: "| Include pgadmin packages {{ ansible_os_family | lower }} tasks"
+      ansible.builtin.include_tasks: "pgadmin_packages_{{ ansible_os_family | lower }}.yml"
+
+    - name: "| Include firewall control {{ ansible_os_family | lower }} tasks"
+      ansible.builtin.include_tasks: "includes_misc/firewall_control_{{ ansible_os_family | lower }}.yml"
+      when: not check_pgadmin_repo_url_results.failed and pgadmin_installation_type is defined and
+        pgadmin_installation_type != 'desktop'
+
+    - name: "| Install packages depending on detected package manager"
+      ansible.builtin.include_tasks: "pkg_management/install_{{ ansible_pkg_mgr }}.yml"
+
+    - name: "| Init pgadmin"
+      ansible.builtin.shell: "{{ pgadmin_init_cmd }}"   # noqa command-instead-of-shell
+      environment:
+        PGADMIN_SETUP_PASSWORD: "{{ pgadmin_password }}"
+        PGADMIN_SETUP_EMAIL: "{{ pgadmin_email }}"
+      register: init_pgadmin_results
+      changed_when: "'You can now start using pgAdmin' in init_pgadmin_results.stdout"
+      failed_when: not ("'You can now start using pgAdmin' in init_pgadmin_results.stdout")
+      when: not check_pgadmin_repo_url_results.failed
+  when: ansible_os_family != 'Alpine'

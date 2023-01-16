@@ -1,0 +1,50 @@
+---
+
+- name: "install server alpine | Install packages depending on detected package manager"
+  ansible.builtin.include_tasks: "pkg_management/install_{{ ansible_pkg_mgr }}.yml"
+
+- name: "install server alpine | Create {{ postgresql_become_user }} group"
+  ansible.builtin.group:
+    name: "{{ postgresql_become_user }}"
+
+- name: "install server alpine | Create {{ postgresql_become_user }} user"
+  ansible.builtin.user:
+    name: "{{ postgresql_become_user }}"
+    group: "{{ postgresql_become_user }}"
+    shell: /bin/sh
+    home: "{{ postgresql_data_path }}"
+    comment: PostgreSQL user (ansible role managed)
+
+- name: "install server alpine | Check data directory exists"
+  ansible.builtin.find:
+    paths: "{{ postgresql_data_path }}"
+  register: postgresql_data_dir_found
+
+- name: "install server alpine | Create database directory"
+  ansible.builtin.file:
+    path: "{{ postgresql_data_path }}"
+    state: directory
+    owner: "{{ postgresql_become_user }}"
+    mode: 0700
+    recurse: True
+  when: postgresql_data_dir_found.matched == 0
+
+- name: "install server alpine | Create unix socket directory"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ postgresql_become_user }}"
+    mode: 0755
+  with_items:
+    - "{{ default_socket_path }}"
+    - /usr/local/share/postgresql
+
+- name: "install server alpine | Init database"
+  ansible.builtin.command:
+    cmd:
+      su {{ postgresql_become_user }} -c 'initdb -D {{ postgresql_data_path }}'
+  environment:
+    LANG: "en_US.utf8"
+  register: init_db_results
+  changed_when: not init_db_results.failed
+  when: postgresql_data_dir_found.matched == 0

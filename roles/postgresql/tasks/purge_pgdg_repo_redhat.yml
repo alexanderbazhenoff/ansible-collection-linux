@@ -1,0 +1,7 @@
+---
+
+- name: "purge pgdg repo redhat | Remove repository key"
+  ansible.builtin.rpm_key:
+    key: "{{ postgresql_url }}repos/yum/RPM-GPG-KEY-PGDG"
+    state: absent
+    validate_certs: False

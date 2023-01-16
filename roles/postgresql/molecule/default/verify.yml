@@ -1,0 +1,21 @@
+---
+
+- name: Verify
+  hosts: all
+  gather_facts: True
+  become: False
+
+  tasks:
+
+#  DEBUG SECTION (uncomment to troubleshoot)
+#    - name: "default >>> verify | Pause to troubleshoot"
+#      ansible.builtin.pause:
+#        prompt: "Make sure everything was installed"
+
+    - name: "default >>> verify | Check dumping database complete"
+      ansible.builtin.lineinfile:
+        dest: /tmp/test_db.dir
+        line: "-- PostgreSQL database dump complete"
+      check_mode: True
+      register: dump_complete_line_results
+      failed_when: dump_complete_line_results.changed

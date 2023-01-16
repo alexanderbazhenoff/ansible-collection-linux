@@ -27,9 +27,9 @@ galaxy or clone from github.
 2. Set-up your zabbix server IPs and other params in [defaults/main.yml](defaults/main.yml). If you need to add your
 custom daemon discovery (something you usually do like `systemctl start my-app-daemon`), add it in the 'daemon hashes'
 section.
-3. Fill-up [inventory file](inventory) or prepare your
+3. Fill-up [inventory file](examples/inventory) or prepare your
 [connection method](https://docs.ansible.com/ansible/latest/user_guide/connection_details.html) then call the role
-from [install_agent_example.yml](install_agent_example.yml). Or call this role other way in your ansible playbooks
+from [install_agent_example.yml](examples/install_agent_example.yml). Or call this role other way in your ansible playbooks
 according to [examples below](#Example-Playbook).
 
 Requirements

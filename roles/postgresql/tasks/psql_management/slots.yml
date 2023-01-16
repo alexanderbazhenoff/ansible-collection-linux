@@ -1,0 +1,15 @@
+---
+
+- name: "slots | Add or remove replication slots from a database"
+  community.postgresql.postgresql_slot:
+    name: "{{ item.name | mandatory }}"
+    db: "{{ item.db | default(omit) }}"
+    immediately_reserve: "{{ item.immediately_reserve | default(False) }}"
+    slot_type: "{{ item.slot_type | default('physical') }}"
+    output_plugin: "{{ item.output_plugin | default(omit) }}"
+    ssl_mode: "{{ item.ssl_mode | default('prefer') }}"
+    ca_cert: "{{ item.ca_cert | default('') }}"
+    state: "{% if role_action == 'create' %}present{% elif role_action == 'drop' %}absent{% endif %}"
+    trust_input: "{{ item.trust_input | default(True) }}"
+  with_items:
+    - "{{ postgresql_slots }}"

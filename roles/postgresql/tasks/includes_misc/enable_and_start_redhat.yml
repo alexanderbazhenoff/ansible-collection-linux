@@ -1,0 +1,13 @@
+---
+
+- name: "enable and start redhat | Enable and start daemon via systemctl"   # noqa command-instead-of-module
+  ansible.builtin.shell: "systemctl enable --now {{ postgresql_daemon_name }}"   # noqa command-instead-of-shell
+  register: systemctl_results
+  ignore_errors: True
+  changed_when: "'Created symlink from' in systemctl_results.stdout"
+
+- name: "enable and start redhat | Enable and start daemon via service"
+  ansible.builtin.service:
+    name: "{{ postgresql_daemon_name }}"
+    state: started
+  when: systemctl_results.failed

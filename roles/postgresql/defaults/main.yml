@@ -1,0 +1,102 @@
+---
+
+### ROLE PARAMETERS
+
+# Role action: uninstall, install, configure, create, grant, drop, revoke, dump, rename, restore
+role_action: install
+
+# Role subject to perform with: server, pgadmin, hba_conf, postgresql_conf, users, databases, privileges, schemas, slots
+role_subject: server
+
+# Perform clean install
+clean_install: True
+
+# Version of pgsql repository.
+postgresql_version: 15
+
+# Clean-up PostgreSQL data directory (also see $PGDATA env variable).
+cleanup_data_directory: True
+
+# Install only maximum recommended version based on dnf profile, e.g: https://www.postgresql.org/download/linux/redhat/
+# Affects only for systems with dnf package manager. Also read about dnf modules in specified Linux distribution, e.g:
+# https://docs.fedoraproject.org/en-US/modularity/using-modules/
+postgresql_recommended_version: False
+
+# List of additional PostgreSQL related packages, e.g: 'postgresql-contrib' or 'postgresql14-contrib' for
+# postgresql_version_force = True. So there is no automated version handling, include them in the package names.
+postgresql_additional_packages: []
+
+# Install psycopg2: https://pypi.org/project/psycopg2/
+install_psycopg2: True
+
+# Install pgadmin for web mode alongside with postgresql server: https://www.pgadmin.org/
+install_pgadmin: False
+
+# pgadmin installation type: web or desktop. Leave them empty to install both web and desktop.
+pgadmin_installation_type: web
+
+# Add or remove firewalld and/or ufw rules on install or uninstall. Will be skipped when firewall disabled.
+firewall_control: True
+
+
+### SERVER PARAMETERS:
+
+# Specify parameters from postgresql.conf with the same name here.
+# https://www.postgresql.org/docs/current/config-setting.html
+# Double quotes to keep single 'quotes of value'.
+postgresql_conf:
+  port: 5432
+  max_connections: 100
+  superuser_reserved_connections: 3
+  listen_addresses: "'*'"
+
+# pg_hba.conf write content mode to perform configure hba_conf: regex (ensure line(s) presents) or block (replace
+# original file with), otherwise set template filename here (from /templates sub-folder or full path to replace with,
+# e.g. pg_hba.conf.j2). https://www.postgresql.org/docs/current/auth-pg-hba-conf.html
+pg_conf_content_mode: pg_hba.conf.j2
+
+# pg_hba.conf block or lines for regex mode.
+hba_conf_content: |
+# local   all             postgres                                trust
+
+
+### POSTGRESQL MANAGEMENT PARAMETERS:
+
+# List of postgresql users (roles) parameters to perform role action (create, alter or drop) from database instance.
+# https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_user_module.html
+postgresql_users:
+  - name: username
+    password: my_password
+
+# List of postgresql databases parameters to perform role action (create, drop, dump, rename, restore).
+# https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_db_module.html
+postgresql_databases:
+  - name: db_name
+    owner: username
+
+# List of parameters to add or remove schemas.
+# https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_schema_module.html
+postgresql_schemas:
+  - name: schema_name
+    database: db_name
+    owner: username
+
+# List of privileges to grant or revoke on database objects.
+# https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_privs_module.html
+postgresql_privileges:
+  - database: db_name
+    roles: username
+    privs: ALL
+
+# List of parameters to add or remove replication slots from a database.
+# https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_slot_module.html
+postgresql_slots:
+  - name: physical_slot_one
+    db: db_name
+
+
+### PGADMIN PARAMETERS:
+
+# pgadmin email and password for administrator login via web UI
+pgadmin_email: my.name@company.com
+pgadmin_password: my_password

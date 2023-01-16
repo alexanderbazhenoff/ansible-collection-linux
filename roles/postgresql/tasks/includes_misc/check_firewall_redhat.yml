@@ -1,0 +1,7 @@
+---
+
+- name: "check firewall redhat | Check firewalld is running"   # noqa command-instead-of-module
+  ansible.builtin.command: systemctl is-active firewalld
+  ignore_errors: True
+  register: firewalld_state
+  changed_when: False

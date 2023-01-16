@@ -1,0 +1,35 @@
+---
+
+- name: "configure postgresql conf | Include get daemon name tasks"
+  ansible.builtin.include_tasks: includes_misc/get_daemon_name.yml
+
+- name: "configure postgresql conf | Get postgresql.conf path with standard command"
+  ansible.builtin.shell: "{{ postgresql_conf_path_standard_cmd }}"   # noqa command-instead-of-shell
+  register: postgresql_conf_path_results
+  changed_when: False
+
+- name: "configure postgresql conf | Get postgresql.conf path alternative way"
+  ansible.builtin.shell: "{{ postgresql_conf_path_alternative_cmd }}"   # noqa command-instead-of-shell
+  register: postgresql_conf_path_retry_results
+  changed_when: False
+  when: not ("'postgresql.conf' in postgresql_conf_path_results.stdout") or
+    (postgresql_conf_path_results.stderr is defined and postgresql_conf_path_results.stderr | length > 0)
+
+- name: "configure postgresql conf | Set fact for postgresql.conf path results with alternative command"
+  ansible.builtin.set_fact:
+    postgresql_conf_path: >-
+      {% if not ("'postgresql.conf' in postgresql_conf_path_results.stdout") or
+      (postgresql_conf_path_results.stderr is defined and postgresql_conf_path_results.stderr | length > 0) -%}
+      {{ postgresql_conf_path_retry_results.stdout }}{% else %}{{ postgresql_conf_path_results.stdout }}{% endif -%}
+
+- name: "configure postgresql conf | Apply changes to postgresql.conf file"
+  ansible.builtin.lineinfile:
+    dest: "{{ postgresql_conf_path }}"
+    regexp: "{{ item.key }} ="
+    insertafter: "#?.?{{ item.key }} ="
+    line: "{{ item.key }} = {{ item.value }}"
+  when: item.key is defined and item.key is not none and item.key | length > 0
+  with_items:
+    - "{{ postgresql_conf | dict2items | default({}) }}"
+  notify:
+    - Postgresql restart

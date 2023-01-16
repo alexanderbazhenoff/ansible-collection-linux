@@ -1,0 +1,31 @@
+---
+
+- name: "server packages debian | Check required apt repo is available"
+  ansible.builtin.uri:
+    url: "{{ (postgresql_repo_file.split(' '))[2] }}dists/{{ (postgresql_repo_file.split(' '))[3] }}/Release"
+  register: check_postgresql_repo_url_results
+  ignore_errors: True
+  failed_when: check_postgresql_repo_url_results.status == 404
+
+- name: "server packages debian | Check required postgresql version is available in apt repo"
+  ansible.builtin.uri:
+    url: "{{ (postgresql_repo_file.split(' '))[2] }}dists/{{ (postgresql_repo_file.split(' '))[3] -}}
+      /{{ postgresql_version | default('') }}"
+  register: check_postgresql_version_url_results
+  ignore_errors: True
+  failed_when: check_postgresql_repo_url_results.status == 404
+
+- name: "server packages debian | Set fact for postgresql version remove regex"
+  ansible.builtin.set_fact:
+    postgresql_version_regex: >-
+      {% if check_postgresql_repo_url_results.failed or check_postgresql_version_url_results.failed or
+      postgresql_recommended_version and postgresql_version is defined and postgresql_version is not none and
+      postgresql_version | string | length > 0 %}-{{ postgresql_version }}{% endif %}
+
+- name: "server packages debian | Set list of packages to install"
+  ansible.builtin.set_fact:
+    packages_to_install: >-
+      {{ packages_to_install | default([]) + [{ 'package': item | regex_replace(postgresql_version_regex, '') }] }}
+  with_items:
+    - "{{ postgresql_additional_packages }}"
+    - "{{ postgresql_packages }}"

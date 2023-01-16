@@ -4,7 +4,6 @@
 ## 10.10.1.1
 ## 10.10.1.2
 ## hostname.domain
-10.10.1.1
 
 [all:vars]
 ansible_connection=ssh

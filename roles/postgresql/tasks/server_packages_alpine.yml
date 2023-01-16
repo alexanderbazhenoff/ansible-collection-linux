@@ -1,0 +1,21 @@
+---
+
+- name: "server packages alpine | Check postgresql version is available to download"
+  ansible.builtin.shell: "apk info postgresql{{ postgresql_version | default('') }} || true"
+  register: apk_info_results
+  changed_when: False
+
+- name: "server packages alpine | Set postgresql version regex fact"
+  ansible.builtin.set_fact:
+    postgresql_version_regex: >-
+      {% if apk_info_results.stdout is defined and 'installed size' in apk_info_results.stdout and
+      postgresql_version is defined and postgresql_version is not none and postgresql_version | string | length > 0 -%}
+      -{{ postgresql_version }}{% endif %}
+
+- name: "server packages alpine | Set list of packages to install"
+  ansible.builtin.set_fact:
+    packages_to_install: >-
+      {{ packages_to_install | default([]) + [{ 'package': item | regex_replace(postgresql_version_regex, '') }] }}
+  with_items:
+    - "{{ postgresql_additional_packages }}"
+    - "{{ postgresql_packages }}"

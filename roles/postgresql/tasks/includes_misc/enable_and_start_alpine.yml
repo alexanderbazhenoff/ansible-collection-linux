@@ -1,0 +1,13 @@
+---
+
+- name: "enable and start alpine | Autorun postgresql service"
+  ansible.builtin.command: rc-update add postgresql
+  register: postgresql_rc_enable_results
+  failed_when: not ("'postgresql already installed in runlevel' in postgresql_rc_enable_results.stdout" or
+    "'postgresql added to runlevel' in postgresql_rc_enable_results.stdout")
+  changed_when: "'postgresql added to runlevel' in postgresql_rc_enable_results.stdout"
+
+- name: "enable and start alpine | Start postgresql service"
+  ansible.builtin.service:
+    name: postgresql
+    state: started

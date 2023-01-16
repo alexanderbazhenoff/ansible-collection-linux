@@ -1,0 +1,16 @@
+---
+
+- hosts: all
+  become: True
+  become_method: sudo
+  gather_facts: True
+
+  tasks:
+
+    - name: "Install pgadmin4 desktop version"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: install
+        role_subject: pgadmin
+        pgadmin_installation_type: desktop

@@ -1,0 +1,20 @@
+---
+
+- name: Converge
+  hosts: all
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    - name: "default >>> converge | Include postgresql role to install version 15 instance with additional packages"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: install
+        role_subject: server
+        install_pgadmin: True
+        debug_mode: True
+        postgresql_additional_packages:
+          - "postgresql{% if ansible_os_family == 'Debian' %}-client-{{ postgresql_version }}{% else -%}
+            {{ postgresql_version }}-contrib{% endif %}"

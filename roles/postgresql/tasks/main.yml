@@ -1,0 +1,13 @@
+---
+
+- name: "main | Include {{ ansible_os_family | lower }} vars"
+  ansible.builtin.include_vars: "{{ ansible_os_family | lower }}.yml"
+
+- name: "main | Set include playbook fact"
+  ansible.builtin.set_fact:
+    postgresql_include_playbook_name: >-
+      {% if role_subject | regex_search ('users|databases|privileges|schemas|slots') %}psql_management/{% else -%}
+      {{ role_action }}_{% endif %}{{ role_subject }}.yml
+
+- name: "main | Include {{ role_action }} {{ role_subject }} tasks"
+  ansible.builtin.include_tasks: "{{ postgresql_include_playbook_name }}"

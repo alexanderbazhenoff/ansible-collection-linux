@@ -1,0 +1,27 @@
+---
+
+- name: "uninstall server alpine | Delete postgresql service from autorun"
+  ansible.builtin.shell: rc-update del postgresql || true
+  register: postgresql_rc_delete_results
+  changed_when: "'service postgresql removed from runlevel' in postgresql_rc_delete_results.stdout"
+
+- name: "uninstall server alpine | Stop postgresql service"
+  ansible.builtin.shell: rc-service postgresql stop || true
+  register: postgresql_rc_delete_results
+  changed_when: "'Stopping' in postgresql_rc_delete_results.stdout"
+
+- name: "uninstall server alpine | Remove unix socket directory"
+  ansible.builtin.file:
+    path: "{{ default_socket_path }}"
+    state: absent
+
+- name: "uninstall server alpine | Remove {{ postgresql_become_user }} user"
+  ansible.builtin.user:
+    name: "{{ postgresql_become_user }}"
+    state: absent
+    remove: True
+
+- name: "uninstall server alpine | Remove {{ postgresql_become_user }} group"
+  ansible.builtin.group:
+    name: "{{ postgresql_become_user }}"
+    state: absent

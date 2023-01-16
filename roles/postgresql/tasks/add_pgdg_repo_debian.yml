@@ -1,0 +1,19 @@
+---
+
+- name: "add pgdg repo debian | Create folder for keyring"
+  ansible.builtin.file:
+    path: "{{ postgresql_apt_keys_dir }}"
+    state: directory
+    mode: 0755
+
+- name: "add pgdg repo debian | Install postgresql packages signing key"
+  ansible.builtin.get_url:
+    url: "{{ postgresql_apt_key_url }}"
+    dest: "{{ postgresql_apt_keys_dir }}/pgdg.asc"
+    mode: 0755
+    validate_certs: False
+    force: True
+  register: postgresql_apt_key_results
+  until: postgresql_apt_key_results is succeeded
+  retries: 5
+  delay: 5

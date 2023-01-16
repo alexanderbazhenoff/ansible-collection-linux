@@ -1,0 +1,11 @@
+---
+
+postgresql_become_user: postgres
+
+postgresql_url: https://download.postgresql.org/pub/
+
+hba_conf_path_standard_cmd: >-
+  su - {{ postgresql_become_user }} -c "psql -t -P format=unaligned -c 'SHOW hba_file'" || true
+
+postgresql_conf_path_standard_cmd: >-
+  psql -U {{ postgresql_become_user }} -t -P format=unaligned -c 'SHOW config_file' || true

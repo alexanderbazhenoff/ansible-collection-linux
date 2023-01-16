@@ -1,0 +1,11 @@
+---
+
+- name: "purge pgadmin repo debian | Remove pgadmin key"
+  ansible.builtin.file:
+    path: "{{ pgadmin_apt_keys_dir }}/pgadmin.gpg"
+    state: absent
+
+- name: "purge pgadmin repo debian | Purge debian repository"
+  ansible.builtin.apt_repository:
+    repo: "{{ pgadmin_repo_file }}"
+    state: absent

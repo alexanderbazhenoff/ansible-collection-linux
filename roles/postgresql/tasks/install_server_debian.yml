@@ -1,0 +1,31 @@
+---
+
+- name: "install server debian | Install debian repository and update apt cache"
+  ansible.builtin.apt_repository:
+    repo: "{{ postgresql_repo_file }}"
+    update_cache: True
+  when: not check_postgresql_repo_url_results.failed
+
+- name: "install server debian | Include purge repo tasks when there is no postgresql repo for current linux distro"
+  ansible.builtin.include_tasks: "purge_pgdg_repo_{{ ansible_os_family | lower }}.yml"
+  when: check_postgresql_repo_url_results.failed
+
+- name: "install server debian | Install packages depending on detected package manager"
+  ansible.builtin.include_tasks: "pkg_management/install_{{ ansible_pkg_mgr }}.yml"
+
+- name: "install server debian | Check data directory exists"
+  ansible.builtin.find:
+    paths: "{{ postgresql_data_path }}/main"
+  register: postgresql_data_dir_found
+  when: not check_postgresql_repo_url_results.failed
+
+- name: "install server debian | Init database when data directory not found"
+  ansible.builtin.shell: >-
+    su - {{ postgresql_become_user }} -c '/usr/lib/postgresql/{{ postgresql_version }}/bin/pg_ctl initdb
+    -D /var/lib/postgresql/{{ postgresql_version }}/main;
+    /usr/lib/postgresql/{{ postgresql_version }}/bin/pg_ctl start -D /var/lib/postgresql/{{ postgresql_version }}/main
+    -o "-c config_file=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"'
+  register: init_db_results
+  changed_when: not init_db_results.failed
+  when: not check_postgresql_repo_url_results.failed and postgresql_data_dir_found is defined and
+    postgresql_data_dir_found.matched == 0

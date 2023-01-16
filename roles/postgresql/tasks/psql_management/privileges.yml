@@ -1,0 +1,18 @@
+---
+
+- name: "privileges | Grant or revoke privileges on database objects"
+  community.postgresql.postgresql_privs:
+    database: "{{ item.database | mandatory }}"
+    roles: "{{ item.roles | mandatory }}"
+    grant_option: "{{ item.grant_option | default(omit) }}"
+    objs: "{{ item.objs | default(omit) }}"
+    privs: "{{ item.privs | default(omit) }}"
+    schema: "{{ item.schema | default(omit) }}"
+    target_roles: "{{ item.target_roles | default(omit) }}"
+    type: "{{ item.type | default(omit) }}"
+    ssl_mode: "{{ item.ssl_mode | default('prefer') }}"
+    ca_cert: "{{ item.ca_cert | default('') }}"
+    state: "{% if role_action == 'grant' %}present{% elif %}absent{% endif %}"
+    trust_input: "{{ item.trust_input | default(True) }}"
+  with_items:
+    - "{{ postgresql_privileges }}"

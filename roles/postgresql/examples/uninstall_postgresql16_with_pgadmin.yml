@@ -1,0 +1,17 @@
+---
+
+- hosts: all
+  become: True
+  become_method: sudo
+  gather_facts: True
+
+  tasks:
+
+    - name: "Uninstall PostgreSQL v16 and pgadmin4 web with cleanup data directory"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: uninstall
+        postgresql_version: 16
+        install_pgadmin: True
+        clean_install: True

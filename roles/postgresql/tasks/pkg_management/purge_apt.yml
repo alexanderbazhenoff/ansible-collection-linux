@@ -1,0 +1,10 @@
+---
+
+- name: "purge apt | Purge packages"
+  ansible.builtin.apt:
+    name: "{{ item.package }}"
+    state: absent
+    autoremove: True
+  when: item.package | length > 0
+  with_items:
+    - "{{ packages_to_install }}"

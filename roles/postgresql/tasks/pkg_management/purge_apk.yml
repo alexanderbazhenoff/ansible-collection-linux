@@ -1,0 +1,9 @@
+---
+
+- name: "purge apt | Purge packages"
+  community.general.apk:
+    name: "{{ item.package }}"
+    state: absent
+  when: item.package | length > 0
+  with_items:
+    - "{{ packages_to_install }}"

@@ -1,0 +1,38 @@
+---
+
+- name: Side Effect
+  hosts: all
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    - name: "default >>> side effect | Include postgresql role create test user"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: create
+        role_subject: users
+        postgresql_users:
+          - name: test
+            password: my_password
+
+    - name: "default >>> side effect | Include postgresql role to create database"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: create
+        role_subject: databases
+        postgresql_databases:
+          - name: test_db
+            owner: test
+
+    - name: "default >>> side effect | Include postgresql role to dump database"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: dump
+        role_subject: databases
+        postgresql_databases:
+          - name: test_db
+            target: /tmp/test_db.dir

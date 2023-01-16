@@ -1,0 +1,8 @@
+---
+
+- name: "firewall control debian | Add ufw rule"
+  community.general.ufw:
+    rule: "{{ firewall_state | default(False) | ternary('allow', 'deny') }}"
+    port: "{{ firewall_port | default(postgresql_conf.port) }}"
+    proto: tcp
+  when: firewall_control and not ufw_state.failed and ufw_state.stdout is defined and 'inactive' not in ufw_state.stdout

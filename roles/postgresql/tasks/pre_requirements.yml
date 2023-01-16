@@ -1,0 +1,26 @@
+---
+
+- name: "pre-requirements | Include check firewall {{ ansible_os_family | lower }} tasks"
+  ansible.builtin.include_tasks: "includes_misc/check_firewall_{{ ansible_os_family | lower }}.yml"
+  when: not clean_install and ansible_os_family != 'Alpine'
+
+- name: "pre-requirements | Set required packages list"
+  ansible.builtin.set_fact:
+    packages_to_install:
+      - { package: 'ca-certificates' }
+      - { package: "{% if ansible_os_family == 'Debian' %}apt-transport-https{% endif %}" }
+      - { package: "{% if ansible_os_family == 'Debian' %}gnupg2{% endif %}" }
+      - { package: "{% if ansible_os_family == 'Debian' %}software-properties-common{% endif %}" }
+      - { package: "{% if ansible_os_family == 'RedHat' and ansible_facts.selinux.status is defined and
+        ansible_facts.selinux.status == 'enabled' %}{{ (ansible_python.version.major == 3) |
+        ternary('python3-libselinux', 'libselinux-python') }}{% endif %}" }
+      - { package: "{% if ansible_os_family == 'RedHat' and ansible_facts.selinux.status is defined and
+        ansible_facts.selinux.status == 'enabled' %}policycoreutils-python{{ (ansible_python.version.major == 3) |
+        ternary('3', '') }}{% endif %}"}
+    firewall_state: True
+
+- name: "pre-requirements | Ensure required packages are installed"
+  ansible.builtin.include_tasks: "pkg_management/install_{{ ansible_pkg_mgr }}.yml"
+
+- name: "pre-requirements | Include add repo {{ ansible_os_family | lower }} tasks"
+  ansible.builtin.include_tasks: "add_pgdg_repo_{{ ansible_os_family | lower }}.yml"

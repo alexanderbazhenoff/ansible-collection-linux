@@ -1,0 +1,37 @@
+---
+
+- name: "install server | Include uninstall tasks"
+  ansible.builtin.include_tasks: uninstall_server.yml
+  when: clean_install
+
+- name: "install server | Include pre requirements tasks"
+  ansible.builtin.include_tasks: pre_requirements.yml
+
+- name: "install server | Set facts for firewall control"
+  ansible.builtin.set_fact:
+    firewall_port: "{{ postgresql_conf.port }}"
+    firewall_state: True
+
+- name: "install server | Include firewall control {{ ansible_os_family | lower }} tasks"
+  ansible.builtin.include_tasks: "includes_misc/firewall_control_{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family != 'Alpine'
+
+- name: "install server | Include server packages {{ ansible_os_family | lower }} tasks"
+  ansible.builtin.include_tasks: "server_packages_{{ ansible_os_family | lower }}.yml"
+
+- name: "install server | Include install server {{ ansible_os_family | lower }} tasks"
+  ansible.builtin.include_tasks: "install_server_{{ ansible_os_family | lower }}.yml"
+
+- name: "install server | Include enable and start daemon {{ ansible_os_family | lower }} tasks"
+  ansible.builtin.include_tasks: "includes_misc/enable_and_start_{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family != 'Debian'
+
+- name: "install server | Include configure pg_hba.conf tasks"
+  ansible.builtin.include_tasks: configure_hba_conf.yml
+
+- name: "install server | Include configure postgresql.conf tasks"
+  ansible.builtin.include_tasks: configure_postgresql_conf.yml
+
+- name: "install server | Include install pgadmin tasks"
+  ansible.builtin.include_tasks: install_pgadmin.yml
+  when: install_pgadmin

@@ -1,0 +1,18 @@
+---
+
+- name: "users | Create, alter, or remove a user (role) from database instance"
+  community.postgresql.postgresql_user:
+    name: "{{ item.name | mandatory }}"
+    comment: "{{ item.comment | default(omit) }}"
+    password: "{{ item.password | default(omit) }}"
+    conn_limit: "{{ item.conn_limit | default(omit) }}"
+    no_password_changes: "{{ item.no_password_changes | default(False) }}"
+    db: "{{ item.database | default('') }}"
+    encrypted: "{{ item.encrypted | default(True) }}"
+    role_attr_flags: "{{ item.role_attr_flags | default('') }}"
+    ssl_mode: "{{ item.ssl_mode | default('prefer') }}"
+    ca_cert: "{{ item.ca_cert | default('') }}"
+    state: "{% if role_action == 'create' %}present{% elif role_action == 'drop' %}absent{% endif %}"
+    trust_input: "{{ item.trust_input | default(True) }}"
+  with_items:
+    - "{{ postgresql_users }}"

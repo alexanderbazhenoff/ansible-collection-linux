@@ -1,0 +1,4 @@
+flake8
+molecule
+molecule[ansible-lint]
+molecule[docker]

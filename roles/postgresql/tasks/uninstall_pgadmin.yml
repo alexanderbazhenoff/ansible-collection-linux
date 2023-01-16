@@ -1,0 +1,48 @@
+---
+
+- name: "uninstall pgadmin | Uninstall pgadmin4"
+  block:
+    - name: "| Set facts for pgadmin uninstall"
+      ansible.builtin.set_fact:
+        firewall_port: 80
+        firewall_state: False
+        packages_to_install: "{{ pgadmin_packages }}"
+
+    - name: "| Include purge pgadmin repo {{ ansible_os_family | lower }} tasks"
+      ansible.builtin.include_tasks: "purge_pgadmin_repo_{{ ansible_os_family | lower }}.yml"
+      when: ansible_os_family == 'Debian'
+
+    - name: "| Purge packages"
+      ansible.builtin.include_tasks: "pkg_management/purge_{{ ansible_pkg_mgr }}.yml"
+
+    - name: "| Check postgresql server version"
+      ansible.builtin.shell: "su - {{ postgresql_become_user }} -c 'psql --version' || true"
+      args:
+        executable: /bin/sh
+      register: postgresql_version_check_results
+      changed_when: False
+
+    - name: "| Check postgresql packages"   # noqa command-instead-of-shell
+      ansible.builtin.shell: "{{ check_postgresql_packages_cmd }}"
+      register: postgresql_packages_check_results
+      changed_when: False
+
+    - name: "| Include purge repo {{ ansible_os_family | lower }} tasks"
+      ansible.builtin.include_tasks: "purge_pgdg_repo_{{ ansible_os_family | lower }}.yml"
+      when: not ("'psql (PostgreSQL)' in postgresql_version_check_results.stdout") and
+        postgresql_packages_check_results.stdout | length > 0
+
+    - name: "| Include check firewall {{ ansible_os_family | lower }} tasks"
+      ansible.builtin.include_tasks: "includes_misc/check_firewall_{{ ansible_os_family | lower }}.yml"
+
+    - name: "| Include firewall control {{ ansible_os_family | lower }} tasks"
+      ansible.builtin.include_tasks: "includes_misc/firewall_control_{{ ansible_os_family | lower }}.yml"
+      when: pgadmin_installation_type is defined and pgadmin_installation_type != 'desktop'
+
+    - name: "| Cleanup related files and folders"
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "{{ pgadmin_data_folders }}"
+  when: ansible_os_family != 'Alpine'

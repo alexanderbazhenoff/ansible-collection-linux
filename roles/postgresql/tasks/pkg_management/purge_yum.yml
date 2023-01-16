@@ -1,0 +1,11 @@
+---
+
+- name: "purge yum | Purge packages"
+  ansible.builtin.yum:
+    name: >-
+      {% if item.package_name_short is defined and item.package_name_short | length > 0 %}{{ item.package_name_short -}}
+      {% else %}{{ item.package }}{% endif %}
+    state: absent
+    autoremove: "{{ ansible_distribution_major_version | int >= 7 }}"
+  with_items:
+    - "{{ packages_to_install }}"
