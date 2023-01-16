@@ -69,6 +69,7 @@ playbooks and inventory files already. You can also find usage examples in readm
 2. If you like it please vote on [ansible galaxy page](https://galaxy.ansible.com/alexanderbazhenoff/linux).
 3. If you found an issue please submit [here](https://github.com/alexanderbazhenoff/ansible-collection-linux/issues)
 with detailed information, e.g:
+
 - Playbook and parameters which the role was included with.
 - Distribution and output of: `ansible --version`.
 - What did you expect?
