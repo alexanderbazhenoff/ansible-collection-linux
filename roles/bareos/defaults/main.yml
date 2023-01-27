@@ -99,7 +99,7 @@ use_postgresql: True
 postgresql_version: 14
 # Install psycopg2: https://pypi.org/project/psycopg2/
 install_psycopg2: True
-# PostgreSQL timezone. Check your version: https://www.postgresql.org/docs/15/datatype-datetime.html
+# PostgreSQL timezone. Read manual: https://www.postgresql.org/docs/15/datatype-datetime.html
 postgresql_timezone: Europe/Moscow
 # Download PostgreSQL repository URL prefix.
 postgresql_url: https://download.postgresql.org/pub/

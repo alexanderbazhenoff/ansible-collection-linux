@@ -390,6 +390,8 @@ The most useful settings are stored in:
 - **use_postgresql** *[Default: True]*: Enable to use Bareos with PostgreSQL, disable for sqlite.
 - **postgresql_version** *[Default: 14]*: PostgreSQL version to install by this role. Leave it `''` for default version.
 - **install_psycopg2** *[Default: True]*: Install [psycopg2](https://pypi.org/project/psycopg2/).
+- **postgresql_timezone** *[Default: 'Europe/Moscow']*: PostgreSQL timezone (read 
+[manual](https://www.postgresql.org/docs/15/datatype-datetime.html)).
 
 Another variables:
 
