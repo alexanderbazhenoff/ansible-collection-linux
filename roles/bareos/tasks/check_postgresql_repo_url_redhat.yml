@@ -1,0 +1,10 @@
+---
+
+- name: "check postgresql repo url redhat | Set postgresql repo package URL"
+  ansible.builtin.set_fact:
+    repo_url_to_install: >-
+      {{ postgresql_url }}repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-{{ ansible_architecture -}}
+      /pgdg-{% if ansible_distribution == 'Fedora' %}fedora{% else %}redhat{% endif %}-repo-latest.noarch.rpm
+
+- name: "check postgresql repo url redhat | Include check repo url tasks"
+  ansible.builtin.include_tasks: check_repo_url.yml

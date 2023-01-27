@@ -1,0 +1,40 @@
+---
+
+- name: "purge postgresql alpine | Delete postgresql service via rc-update"
+  ansible.builtin.shell: rc-update del postgresql || true
+  register: postgresql_rc_delete_results
+  changed_when: "'service postgresql removed from runlevel' in postgresql_rc_delete_results.stdout"
+
+- name: "purge postgresql alpine | Stop postgresql service"
+  ansible.builtin.shell: rc-service postgresql stop || true
+  register: postgresql_rc_delete_results
+  changed_when: "'Stopping' in postgresql_rc_delete_results.stdout"
+
+- name: "purge postgresql alpine | Purge postgresql server package(s)"
+  community.general.apk:
+    name: "{{ item }}"
+    state: absent
+  when: item is defined and item is not none and item | length > 0
+  with_items:
+    - "{{ postgresql_packages |
+      json_query((ansible_os_family | lower) + (install_psycopg2 | ternary('_psycopg2', ''))) }}"
+
+- name: "purge postgresql alpine | Remove unix socket and data directories"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /run/postgresql
+    - /usr/local/share/postgresql
+    - /var/lib/postgresql/{{ postgresql_version }}/data
+
+- name: "purge postgresql alpine | Remove {{ postgresql_become_user }} user"
+  ansible.builtin.user:
+    name: "{{ postgresql_become_user }}"
+    state: absent
+    remove: True
+
+- name: "purge postgresql alpine | Remove {{ postgresql_become_user }} group"
+  ansible.builtin.group:
+    name: "{{ postgresql_become_user }}"
+    state: absent

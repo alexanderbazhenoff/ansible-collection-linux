@@ -1,0 +1,83 @@
+---
+
+# (Some RedHat family distribution repositories (e.g. Oracle Linux 7.x) are not contains php-intl and php-mbstring
+# packages which are required for bareos-webui. Installing remi repository is a solution, but RHEL remi repo package
+# also requires epel repo package).
+- name: "install php requirements redhat | Try to install required php dependencies"
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  ignore_errors: True
+  register: install_php_packages
+  with_items:
+    - "{{ php_package_dependencies }}"
+
+- name: "install php requirements redhat | Install remi repo to workaround php dependency issues"
+  block:
+    - name: "| Set epel repo package URL (remi repo package dependency)"
+      ansible.builtin.set_fact:
+        repo_url_to_install: >-
+          https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+      when: ansible_distribution != 'Fedora'
+
+    - name: "| Include check repo url tasks with epel repo package URL"
+      ansible.builtin.include_tasks: check_repo_url.yml
+      when: ansible_distribution != 'Fedora'
+
+    - name: "| Set epel repo package fact to install after all URLs check"
+      ansible.builtin.set_fact:
+        epel_repo_package_url: >-
+          {% if ansible_distribution != 'Fedora' and ansible_distribution_major_version | int > 6 -%}
+          {{ repo_url_to_install }}{% endif %}
+        check_epel_url_results: "{{ check_repo_url_results | default(True) }}"
+
+    - name: "| Set remi repo package URL"
+      ansible.builtin.set_fact:
+        repo_url_to_install: https://rpms.remirepo.net/{% if ansible_distribution == 'Fedora' %}fedora{% else -%}
+          enterprise{% endif %}/remi-release-{{ ansible_distribution_major_version }}.rpm
+
+    - name: "| Include check repo url tasks with remi repo package URL"
+      ansible.builtin.include_tasks: check_repo_url.yml
+
+    - name: "| Asset remi repo package is available to download"
+      ansible.builtin.assert:
+        that:
+          - check_epel_url_results or (check_epel_url_results.failed is defined and not check_epel_url_results.failed)
+          - check_repo_url_results is defined and not check_repo_url_results.failed
+        fail_msg: >-
+          {% if check_epel_url_results.failed is defined and not check_epel_url_results.failed %}
+          {{ epel_repo_package_url }} is not available for your Linux distribution which required for remi repo by
+          dependencies.{% endif %}
+          {% if check_repo_url_results is defined and not check_repo_url_results.failed %}{{ repo_url_to_install }}
+          is not available for your Linux distribution while {{ php_package_dependencies }} are not available in your
+          already installed repositories.{% endif %} Please install the next bareos-webui dependencies
+          {{ php_package_dependencies }} manually then run role again.
+
+    - name: "| Install default php version"
+      ansible.builtin.package:
+        name: php
+        state: present
+
+    - name: "| Get default php version"
+      ansible.builtin.command: php --version | head -1
+      changed_when: False
+      register: php_version_results
+
+    - name: "| Set fact for package list to install repositories"
+      ansible.builtin.set_fact:
+        packages_to_install:
+          - "{{ epel_repo_package_url }}"
+          - "{{ repo_url_to_install }}"
+
+    - name: "| Include install tasks depending on package manager"
+      ansible.builtin.include_tasks: pkg_management/install_{{ ansible_pkg_mgr }}.yml
+
+    - name: "| Enable remi repository"   # noqa command-instead-of-shell
+      ansible.builtin.shell: >-
+        {% if ansible_pkg_mgr == 'yum' %}yum-config-manager --enable {% else %}dnf config-manager --set-enabled
+        {% endif %}remi-php{{ (php_version_results.stdout.split(' ') | list)[1] | regex_replace('(.[0-9]{2})', '') |
+        regex_replace('\.', '') }}
+      register: remi_repo_enable_results
+      changed_when: remi_repo_enable_results.stdout | length > 0
+  when: (install_php_packages.results[0] is defined and install_php_packages.results[0].failed) or
+    (install_php_packages.results[1] is defined and install_php_packages.results[1].failed)

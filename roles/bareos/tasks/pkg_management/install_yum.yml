@@ -1,0 +1,14 @@
+---
+
+- name: "install yum | Install packages"   # noqa package-latest
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: latest
+    update_cache: True
+  register: install_yum_results
+  until: install_yum_results is succeeded
+  retries: 5
+  delay: 5
+  when: item | length > 0
+  with_items:
+    - "{{ packages_to_install }}"

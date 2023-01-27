@@ -1,0 +1,13 @@
+---
+
+- name: "fix timezone | Check /etc/timezone exists"
+  ansible.builtin.find:
+    paths: /etc/timezone
+  register: etc_timezone_file_found
+
+- name: "fix timezone | Set timezone in /etc/timezone when not exists"
+  ansible.builtin.copy:
+    content: "{{ postgresql_timezone }}"
+    dest: /etc/timezone
+    mode: 0644
+  when: etc_timezone_file_found.matched == 0

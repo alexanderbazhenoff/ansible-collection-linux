@@ -1,0 +1,79 @@
+---
+
+- name: "install postgresql alpine | heck postgresql version is available to download"
+  ansible.builtin.shell: apk info postgresql{{ postgresql_version | default('') }} || true
+  register: apk_info_postgresql_results
+  changed_when: False
+
+- name: "install postgresql alpine | Assert availability of postgresql version repo"
+  ansible.builtin.assert:
+    that:
+      - apk_info_postgresql_results.stdout is defined and apk_info_postgresql_results.stdout | length > 0
+    fail_msg: >-
+      postgresql version {{ postgresql_version }} is not available for your Linux distribution in repositories. Try to
+      change version in 'postgresql_version' role variable or install PostgreSQL server manually.
+
+- name: "install postgresql alpine | Install postgresql server packages"
+  community.general.apk:
+    name: "{{ item }}"
+    update_cache: True
+  register: postgresql_yum_results
+  until: postgresql_yum_results is succeeded
+  retries: 5
+  delay: 5
+  when: item is defined and item is not none and item | length > 0
+  with_items:
+    - "{{ postgresql_packages |
+      json_query((ansible_os_family | lower) + (install_psycopg2 | ternary('_psycopg2', ''))) }}"
+
+- name: "install postgresql alpine | Check postgresql data directory files"
+  ansible.builtin.find:
+    paths: /var/lib/postgresql/{{ postgresql_version }}/data
+  register: postgresql_data_files_found
+
+- name: "install postgresql alpine | Create database directory"
+  ansible.builtin.file:
+    path: /var/lib/postgresql/{{ postgresql_version }}/data
+    state: directory
+    owner: "{{ postgresql_become_user }}"
+    mode: 0700
+    recurse: True
+  when: postgresql_data_files_found.matched == 0
+
+- name: "install postgresql alpine | Create {{ postgresql_become_user }} group"
+  ansible.builtin.group:
+    name: "{{ postgresql_become_user }}"
+
+- name: "install server alpine | Create {{ postgresql_become_user }} user"
+  ansible.builtin.user:
+    name: "{{ postgresql_become_user }}"
+    group: "{{ postgresql_become_user }}"
+    shell: /bin/sh
+    home: /var/lib/postgresql/{{ postgresql_version }}/data
+    comment: PostgreSQL user (ansible role managed)
+
+- name: "install postgresql alpine | Init database"
+  ansible.builtin.command:
+    cmd: su {{ postgresql_become_user }} -c 'initdb -D /var/lib/postgresql/{{ postgresql_version }}/data'
+  environment:
+    LANG: en_US.utf8
+    TZ: "{{ postgresql_timezone }}"
+    PGTZ: "{{ postgresql_timezone }}"
+  register: init_db_results
+  changed_when: not init_db_results.failed
+  when: postgresql_data_files_found.matched == 0
+
+- name: "install postgresql alpine | Create unix socket directory"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ postgresql_become_user }}"
+    mode: 0755
+  with_items:
+    - /run/postgresql
+    - /usr/local/share/postgresql
+
+- name: "install postgresql alpine | Autorun postgresql service"
+  ansible.builtin.command: rc-update add postgresql
+  register: postgresql_rc_enable_results
+  changed_when: "'postgresql added to runlevel' in postgresql_rc_enable_results.stdout"

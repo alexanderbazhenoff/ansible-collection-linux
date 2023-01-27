@@ -1,0 +1,19 @@
+---
+
+- name: "purge bareos alpine | Cleanup bareos packages depending on components to install selection"
+  community.general.apk:
+    name: "{{ item }}"
+    state: absent
+    available: True
+  when: item is defined and item is not none and item | length > 0
+  with_items:
+    - "{{ bareos_packages | json_query(bareos_components) + install_additional_bareos_packages }}"
+
+
+- name: "purge bareos alpine | Delete daemons via rc-update"
+  ansible.builtin.shell: rc-update del {{ item }} || true
+  register: bareos_rc_enable_results
+  changed_when: ('removed from runlevel' in bareos_rc_enable_results.stdout)
+  when: item is defined and item is not none and item | length > 0
+  with_items:
+    - "{{ bareos_daemons | json_query(bareos_components) }}"

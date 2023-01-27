@@ -1,0 +1,10 @@
+---
+
+- name: "purge dnf | Purge packages"
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: absent
+    autoremove: True
+  when: item | length > 0
+  with_items:
+    - "{{ packages_to_install }}"

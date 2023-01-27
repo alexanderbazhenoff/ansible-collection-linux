@@ -1,0 +1,8 @@
+---
+
+- name: "check remi repo url | Check required repo URL is available"
+  ansible.builtin.uri:
+    url: "{{ repo_url_to_install }}"
+  register: check_repo_url_results
+  ignore_errors: True
+  failed_when: check_repo_url_results.status == 404

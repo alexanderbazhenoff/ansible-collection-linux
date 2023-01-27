@@ -1,0 +1,9 @@
+---
+
+- name: "enable start bareos alpine | Add daemons via rc-update"
+  ansible.builtin.command: rc-update add {{ item }}
+  register: bareos_rc_enable_results
+  changed_when: ('added to runlevel' in bareos_rc_enable_results.stdout)
+  when: item is defined and item is not none and item | length > 0
+  with_items:
+    - "{{ bareos_daemons | json_query(bareos_components) }}"
