@@ -81,7 +81,7 @@ add_component_password: ''
 add_component_password_gen_length: 16
 # Use TLS to connect between file daemon and server.
 add_component_tls_enable: False
-# Maximum concurrent jobs on avalialable on file daemon.
+# Maximum concurrent jobs on available on file daemon.
 add_component_max_jobs: 1
 # Bareos server IP address or hostname:
 add_component_server: 127.0.0.1
