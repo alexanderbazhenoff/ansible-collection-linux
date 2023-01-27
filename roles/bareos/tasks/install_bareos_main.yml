@@ -68,5 +68,5 @@
   when: bareos_components | regex_search('dir') and init_bareos_database
 
 - name: "install bareos main | Include enable start bareos tasks"
-  ansible.builtin.include_tasks: "enable_start_bareos_{{ ansible_os_family | lower }}.yml"
+  ansible.builtin.include_tasks: enable_start_bareos_{{ ansible_os_family | lower }}.yml
   when: ansible_os_family != 'Debian'
