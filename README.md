@@ -7,7 +7,7 @@ An ansible collection with linux-related roles to perform various setups.
 
 - [**bareos**](roles/bareos/README.md) - Installs and configures [Bareos](https://www.bareos.com/) and third-party
 components, adds Bareos file daemons to Bareos server, create or revoke user profiles and uploads Bareos configs to the
-host (e.g. if you have predefined Bareos server, storage daemon etc).
+host (e.g. if you have already installed Bareos server, storage daemon(s) etc).
 
 - [**lxcfs**](roles/lxcfs/README.md): Installs [lxc](https://linuxcontainers.org/lxc/introduction/) or
 [**lxcfs**](https://linuxcontainers.org/lxcfs/introduction/) on linux system.
