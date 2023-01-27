@@ -13,7 +13,7 @@
     #   ansible.builtin.pause:
     #     prompt: "Make sure everything was installed"
 
-    - name: "default >>> side_effect | Include bareos role to install bareos-client"
+    - name: "default >>> side effect | Include bareos role to install bareos-client"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.bareos
       vars:
@@ -23,16 +23,7 @@
         debug_mode: True
       when: inventory_hostname in groups["bareos_clients"]
 
-    ### DEBUG SECTION (uncomment to troubleshoot)
-    #
-    # - name: "default >>> side_effect | (debug) Show params on delegating hosts"
-    #   ansible.builtin.debug:
-    #     msg: "grep by {{ ansible_hostname }} on the host {{ hostvars[inventory_hostname].bareos_dir }}"
-    #   delegate_to: "{{ hostvars[inventory_hostname].bareos_dir }}"
-    #   delegate_facts: True
-    #   when: inventory_hostname in groups["bareos_clients"]
-
-    - name: "default >>> side_effect | Include bareos role to add bareos-client on bareos-dir"
+    - name: "default >>> side effect | Include bareos role to add bareos-client on bareos-dir"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.bareos
       vars:
@@ -41,7 +32,7 @@
         debug_mode: True
       when: inventory_hostname in groups["bareos_clients"]
 
-    - name: "default >>> side_effect | Check client was added on the server"
+    - name: "default >>> side effect | Check client was added on the server"
       ansible.builtin.command:
         cmd: "echo 'list clients' | bconsole | grep {{ ansible_hostname }}"
       register: check_client_on_server_results

@@ -38,25 +38,28 @@ configs to `/etc`).
 
 Role limitations:
 
-- You can install Bareos Web UI with Apache web server only. If you with to use them with nginx
+- You can install Bareos Web UI with Apache web server only. If you wish to use Bareos with nginx please
 [do it manually](https://docs.bareos.org/IntroductionAndTutorial/InstallingBareosWebui.html#nginx).
 - Installation of Bareos director with sqlite or mysql/mariadb (for older versions) not supported.
-- This role tested with Bareos v21 and PostgreSQL v14. Various details of configuration of older or newer versions of
-Bareos components or PostgreSQL are not included in this role.
-- No Bareos resources like devices, storages, jobs, pools are possible to add. Adding these features requires a lots of
-code to be written, so use copy predefined configs instead.
+- This role tested with Bareos v.21 and PostgreSQL v14. Various details of configuration of older or newer versions of
+Bareos or third-party components are not included in this role: e.g.
+[manual installation of php required](https://blog.remirepo.net/post/2019/12/03/Install-PHP-7.4-on-CentOS-RHEL-or-Fedora)
+instead of wrong versions by default like on Oracle Linux 8.7 or Fedora 45.
+- No Bareos resources like devices, storages, jobs, pools are possible to add. Only bareos file daemon add which is most
+common.
 - Remove file daemon from Bareos server using this role is not possible. Some existing job configs might be linked with
-this filedaemon. Bareos server will not start after force remove until you delete or change this job configs. Anyway
-there is no normal scenario when you want to remove file daemon from the server while you can change job configs and
-optionally disable on Bareos server.
-- Firewall rules will be applied only when firewalld (CentOS) or ufw (Ubuntu) enabled. This will not affect to iptables
+this filedaemon. Bareos server will not start after force remove until you delete or change job configs. Anyway there is
+no normal scenario when you want to remove file daemon from the server while you can change job configs and optionally
+disable on Bareos server. 
+- Firewall rules will be applied only when firewalld (RedHat) or ufw (Ubuntu) enabled. This will not affect to iptables
 on Debian, so use external or manual iptables control.
 - TLS certificates and setting not supported in this role, but you can copy all required files setting up
 [`bareos_configs_to_copy` variable](#role-variables).
 
 Requirements
 ------------
-- Ubuntu 18.04/20.04, Debian 10/11, CentOS 7, but probably works with other versions.
+- Any version of Ubuntu or any Debian family distribution, any RedHat family distribution or any Alpine Linux (but
+please check `override_ansible_distribution_major_version` [role variable description](#main-role-variables-) first).
 
 Dependencies
 ------------
@@ -65,9 +68,12 @@ Dependencies
 - Apache2 web server and Epel repo (for libzstd download on CentOS) which will be automatically install running this
 role.
 - This role using 'sudo' become method, so Debian distribution should have them already pre-installed.
+- Alpine Linux binaries built unofficially they could have some bugs 
+([like this one](https://gitlab.alpinelinux.org/alpine/aports/-/issues/14570)). Before you run this role on Alpine Linux
+set your `/etc/apk/repositories` manually (read [documentation](https://wiki.alpinelinux.org/wiki/Repositories)).
 
-Example Playbook
-----------------
+Example Playbooks
+-----------------
 The easiest ways to use this role should look like typical installation: 
 [all Bareos components](https://docs.bareos.org/IntroductionAndTutorial/InstallingBareosWebui.html#installation) on the
 same host and/or 
@@ -97,7 +103,7 @@ speed up).
           vars:
             role_action: install
             bareos_components: dir_webui
-            init_bareos_database: "{{ (ansible_distribution == 'CentOS') }}"
+            init_bareos_database: "{{ (ansible_os_family == 'RedHat') }}"
             postgresql_version: 14
 
 #### 2. Make client user profile to access Bareos Web UI
@@ -309,18 +315,22 @@ Role Variables
 #### Main role variables:
 
 - **role_action** *[Default: install, possible values: install/uninstall/access/add_client/copy_configs]*: Role action
-to be performed: install or uninstall Bareos components, create user profile to access Bareos Web UI (access), add
-already installed file daemon (client) on Bareos server (add_client), copy Bareos config to already installed Bareos
+to be performed: install or uninstall Bareos components, create user profile to access Bareos Web UI *(access)*, add
+already installed file daemon *(client)* on Bareos server *(add_client)*, copy Bareos config to already installed Bareos
 component(s).
 - **bareos_components** *[Default: fd, possible values: fd, sd, dir, webui, dir_webui]*: Bareos components to install or
-uninstall: Bareos file daemon or client (fd), Bareos storage daemon (sd), Bareos Director (dir), Bareos director and Web
-UI (dir_webui).
+uninstall: Bareos file daemon or client *(fd)*, Bareos storage daemon *(sd)*, Bareos Director *(dir)*, Bareos director 
+and Web UI *(dir_webui)*.
 - **clean_install** *[Default: True]*: Perform clean installation. All packages and configs will be purged before
 install.
 - **bareos_release** *[Default: 21]*: [Bareos release version](https://download.bareos.org/bareos/release/), e.g: 21,
-20, 19.2, 18.2, etc...
+20, 19.2, 18.2, etc. Affects only for Debian and Redhat Linux distribution families.
 - **bareos_url** *[Default: https://download.bareos.org/bareos/release/]*: Bareos repository URL prefix to download from
 (for example, if you with to use local or another repo).
+- **override_ansible_distribution_major_version** *[Default: None]*: Override ansible linux distribution major version.
+Useful when specified Bareos version repo is not available for your Linux distribution version, but beware package
+dependencies problems (example: Bareos v21 currently is [not available](https://download.bareos.org/bareos/release/21/)
+for any RedHat v9, so try to set `8` here).
 - **debug_mode** *[Default: False]*: Verbose output.
 
 #### Firewall related variables:

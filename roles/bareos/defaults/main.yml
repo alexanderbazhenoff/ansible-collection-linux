@@ -8,7 +8,7 @@
 # uninstall - uninstall Bareos components,
 # access - create user profile to access Bareos Web UI,
 # revoke_access - revoke user profile access to Bareos Web UI,
-# add_cleint - add already installed client (Bareos file daemon support only) on Bareos server.
+# add_client - add already installed client (Bareos file daemon support only) on Bareos server.
 role_action: install
 
 # Bareos components to install or uninstall:
@@ -24,7 +24,12 @@ bareos_components: fd
 clean_install: True
 
 # Bareos release, e.g: 21, 20, 19.2, 18.2, etc (https://download.bareos.org/bareos/release/)
+# Affects only for Debian and Redhat Linux distribution families.
 bareos_release: 21
+
+# Override ansible linux distribution major version. Useful when specified Bareos version repo is not available for your
+# Linux distribution version, but beware package dependencies problems. You can also override non-LTS Ubuntu versions.
+override_ansible_distribution_major_version:
 
 # Bareos repository URL prefix to download from
 bareos_url: https://download.bareos.org/bareos/release/
@@ -46,7 +51,7 @@ cleanup_storage_files: True
 
 # Additional Bareos packages to install: [] or 	bareos-traymonitor, bareos-vmware-plugin etc...
 install_additional_bareos_packages:
-  - bareos-traymonitor
+  - "{% if ansible_os_family != 'Alpine' %}bareos-traymonitor{% endif %}"
 
 # List of additional configs to copy on components install. Performs copying items from item.source to item.destination
 # with item.owner, item.group and item.mode, otherwise set this list to []
@@ -94,6 +99,8 @@ use_postgresql: True
 postgresql_version: 14
 # Install psycopg2: https://pypi.org/project/psycopg2/
 install_psycopg2: True
+# PostgreSQL timezone. Check your version: https://www.postgresql.org/docs/15/datatype-datetime.html
+postgresql_timezone: Europe/Moscow
 # Download PostgreSQL repository URL prefix.
 postgresql_url: https://download.postgresql.org/pub/
 postgresql_debian_key_url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
@@ -106,4 +113,4 @@ postgresql_debian_repo: >
 # PostgreSQL default user to init bareos database. Change when required for your custom database setup only.
 postgresql_become_user: postgres
 # Call database and tables creation scripts (required for old versions of Bareos)
-init_bareos_database: False
+init_bareos_database: True

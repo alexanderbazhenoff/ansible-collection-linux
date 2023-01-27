@@ -2,7 +2,7 @@ galaxy_info:
   role_name: bareos
   namespace: alexanderbazhenoff
   author: Aleksandr Bazhenov
-  description: Install and configure Bareos components.
+  description: Install and configure Bareos and third-party components.
   license: MIT-0
   min_ansible_version: 2.9.0
   platforms:
@@ -19,6 +19,9 @@ galaxy_info:
         - buster
         - stretch
         - jessie
+    - name: rhel
+      versions:
+        - 7
   galaxy_tags:
     - bareos
     - linux

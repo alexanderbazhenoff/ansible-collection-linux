@@ -13,5 +13,7 @@
       vars:
         role_action: install
         bareos_components: dir_webui
-        init_bareos_database: "{{ (ansible_distribution == 'CentOS') }}"
+        postgresql_version: "{% if ansible_os_family == 'RedHat' and ansible_distribution_major_version | int == 8 -%}
+          13{% else %}14{% endif %}"
+        init_bareos_database: "{{ (ansible_os_family == 'RedHat') }}"
         debug_mode: True

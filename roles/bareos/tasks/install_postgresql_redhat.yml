@@ -6,48 +6,68 @@
     state: present
     validate_certs: False
 
-- name: "install postgresql redhat | Install repository package"
-  ansible.builtin.yum:
-    name: |
-      {{ postgresql_url }}repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-{{ ansible_architecture -}}
-      /pgdg-redhat-repo-latest.noarch.rpm
-    validate_certs: False
+- name: "install postgresql redhat | Include check repo url tasks"
+  ansible.builtin.include_tasks: check_postgresql_repo_url_redhat.yml
+
+- name: "install postgresql redhat | Get postgresql dnf postgresql modules list"   # noqa risky-shell-pipe
+  ansible.builtin.shell: dnf module list | grep 'postgresql' {% if postgresql_version | string | length > 0 %} | grep
+    {{ postgresql_version }}{% endif %} || true
+  register: dnf_postgresql_module_results
+  changed_when: False
+  when: ansible_pkg_mgr == 'dnf'
+
+- name: "install postgresql redhat | Enable postgresql module version"
+  ansible.builtin.command: >-
+    dnf -qy module enable postgresql{% if postgresql_version | string in dnf_postgresql_module_results.stdout and
+    postgresql_version | int > 0 %}:{{ postgresql_version }}{% endif -%}
+  register: dnf_postgresql_enable_results
+  changed_when: True
+  when: ansible_pkg_mgr == 'dnf'
+
+- name: "install postgresql redhat | Assert availability of postgresql version repo or dnf module"
+  ansible.builtin.assert:
+    that:
+      - (dnf_postgresql_enable_results.failed is defined and not dnf_postgresql_enable_results.failed) or
+        not check_repo_url_results.failed
+    fail_msg: >-
+      {{ repo_url_to_install }} is not available for your Linux distribution in repositories
+      {% if dnf_postgresql_enable_results.failed is defined and dnf_postgresql_enable_results.failed -%}
+      and dnf modules{% endif %}. Try to change version in 'postgresql_version' role variable or install PostgreSQL
+      server manually.
+
+- name: "install postgresql redhat | Install postgresql repo package"
+  ansible.builtin.package:
+    name: "{{ repo_url_to_install }}"
   register: pgsql_repo_yum_results
   until: pgsql_repo_yum_results is succeeded
   retries: 5
   delay: 5
+  when: not check_repo_url_results.failed
 
-- name: "install postgresql redhat | Install epel-release for libzstd dependency download"
-  ansible.builtin.yum:
-    name: epel-release
-  register: epel_yum_results
-  until: epel_yum_results is succeeded
-  retries: 5
-  delay: 5
+- name: "install postgresql redhat | Set postgresql packages list"
+  ansible.builtin.set_fact:
+    packages_to_install:
+      - "{{ postgresql_packages |
+        json_query((ansible_os_family | lower) + (install_psycopg2 | ternary('_psycopg2', ''))) }}"
 
-- name: "install postgresql redhat | Install PostgreSQL server packages (RedHat)"
-  ansible.builtin.yum:
-    name: "{{ item }}"
-    update_cache: True
-  with_items:
-    - "{{ postgresql_packages |
-      json_query((ansible_os_family | lower) + (install_psycopg2 | ternary('_psycopg2', ''))) }}"
-  register: postgresql_yum_results
-  until: postgresql_yum_results is succeeded
-  retries: 5
-  delay: 5
+- name: "install postgresql redhat | Include install tasks depending on package manager"
+  ansible.builtin.include_tasks: pkg_management/install_{{ ansible_pkg_mgr }}.yml
 
-- name: "install postgresql redhat | Check PostgreSQL data directory files"
+- name: "install postgresql redhat | Check postgresql data directory files"
   ansible.builtin.find:
-    paths: /var/lib/pgsql/{{ postgresql_version }}/data
+    paths: /var/lib/pgsql/{% if not check_repo_url_results.failed and postgresql_version is not none and
+      postgresql_version | string | length > 0 %}{{ postgresql_version }}/{% endif %}data
   register: postgresql_data_files_found
 
 - name: "install postgresql redhat | Init database"
   ansible.builtin.command:
-    cmd: |
-      {% if (ansible_distribution_major_version | int >= 7) -%}
-      /usr/pgsql-{{ postgresql_version }}/bin/postgresql-{{ postgresql_version }}-setup initdb{% else -%}
-      /sbin/service postgresql-{{ postgresql_version }} initdb{% endif %}
+    cmd: >-
+      {% if ansible_distribution == 'Fedora' or ansible_distribution_major_version | int >= 7 -%}
+      {% if check_repo_url_results.failed or dnf_postgresql_enable_results.stdout is defined -%}
+      /usr/bin/postgresql-setup initdb{% else %}/usr/pgsql-{{ postgresql_version -}}
+      /bin/postgresql-{{ postgresql_version }}-setup initdb{% endif %}{% else -%}
+      /sbin/service postgresql{% if not check_repo_url_results.failed and postgresql_version is not none and
+      postgresql_version | string | length > 0 %}-{{ postgresql_version }}{% endif %} initdb{% endif %}
   register: init_db_results
   changed_when: not init_db_results.failed
   when: postgresql_data_files_found.matched == 0

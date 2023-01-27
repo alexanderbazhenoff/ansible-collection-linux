@@ -1,11 +1,11 @@
 ---
 
-- name: "main | Check firewalld is running (CentOS)"   # noqa command-instead-of-module
+- name: "main | Check firewalld is running (RedHat)"   # noqa command-instead-of-module
   ansible.builtin.command: systemctl is-active firewalld
   ignore_errors: True
   register: firewalld_state
   changed_when: False
-  when: role_action | regex_search('install') and ansible_distribution == 'CentOS' and firewall_control
+  when: role_action | regex_search('install') and ansible_os_family == 'RedHat' and firewall_control
 
 - name: "main | Check ufw exists and running (Ubuntu)"
   ansible.builtin.command: ufw status
@@ -14,32 +14,41 @@
   changed_when: False
   when: role_action | regex_search('install') and ansible_distribution == 'Ubuntu' and firewall_control
 
-- name: "main | Cleanup Bareos component(s)"
+- name: "main | Cleanup bareos component(s)"
   block:
     - name: "| Include cleanup bareos tasks"
       ansible.builtin.include_tasks: "purge_bareos_{{ ansible_os_family | lower }}.yml"
-    - name: "| Cleanup Bareos-related files and folders"
+    - name: "| Set swap bareos web packages flag"
+      ansible.builtin.set_fact:
+        swap_bareos_web_packages: True
+    - name: "| Cleanup bareos-related files and folders"
       ansible.builtin.file:
         path: "{{ item | trim }}"
         state: absent
+      when: item is defined and item is not none and item | length > 0
       with_items:
         - "{{ bareos_path | json_query(bareos_components) }}"
   when: (clean_install and role_action == 'install') or role_action == 'uninstall'
 
-- name: "main | Cleanup PostgreSQL"
+# (Workaround of initdb timezone error of PostgreSQL (e.g. v14) mostly for Alpine, but also performing on Debian family)
+- name: "main | Include fix timezone tasks"
+  ansible.builtin.include_tasks: fix_timezone.yml
+  when: ansible_os_family | regex_search('Alpine|Debian')
+
+- name: "main | Include purge postgresql tasks"
   ansible.builtin.include_tasks: "purge_postgresql_{{ ansible_os_family | lower }}.yml"
   when: bareos_components | regex_search('dir') and role_action | regex_search('install') and clean_install and
     not preinstalled_postgresql
 
-- name: "main | Cleanup firewall rules (or configure to reject connections)"
+- name: "main | Include firewall control tasks (reject connections)"
   ansible.builtin.include_tasks: firewall_control.yml
   when: firewall_control and role_action == 'uninstall'
 
-- name: "main | Install postgresql database"
+- name: "main | Include install postgresql main tasks"
   ansible.builtin.include_tasks: install_postgresql_main.yml
   when: bareos_components | regex_search('dir') and not preinstalled_postgresql and role_action == 'install'
 
-- name: "main | Install Bareos component(s)"
+- name: "main | Include install bareos main tasks"
   ansible.builtin.include_tasks: install_bareos_main.yml
   when: role_action == 'install'
 
@@ -54,9 +63,9 @@
     - "{{ bareos_configs_to_copy }}"
   notify:
     - bareos daemons restart
-  when: (role_action == 'install' or role_action == 'copy_configs') and bareos_configs_to_copy | length > 0
+  when: (role_action == 'install' or role_action == 'copy_configs' ) and bareos_configs_to_copy | length > 0
 
-- name: "main | Create Bareos Web UI access profile"
+- name: "main | Create bareos Web UI access profile"
   ansible.builtin.template:
     src: console.conf.j2
     dest: /etc/bareos/bareos-dir.d/console/{{ webui_username }}.conf
@@ -67,7 +76,7 @@
     - bconsole reload
   when: role_action == 'access'
 
-- name: "main | Revoke Bareos Web UI access profile"
+- name: "main | Revoke bareos Web UI access profile"
   ansible.builtin.file:
     path: /etc/bareos/bareos-dir.d/console/{{ webui_username }}.conf
     state: absent
@@ -75,6 +84,6 @@
     - bconsole reload
   when: role_action == 'revoke_access' and webui_username | length > 0
 
-- name: "main | Add client on Bareos server"
+- name: "main | Include add client (on bareos server) tasks"
   ansible.builtin.include_tasks: add_client.yml
   when: role_action == 'add_client' and bareos_components == 'fd'

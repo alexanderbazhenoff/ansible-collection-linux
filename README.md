@@ -64,15 +64,7 @@ ansible-galaxy collection install $(ls -1 | grep ".tar.gz")
 
 ## Usage.
 
-1. Create inventory and create playbook files. Include these roles into your playbook. These roles include example
+Create inventory and create playbook files. Include these roles into your playbook. These roles include example
 playbooks and inventory files already. You can also find usage examples in readme files or `/example` sub-folders.
-2. If you like it please vote on [ansible galaxy page](https://galaxy.ansible.com/alexanderbazhenoff/linux).
-3. If you found an issue please submit [here](https://github.com/alexanderbazhenoff/ansible-collection-linux/issues)
-with detailed information, e.g:
 
-- Playbook and parameters which the role was included with.
-- Distribution and output of: `ansible --version`.
-- What did you expect?
-- What did you get?
-
-Thank you.
+If you like it please vote on [ansible galaxy page](https://galaxy.ansible.com/alexanderbazhenoff/linux).

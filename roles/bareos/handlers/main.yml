@@ -15,5 +15,6 @@
   ansible.builtin.service:
     name: "{{ item }}"
     state: restarted
+  when: item is defined and item is not none and item | length > 0
   with_items:
     - "{{ bareos_daemons | json_query(bareos_components) }}"

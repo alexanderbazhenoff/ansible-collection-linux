@@ -7,10 +7,8 @@
       {% endif %}
   when: add_component_name is none or add_component_name | length == 0
 
-- name: "add client | Get file daemons list from Bareos server"
-  ansible.builtin.shell: >-
-    set -o pipefail;
-    echo 'list clients' | bconsole
+- name: "add client | Get file daemons list from bareos server"
+  ansible.builtin.shell: set -o pipefail; echo 'list clients' | bconsole
   args:
     executable: /bin/bash
   register: bconsole_list_results
@@ -21,12 +19,12 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
-  with_items:
-    - "/etc/bareos/bareos-dir.d/client/{{ add_component_name }}.conf"
-    - "/etc/bareos/bareos-dir-export/client/{{ add_component_name }}"
-  delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
   when: bconsole_list_results.stdout is defined and add_component_name not in bconsole_list_results.stdout and
     not add_component_force
+  with_items:
+    - /etc/bareos/bareos-dir.d/client/{{ add_component_name }}.conf
+    - /etc/bareos/bareos-dir-export/client/{{ add_component_name }}
+  delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
 
 - name: "add client | bconsole configure add {{ role_action.split('_') | last }}"
   ansible.builtin.shell: >-
@@ -50,7 +48,7 @@
   delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
   no_log: "{{ not (debug_mode | default(False)) }}"
 
-- name: "add cleint | Warn when file daemon client already exists on Bareos server"
+- name: "add cleint | Warn when file daemon client already exists on bareos server"
   ansible.builtin.debug:
     msg: "WARNINIG! {{ add_component_name }} already exists on
       {{ add_component_server | default(ansible_default_ipv4.address) }}, trying to export an existing config."
@@ -59,25 +57,25 @@
 
 - name: "add client | Check file daemon config created or already exists on a server"
   ansible.builtin.stat:
-    path: "/etc/bareos/bareos-dir-export/client/{{ add_component_name }}/bareos-fd.d/director/bareos-dir.conf"
+    path: /etc/bareos/bareos-dir-export/client/{{ add_component_name }}/bareos-fd.d/director/bareos-dir.conf
   register: check_bareos_fd_config
   failed_when: not check_bareos_fd_config.stat.exists
   delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
 
-- name: "add client | Insert TLS option in export content of the config on Bareos server"
+- name: "add client | Insert TLS option in export content of the config on bareos server"
   ansible.builtin.lineinfile:
-    path: "/etc/bareos/bareos-dir-export/client/{{ add_component_name }}/bareos-fd.d/director/bareos-dir.conf"
+    path: /etc/bareos/bareos-dir-export/client/{{ add_component_name }}/bareos-fd.d/director/bareos-dir.conf
     insertbefore: '^}'
     line: "  TlsEnable = {{ add_component_tls_enable | lower }}"
   delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
 
-- name: "add client | Get export content of the config from Bareos server"
+- name: "add client | Get export content of the config from bareos server"
   ansible.builtin.slurp:
-    src: "/etc/bareos/bareos-dir-export/client/{{ add_component_name }}/bareos-fd.d/director/bareos-dir.conf"
+    src: /etc/bareos/bareos-dir-export/client/{{ add_component_name }}/bareos-fd.d/director/bareos-dir.conf
   register: bareos_export_config_data
   delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
 
-- name: "add client | (debug) Show export content of the config from Bareos server"
+- name: "add client | (debug) Show export content of the config from bareos server"
   ansible.builtin.debug:
     msg: "{{ bareos_export_config_data.content | b64decode }}"
   when: debug_mode | default(False)

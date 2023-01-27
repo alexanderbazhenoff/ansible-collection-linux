@@ -8,12 +8,13 @@ dependency:
 driver:
   name: docker
 platforms:
+
   - name: debian10-instance
     image: jrei/systemd-debian:10
-    build:
-      dockerfile: dockerfile_debian.j2
-      args:
-        MOLECULE_IMAGE: jrei/systemd-debian:10
+    dockerfile: dockerfile_debian.j2
+    buildargs:
+      image_platform: 'jrei/systemd-debian'
+      image_tag: '10'
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -28,12 +29,13 @@ platforms:
     groups:
       - bareos_servers
       - bareos_clients
+
   - name: debian11-instance
     image: jrei/systemd-debian:11
-    build:
-      dockerfile: dockerfile_debian.j2
-      args:
-        MOLECULE_IMAGE: jrei/systemd-debian:11
+    dockerfile: dockerfile_debian.j2
+    buildargs:
+      image_platform: 'jrei/systemd-debian'
+      image_tag: '11'
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -48,12 +50,13 @@ platforms:
     groups:
       - bareos_servers
       - bareos_clients
+
   - name: ubuntu1804-instance
     image: jrei/systemd-ubuntu:18.04
-    build:
-      dockerfile: dockerfile_ubuntu.j2
-      args:
-        MOLECULE_IMAGE: jrei/systemd-ubuntu:18.04
+    dockerfile: dockerfile_debian.j2
+    buildargs:
+      image_platform: 'jrei/systemd-ubuntu'
+      image_tag: '18.04'
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -68,12 +71,13 @@ platforms:
     groups:
       - bareos_servers
       - bareos_clients
+
   - name: ubuntu2004-instance
     image: jrei/systemd-ubuntu:20.04
-    build:
-      dockerfile: dockerfile_ubuntu.j2
-      args:
-        MOLECULE_IMAGE: jrei/systemd-ubuntu:20.04
+    dockerfile: dockerfile_debian.j2
+    buildargs:
+      image_platform: 'jrei/systemd-ubuntu'
+      image_tag: '20.04'
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -88,8 +92,13 @@ platforms:
     groups:
       - bareos_servers
       - bareos_clients
-  - name: centos7-instance-server
+
+  - name: centos7-instance
     image: centos:centos7
+    dockerfile: dockerfile_redhat.j2
+    buildargs:
+      image_platform: 'centos'
+      image_tag: 'centos7'
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -102,8 +111,14 @@ platforms:
     command: "/lib/systemd/systemd"
     groups:
       - bareos_servers
-  - name: centos7-instance-client
-    image: centos:centos7
+      - bareos_clients
+
+  - name: centos8-instance
+    image: centos:8
+    dockerfile: dockerfile_redhat.j2
+    buildargs:
+      image_platform: 'centos'
+      image_tag: '8'
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -115,7 +130,9 @@ platforms:
       - SYS_ADMIN
     command: "/lib/systemd/systemd"
     groups:
+      - bareos_servers
       - bareos_clients
+
 scenario:
   test_sequence:
     - dependency
@@ -143,8 +160,10 @@ provisioner:
         bareos_dir: ubuntu2004-instance
       ubuntu2004-instance:
         bareos_dir: ubuntu1804-instance
-      centos7-instance-client:
-        bareos_dir: centos7-instance-server
+      centos7-instance:
+        bareos_dir: centos7-instance
+      centos8-instance:
+        bareos_dir: centos8-instance
 lint: |
     export ANSIBLE_ROLES_PATH=${MOLECULE_PROJECT_DIRECTORY}/..
     export PY_COLORS=1

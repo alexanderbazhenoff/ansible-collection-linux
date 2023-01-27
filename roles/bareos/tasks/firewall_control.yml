@@ -6,17 +6,17 @@
     permanent: True
     immediate: True
     state: "{{ firewalld_rules_state | default('disabled') }}"
+  when: firewall_control and ansible_os_family == 'RedHat' and firewalld_state.stdout is defined and
+    firewalld_state.stdout == 'active'
   with_items:
     - "{{ bareos_ports | json_query(bareos_components) }}"
-  when: firewall_control and ansible_distribution == 'CentOS' and firewalld_state.stdout is defined and
-    firewalld_state.stdout == 'active'
 
 - name: "firewall control | Add ufw rule(s) (Ubuntu)"
   community.general.ufw:
     rule: "{{ ufw_rules_state | default('deny') }}"
     port: "{{ item }}"
     proto: tcp
-  with_items:
-    - "{{ bareos_ports | json_query(bareos_components) }}"
   when: firewall_control and ansible_distribution == 'Ubuntu' and not ufw_state.failed and
     ufw_state.stdout is defined and 'inactive' not in ufw_state.stdout
+  with_items:
+    - "{{ bareos_ports | json_query(bareos_components) }}"

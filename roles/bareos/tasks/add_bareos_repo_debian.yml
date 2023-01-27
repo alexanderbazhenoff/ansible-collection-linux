@@ -1,26 +1,40 @@
 ---
 
-- name: "add bareos repo debian | Install gnupg2 and apt-transport-https"
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: True
-  with_items:
-    - gnupg2
-    - apt-transport-https
-  register: pkgs_apt_results
-  until: pkgs_apt_results is succeeded
-  retries: 5
-  delay: 5
+- name: "add bareos repo debian | Set fact for bareos repo URL"
+  ansible.builtin.set_fact:
+    repo_url_to_install: >-
+      {% if ansible_distribution == "Debian" and linux_distro_major_version | int >= 10 -%}
+      {{ bareos_url }}{{ bareos_release }}/{{ ansible_distribution }}_{{ linux_distro_major_version -}}
+      {% elif ansible_distribution == "Debian" and linux_distro_major_version | int <= 9 -%}
+      {{ bareos_url }}{{ bareos_release }}/{{ ansible_distribution }}_{{ linux_distro_major_version }}.0{% endif -%}
+      {% if ansible_distribution == "Ubuntu" -%}
+      {{ bareos_url }}{{ bareos_release }}/x{{ ansible_distribution }}_{{ linux_distro_major_version }}.04{% endif -%}
+      /Release
 
-- name: "add bareos repo debian | Add Bareos GPG key"
+- name: "add bareos repo debian | (debug) Show repo URL"
+  ansible.builtin.debug:
+    var: repo_url_to_install
+  when: debug_mode | default(False)
+
+- name: "add bareos repo debian | Include check bareos repo url tasks"
+  ansible.builtin.include_tasks: check_repo_url.yml
+
+- name: "add bareos repo debian | Assert bareos repo is available"
+  ansible.builtin.assert:
+    that:
+      - check_repo_url_results is defined and not check_repo_url_results.failed
+    fail_msg: >-
+      {{ check_repo_url_results }} is not available for your Linux distribution. Try to override distribution version
+      with 'override_ansible_distribution_major_version' variable.
+
+- name: "add bareos repo debian | Add bareos GPG key"
   ansible.builtin.apt_key:
-    url: "{{ bareos_repo_url | trim }}/Release.key"
+    url: "{{ repo_url_to_install }}.key"
     state: present
 
 - name: "add bareos repo debian | Get bareos.list file"
   ansible.builtin.get_url:
-    url: "{{ bareos_repo_url | trim }}/bareos.list"
+    url: "{{ repo_url_to_install | replace('Release', 'bareos.list') }}"
     dest: /etc/apt/sources.list.d/bareos.list
     mode: 0644
     owner: root

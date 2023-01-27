@@ -1,5 +1,22 @@
 ---
 
+- name: "install postgresql debian | Check required repo URL is available"
+  ansible.builtin.uri:
+    url: "{{ postgresql_debian_apt_repo_url_prefix }}/dists/{{ ansible_distribution_release -}}
+      -pgdg/{{ postgresql_version | default('') }}/"
+  register: check_repo_url_results
+  ignore_errors: True
+  failed_when: check_repo_url_results.status == 404
+
+- name: "install postgresql debian | Assert availability of postgresql version repo"
+  ansible.builtin.assert:
+    that:
+      - not check_repo_url_results.failed
+    fail_msg: >-
+      {{ postgresql_debian_apt_repo_url_prefix }}{{ ansible_distribution_release }}-pgdg/{{ postgresql_version }}/ is
+      not available for your Linux distribution in repositories. Try to change version in 'postgresql_version' role
+      variable or install PostgreSQL server manually.
+
 - name: "install postgresql debian | Create folder for keyring"
   ansible.builtin.file:
     path: "{{ postgresql_debian_keys_dir }}"
@@ -22,9 +39,10 @@
     repo: "{{ postgresql_debian_repo }}"
     update_cache: True
 
-- name: "install postgresql debian | Install PostgreSQL server packages"
+- name: "install postgresql debian | Install postgresql server packages"
   ansible.builtin.apt:
     name: "{{ item }}"
+  when: item is defined and item is not none and item | length > 0
   with_items:
     - "{{ postgresql_packages |
       json_query((ansible_os_family | lower) + (install_psycopg2 | ternary('_psycopg2', ''))) }}"

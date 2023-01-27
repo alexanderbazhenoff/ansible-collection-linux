@@ -1,30 +1,37 @@
 ---
 
+- name: "install bareos main | Install pre-requirements"
+  ansible.builtin.include_tasks: install_pre_requirements.yml
+
 - name: "install postgresql main | Include install postgresql tasks"
   ansible.builtin.include_tasks: "install_postgresql_{{ ansible_os_family | lower }}.yml"
 
-- name: "install postgresql main | Set fact for postgresql service name"
+- name: "install postgresql main | Populate service facts"
+  ansible.builtin.service_facts:
+
+- name: "install postgresql main | Set daemon name fact"
   ansible.builtin.set_fact:
     postgresql_service_name: >-
-      postgresql{% if (ansible_distribution == "CentOS") %}-{{ postgresql_version }}{% endif %}
+      {% if ansible_facts.services is defined and ansible_os_family != 'Alpine' -%}
+      {{ (ansible_facts.services | select('regex', '^postgresql'))[0] }}{% else %}postgresql{% endif %}
 
-- name: "install postgresql main | Check PostgreSQL service is enabled"   # noqa command-instead-of-module
+- name: "install postgresql main | Check postgresql service is enabled"   # noqa command-instead-of-module
   ansible.builtin.shell: systemctl is-enabled {{ postgresql_service_name }} || exit 0
   register: service_enabled_results
   changed_when: False
 
-- name: "install postgresql main | Check PostgreSQL service is active"   # noqa command-instead-of-module
+- name: "install postgresql main | Check postgresql service is active"   # noqa command-instead-of-module
   ansible.builtin.shell: systemctl is-active {{ postgresql_service_name }} || exit 0
   register: service_running_results
   changed_when: False
 
-- name: "install postgresql main | Enable PostgreSQL if not enabled after install"
+- name: "install postgresql main | Enable postgresql if not enabled after install"
   ansible.builtin.service:
     name: "{{ postgresql_service_name }}"
     enabled: True
   when: service_enabled_results.stdout is not defined or 'enabled' not in service_enabled_results.stdout
 
-- name: "install postgresql main | Start PostgreSQL if not started after install"
+- name: "install postgresql main | Start postgresql if not started after install"
   ansible.builtin.service:
     name: "{{ postgresql_service_name }}"
     state: started

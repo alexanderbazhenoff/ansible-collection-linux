@@ -1,6 +1,6 @@
 namespace: alexanderbazhenoff
 name: linux
-version: 1.1.0
+version: 1.1.1
 readme: README.md
 authors:
 - Aleksandr Bazhenov <>
@@ -15,6 +15,7 @@ tags:
   - databases
 dependencies:
   "community.general": "*"
+  "community.postgresql": "*"
 repository: https://github.com/alexanderbazhenoff/ansible-collection-linux
 documentation: https://github.com/alexanderbazhenoff/ansible-collection-linux/wiki
 homepage: https://galaxy.ansible.com/alexanderbazhenoff/ansible-collection-linux

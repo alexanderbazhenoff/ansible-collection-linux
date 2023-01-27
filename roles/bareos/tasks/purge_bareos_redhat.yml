@@ -1,10 +1,10 @@
 ---
 
-- name: "purge bareos redhat | Cleanup Bareos packages depending on components to install selection"
-  ansible.builtin.yum:
-    name: "{{ item }}"
-    state: absent
-    autoremove: True
-  with_items:
-    - "{{ bareos_packages | json_query(bareos_components) + install_additional_bareos_packages }}"
-  when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int <= 7
+- name: "purge bareos redhat | Set bareos packages list to uninstall"
+  ansible.builtin.set_fact:
+    packages_to_install:
+      - "{{ bareos_packages | json_query(bareos_components) + install_additional_bareos_packages }}"
+      - "{% if bareos_components | regex_search('webui') %}{{ php_package_dependencies }}{% endif %}"
+
+- name: "purge bareos redhat | Include purge tasks depending on package manager"
+  ansible.builtin.include_tasks: pkg_management/purge_{{ ansible_pkg_mgr }}.yml

@@ -1,14 +1,54 @@
 ---
 
+- name: "add bareos repo redhat | Trying to set bareos repo URL by Linux distribution"
+  ansible.builtin.set_fact:
+    repo_url_to_install: >-
+      {{ bareos_url }}{{ bareos_release }}/{% if ansible_distribution == 'Red Hat Enterprise Linux' %}RHEL{% else -%}
+      {{ ansible_distribution }}{% endif %}_{{ linux_distro_major_version }}/bareos.repo
+
+- name: "add bareos repo redhat | Include check repo url tasks with distribution-defined URL prefix"
+  ansible.builtin.include_tasks: check_repo_url.yml
+
+- name: "add bareos repo redhat | First retry to set bareos repo URL"
+  ansible.builtin.set_fact:
+    repo_url_to_install: "{{ bareos_url }}{{ bareos_release }}/EL_{{ linux_distro_major_version }}/bareos.repo"
+  when: check_repo_url_results.failed
+
+- name: "add bareos repo redhat | Include check repo url tasks with EL_ prefix"
+  ansible.builtin.include_tasks: check_repo_url.yml
+  when: check_repo_url_results.failed
+
+- name: "add bareos repo redhat | Second retry to set bareos URL"
+  ansible.builtin.set_fact:
+    repo_url_to_install: "{{ bareos_url }}{{ bareos_release }}/RHEL_{{ linux_distro_major_version }}/bareos.repo"
+  when: check_repo_url_results.failed
+
+- name: "add bareos repo redhat | Include check repo url tasks with RHEL_ prefix"
+  ansible.builtin.include_tasks: check_repo_url.yml
+  when: check_repo_url_results.failed
+
+- name: "add bareos repo redhat | Assert bareos repo is available"
+  ansible.builtin.assert:
+    that:
+      - check_repo_url_results is defined and not check_repo_url_results.failed
+    fail_msg: >-
+      {{ repo_url_to_install }} is not available for your Linux distribution. Try to override distribution version with
+      'override_ansible_distribution_major_version' role variable.
+
+- name: "add bareos repo redhat | (debug) Show repo URL"
+  ansible.builtin.debug:
+    var: bareos_repo_url
+  when: debug_mode | default(False)
+
 - name: "add bareos repo redhat | Add GPG key"
   ansible.builtin.rpm_key:
-    key: "{{ bareos_repo_url | trim }}/RPM-GPG-KEY"
+    key: "{{ repo_url_to_install | replace('bareos.repo', 'RPM-GPG-KEY') }}"
     state: present
     validate_certs: False
 
 - name: "add bareos repo redhat | Get bareos.repo file"
   ansible.builtin.get_url:
-    url: "{{ bareos_repo_url | trim }}/bareos.repo"
+    url: "{{ repo_url_to_install }}"
     dest: /etc/yum.repos.d/bareos.repo
     validate_certs: False
     mode: 0644

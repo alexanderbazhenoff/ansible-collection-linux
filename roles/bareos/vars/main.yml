@@ -6,64 +6,75 @@ bareos_packages:
   sd:
     - bareos-storage
   dir:
-    - bareos
+    - "{% if role_action != 'uninstall' and ansible_os_family != 'Alpine' %}bareos{% endif %}"
     - bareos-storage
     - bareos-filedaemon
-    - "{% if use_postgresql %}bareos-database-postgresql{% else %}bareos{% endif %}"
-    - bareos-database-tools
-    - bareos-bconsole
+    - "{% if use_postgresql %}{% if ansible_os_family == 'Alpine' %}bareos-postgresql{% else -%}
+      bareos-database-postgresql{% endif %}{% endif %}"
+    - "{% if ansible_os_family != 'Alpine' %}bareos-database-tools{% endif %}"
+    - "{% if ansible_os_family != 'Alpine' %}bareos-bconsole{% endif %}"
   webui:
+    - "{% if ansible_os_family == 'Alpine' %}{% if role_action == 'install' %}apache2{% else -%}
+      bareos-webui-apache2{% endif %}{% endif %}"
     - bareos-webui
+    - "{% if ansible_os_family == 'Alpine' %}{% if role_action == 'install' %}bareos-webui-apache2{% else -%}
+      apache2{% endif %}{% endif %}"
   dir_webui:
-    - bareos
+    - "{% if role_action != 'uninstall' and ansible_os_family != 'Alpine' %}bareos{% endif %}"
     - bareos-storage
     - bareos-filedaemon
+    - "{% if ansible_os_family == 'Alpine' %}{% if role_action == 'install' and swap_bareos_web_packages is defined -%}
+      apache2{% else %}bareos-webui-apache2{% endif %}{% endif %}"
     - bareos-webui
-    - "{% if use_postgresql %}bareos-database-postgresql{% else %}bareos{% endif %}"
-    - bareos-database-tools
-    - bareos-bconsole
+    - "{% if use_postgresql %}{% if ansible_os_family == 'Alpine' %}bareos-postgresql{% else -%}
+      bareos-database-postgresql{% endif %}{% endif %}"
+    - "{% if ansible_os_family != 'Alpine' %}bareos-database-tools{% endif %}"
+    - "{% if ansible_os_family != 'Alpine' %}bareos-bconsole{% endif %}"
+    - "{% if ansible_os_family == 'Alpine' %}{% if role_action == 'install' and swap_bareos_web_packages is defined -%}
+      bareos-webui-apache2{% else %}apache2{% endif %}{% endif %}"
 
 bareos_path:
   fd:
     - /etc/bareos/bareos-fd.d
-    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% else -%}
-      /etc/bareos/bareos-fd.d{% endif %}"
-    - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
-      {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% endif %}"
+    - "{% if ansible_os_family == 'RedHat' %}/etc/yum.repos.d/bareos.repo{% endif -%}
+      {% if ansible_os_family == 'Debian' %}/etc/apt/sources.list.d/bareos.list{% endif %}"
   sd:
     - /etc/bareos/bareos-sd.d
-    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% else -%}
-      /etc/bareos/bareos-sd.d{% endif %}"
-    - "{% if (cleanup_storage_files) %}/var/lib/bareos{% else %}/etc/bareos/bareos-sd.d{% endif %}"
-    - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
-      {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% endif %}"
+    - "{% if cleanup_storage_files %}/var/lib/bareos{% endif %}"
+    - "{% if ansible_os_family == 'RedHat' %}/etc/yum.repos.d/bareos.repo{% endif -%}
+      {% if ansible_os_family == 'Debian' %}/etc/apt/sources.list.d/bareos.list{% endif %}"
   dir:
     - /etc/bareos/bareos-dir.d
     - /etc/bareos/bareos-dir-export
     - /etc/bareos/bareos-sd.d
-    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% else -%}
-      /etc/bareos/bareos-sd.d{% endif %}"
+    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% endif %}"
     - /etc/bareos/bareos-fd.d
-    - "{% if (cleanup_storage_files) %}/var/lib/bareos{% else %}/etc/bareos/bareos-sd.d{% endif %}"
-    - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
-      {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+    - "{% if cleanup_storage_files %}/var/lib/bareos{% endif %}"
+    - "{% if ansible_os_family == 'RedHat' %}/etc/yum.repos.d/bareos.repo{% endif -%}
+      {% if ansible_os_family == 'Debian' %}/etc/apt/sources.list.d/bareos.list{% endif %}"
     - /etc/bareos/bconsole.conf
   webui:
     - /etc/bareos-webui
-    - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
-      {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+    - "{% if ansible_os_family == 'RedHat' %}/etc/yum.repos.d/bareos.repo{% endif -%}
+      {% if ansible_os_family == 'Debian' %}/etc/apt/sources.list.d/bareos.list{% endif %}"
   dir_webui:
     - /etc/bareos/bareos-dir.d
     - /etc/bareos/bareos-dir-export
     - /etc/bareos-webui
     - /etc/bareos/bareos-sd.d
-    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% else -%}
-      /etc/bareos/bareos-sd.d{% endif %}"
+    - "{% if ('bareos-traymonitor' in install_additional_bareos_packages) %}/etc/bareos/tray-monitor.d{% endif %}"
     - /etc/bareos/bareos-fd.d
-    - "{% if (cleanup_storage_files) %}/var/lib/bareos{% else %}/etc/bareos/bareos-sd.d{% endif %}"
-    - "/etc/{% if (ansible_os_family == 'RedHat') %}yum.repos.d/bareos.repo{% endif -%}
-      {% if (ansible_os_family == 'Debian') %}apt/sources.list.d/bareos.list{% endif %}"
+    - "{% if cleanup_storage_files %}/var/lib/bareos{% endif %}"
+    - "{% if ansible_os_family == 'RedHat' %}/etc/yum.repos.d/bareos.repo{% endif -%}
+      {% if ansible_os_family == 'Debian' %}/etc/apt/sources.list.d/bareos.list{% endif %}"
     - /etc/bareos/bconsole.conf
+
+bareos_scripts_path:
+  debian: /usr/lib/bareos/scripts/
+  redhat: /usr/lib/bareos/scripts
+  alpine: /etc/bareos/scripts
 
 bareos_daemons:
   fd:
@@ -75,12 +86,12 @@ bareos_daemons:
     - bareos-fd
     - bareos-dir
   webui:
-    - "{% if (ansible_os_family == 'RedHat') %}httpd{% elif (ansible_os_family == 'Debian') %}apache2{% endif %}"
+    - "{% if ansible_os_family == 'RedHat' %}httpd{% else %}apache2{% endif %}"
   dir_webui:
     - bareos-sd
     - bareos-fd
     - bareos-dir
-    - "{% if (ansible_os_family == 'RedHat') %}httpd{% elif (ansible_os_family == 'Debian') %}apache2{% endif %}"
+    - "{% if ansible_os_family == 'RedHat' %}httpd{% else %}apache2{% endif %}"
 
 bareos_ports:
   fd:
@@ -103,14 +114,23 @@ bareos_ports:
 
 postgresql_packages:
   debian_psycopg2:
-    - "postgresql{{ '-' ~ postgresql_version | default('') }}"
-    - "python{{ (ansible_python.version.major == 3) | ternary('3', '') }}-psycopg2"
+    - postgresql{{ '-' ~ postgresql_version | default('') }}
+    - python{{ (ansible_python.version.major == 3) | ternary('3', '') }}-psycopg2
   debian:
-    - "postgresql{{ '-' ~ postgresql_version | default('') }}"
+    - postgresql{{ '-' ~ postgresql_version | default('') }}
   redhat_psycopg2:
-    - epel-release
-    - "postgresql{{ postgresql_version | default('') }}-server"
-    - "python{{ ansible_python.version.major }}-psycopg2"
+    - postgresql{% if dnf_postgresql_enable_results.stdout is not defined and not check_repo_url_results.failed |
+      default(False) %}{{ postgresql_version | default('') }}{% endif %}-server
+    - python{{ ansible_python.version.major }}-psycopg2
   redhat:
-    - epel-release
-    - "postgresql{{ postgresql_version | default('') }}-server"
+    - postgresql{% if dnf_postgresql_enable_results.stdout is not defined and not check_repo_url_results.failed |
+      default(False) %}{{ postgresql_version | default('') }}{% endif %}-server
+  alpine:
+    - postgresql{{ postgresql_version | default('') }}
+  alpine_psycopg2:
+    - postgresql{{ postgresql_version | default('') }}
+    - py{{ (ansible_python.version.major == 3) | ternary('3', '') }}-psycopg2
+
+php_package_dependencies:
+  - php-intl
+  - php-mbstring

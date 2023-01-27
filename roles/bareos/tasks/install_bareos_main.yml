@@ -1,41 +1,37 @@
 ---
 
-- name: "install bareos main | Set fact for Bareos repo URL"
+- name: "install bareos main | Set fact for repository linux distribution major version"
   ansible.builtin.set_fact:
-    bareos_repo_url: >-
-      {% if (ansible_distribution == "CentOS") -%}
-      {{ bareos_url }}{{ bareos_release }}/{{ ansible_distribution }}_{{ ansible_distribution_major_version -}}
-      {% endif -%}
-      {% if (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 10) -%}
-      {{ bareos_url }}{{ bareos_release }}/{{ ansible_distribution }}_{{ ansible_distribution_major_version -}}
-      {% elif (ansible_distribution == "Debian" and ansible_distribution_major_version | int <= 9) -%}
-      {{ bareos_url }}{{ bareos_release }}/{{ ansible_distribution }}_{{ ansible_distribution_major_version -}}
-      .0{% endif -%}
-      {% if (ansible_distribution == "Ubuntu") -%}
-      {{ bareos_url }}{{ bareos_release }}/x{{ ansible_distribution }}_{{ ansible_distribution_major_version -}}
-      .04{% endif %}
+    linux_distro_major_version: >-
+      {% if override_ansible_distribution_major_version is defined and override_ansible_distribution_major_version is
+      not none and override_ansible_distribution_major_version | string | length > 0 -%}
+      {{ override_ansible_distribution_major_version }}{% else %}{{ ansible_distribution_major_version }}{% endif %}
 
-- name: "install bareos main | (debug) Show repo URL"
-  ansible.builtin.debug:
-    var: bareos_repo_url
-  when: debug_mode | default(False)
+- name: "install bareos main | Install pre-requirements"
+  ansible.builtin.include_tasks: install_pre_requirements.yml
 
 - name: "install bareos main | Include add bareos repo tasks"
-  ansible.builtin.include_tasks: "add_bareos_repo_{{ ansible_os_family | lower }}.yml"
+  ansible.builtin.include_tasks: add_bareos_repo_{{ ansible_os_family | lower }}.yml
+  when: ansible_os_family != 'Alpine'
+
+- name: "install bareos main | Include install php requirements tasks"
+  ansible.builtin.include_tasks: install_php_requirements_redhat.yml
+  when: ansible_os_family == 'RedHat' and bareos_components | regex_search('webui')
 
 - name: "install bareos main | Install packages depending on components to install and additional packages list"
   ansible.builtin.package:
     name: "{{ item }}"
-  with_items:
-    - "{{ bareos_packages | json_query(bareos_components) + install_additional_bareos_packages }}"
-  notify:
-    - bareos daemons restart
+  when: item is defined and item is not none and item | length > 0
   register: bareos_pkgs_results
   until: bareos_pkgs_results is succeeded
   retries: 5
   delay: 5
+  with_items:
+    - "{{ bareos_packages | json_query(bareos_components) + install_additional_bareos_packages }}"
+  notify:
+    - bareos daemons restart
 
-- name: "install bareos main | Copy missing directors.ini and configuration.ini config (Debian family)"
+- name: "install bareos main | Copy missing directors.ini and configuration.ini config (Debian)"
   ansible.builtin.template:
     src: "{{ item.source }}"
     dest: "{{ item.destination }}"
@@ -65,21 +61,12 @@
 
 - name: "install bareos main | Create bareos database, make bareos tables, grant privileges"
   ansible.builtin.shell: |
-    set -e -o pipefail
-    su {{ postgresql_become_user }} -c /usr/lib/bareos/scripts/create_bareos_database
-    su {{ postgresql_become_user }} -c /usr/lib/bareos/scripts/make_bareos_tables
-    su {{ postgresql_become_user }} -c /usr/lib/bareos/scripts/grant_bareos_privileges
-  args:
-    executable: /bin/bash
+    su {{ postgresql_become_user }} -c 'cd {{ bareos_scripts_path | json_query(ansible_os_family | lower) }}; \
+      ./create_bareos_database; ./make_bareos_tables; ./grant_bareos_privileges'
   register: pgsql_user_and_database_create_and_grant_results
   changed_when: not pgsql_user_and_database_create_and_grant_results.failed
   when: bareos_components | regex_search('dir') and init_bareos_database
 
-- name: "install bareos main | Enable and start daemons via systemctl (RedHat)"
-  ansible.builtin.command:
-    cmd: "systemctl enable --now {{ item }}"
-  with_items:
-    - "{{ bareos_daemons | json_query(bareos_components) }}"
-  register: systemctl_results
-  changed_when: not systemctl_results.failed
-  when: ansible_os_family == 'RedHat'
+- name: "install bareos main | Include enable start bareos tasks"
+  ansible.builtin.include_tasks: "enable_start_bareos_{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family != 'Debian'
