@@ -2,7 +2,7 @@
 
 - name: "install dnf | Install packages"   # noqa package-latest
   ansible.builtin.dnf:
-    name: "{{ item.package | default('') }}"
+    name: "{{ item.package }}"
     state: latest
     update_cache: True
     disable_gpg_check: "{{ item.disable_gpg_check | default(False) }}"

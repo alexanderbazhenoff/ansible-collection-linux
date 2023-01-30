@@ -2,11 +2,11 @@
 
 - name: "install yum | Install packages"   # noqa package-latest
   ansible.builtin.yum:
-    name: "{{ item.package | default('') }}"
+    name: "{{ item.package }}"
     state: latest
     update_cache: True
-    disablerepo: "{{ item.disable_repo | default('') }}"
-    enablerepo: "{{ item.enable_repo | default('') }}"
+    disablerepo: "{{ item.disable_repo | default(omit) }}"
+    enablerepo: "{{ item.enable_repo | default(omit) }}"
     validate_certs: "{{ ansible_python_version is version('2.7.5', '>=') }}"
   register: install_yum_results
   until: install_yum_results is succeeded

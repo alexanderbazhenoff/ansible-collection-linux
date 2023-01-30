@@ -3,7 +3,7 @@
 - name: "Populate service facts"
   ansible.builtin.service_facts:
 
-- name: "Set deemon name fact"
+- name: "Set daemon name fact"
   ansible.builtin.set_fact:
     postgresql_daemon_name: "{{ (ansible_facts.services | select('regex', '^postgresql'))[0] }}"
   when: ansible_os_family != 'Alpine'

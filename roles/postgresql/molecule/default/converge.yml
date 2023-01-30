@@ -16,5 +16,5 @@
         install_pgadmin: True
         debug_mode: True
         postgresql_additional_packages:
-          - "postgresql{% if ansible_os_family == 'Debian' %}-client-{{ postgresql_version }}{% else -%}
-            {{ postgresql_version }}-contrib{% endif %}"
+          - postgresql{% if ansible_os_family == 'Debian' %}-client-{{ postgresql_version }}{% else -%}
+            {{ postgresql_version }}-contrib{% endif %}

@@ -10,8 +10,8 @@
   ansible.builtin.include_tasks: check_postgresql_repo_url_redhat.yml
 
 - name: "install postgresql redhat | Get postgresql dnf postgresql modules list"   # noqa risky-shell-pipe
-  ansible.builtin.shell: dnf module list | grep 'postgresql' {% if postgresql_version | string | length > 0 %} | grep
-    {{ postgresql_version }}{% endif %} || true
+  ansible.builtin.shell: dnf -qy module list | grep 'postgresql' {% if postgresql_version | string | length > 0 %} |
+    grep {{ postgresql_version }}{% endif %} || true
   register: dnf_postgresql_module_results
   changed_when: False
   when: ansible_pkg_mgr == 'dnf'

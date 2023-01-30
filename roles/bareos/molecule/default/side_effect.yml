@@ -23,6 +23,15 @@
         debug_mode: True
       when: inventory_hostname in groups["bareos_clients"]
 
+    ### DEBUG SECTION (uncomment to troubleshoot)
+    #
+    # - name: "default >>> side_effect | (debug) Show params on delegating hosts"
+    #   ansible.builtin.debug:
+    #     msg: "grep by {{ ansible_hostname }} on the host {{ hostvars[inventory_hostname].bareos_dir }}"
+    #   delegate_to: "{{ hostvars[inventory_hostname].bareos_dir }}"
+    #   delegate_facts: True
+    #   when: inventory_hostname in groups["bareos_clients"]
+
     - name: "default >>> side effect | Include bareos role to add bareos-client on bareos-dir"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.bareos

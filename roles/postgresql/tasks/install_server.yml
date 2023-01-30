@@ -13,17 +13,17 @@
     firewall_state: True
 
 - name: "install server | Include firewall control {{ ansible_os_family | lower }} tasks"
-  ansible.builtin.include_tasks: "includes_misc/firewall_control_{{ ansible_os_family | lower }}.yml"
+  ansible.builtin.include_tasks: includes_misc/firewall_control_{{ ansible_os_family | lower }}.yml
   when: ansible_os_family != 'Alpine'
 
 - name: "install server | Include server packages {{ ansible_os_family | lower }} tasks"
-  ansible.builtin.include_tasks: "server_packages_{{ ansible_os_family | lower }}.yml"
+  ansible.builtin.include_tasks: server_packages_{{ ansible_os_family | lower }}.yml
 
 - name: "install server | Include install server {{ ansible_os_family | lower }} tasks"
-  ansible.builtin.include_tasks: "install_server_{{ ansible_os_family | lower }}.yml"
+  ansible.builtin.include_tasks: install_server_{{ ansible_os_family | lower }}.yml
 
 - name: "install server | Include enable and start daemon {{ ansible_os_family | lower }} tasks"
-  ansible.builtin.include_tasks: "includes_misc/enable_and_start_{{ ansible_os_family | lower }}.yml"
+  ansible.builtin.include_tasks: includes_misc/enable_and_start_{{ ansible_os_family | lower }}.yml
   when: ansible_os_family != 'Debian'
 
 - name: "install server | Include configure pg_hba.conf tasks"

@@ -14,7 +14,7 @@
     packages_to_install: "{% if check_pgadmin_repo_url_results.failed %}[]{% else %}{{ pgadmin_packages }}{% endif %}"
 
 - name: "pgadmin packages debian | Include purge repo tasks when there is no pgadmin repo for current linux distro"
-  ansible.builtin.include_tasks: "purge_pgadmin_repo_{{ ansible_os_family | lower }}.yml"
+  ansible.builtin.include_tasks: purge_pgadmin_repo_{{ ansible_os_family | lower }}.yml
   when: check_pgadmin_repo_url_results.failed
 
 - name: "pgadmin packages debian | Install debian repository and update apt cache"

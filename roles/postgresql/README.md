@@ -20,7 +20,7 @@ details).
 firewall rules during uninstall.
 - Configure `pg_hba.conf` on already installed database instance (see [example playbook tasks](#3-configure-pghbaconf)).
 - Configure `postgresql.conf` on already installed database instance 
-([example playboo tasks](#4-configure-postgresqlconf)).
+([example playbook tasks](#4-configure-postgresqlconf)).
 
 Limitations:
 
@@ -41,6 +41,8 @@ Requirements
 ------------
 
 - Any LTS version of Ubuntu. Any version of Debian, RHEL, Centos, Fedora, Oracle Linux and Alpine Linux.
+- Before you run this role on Alpine Linux set your `/etc/apk/repositories` manually (read
+[documentation](https://wiki.alpinelinux.org/wiki/Repositories)).
 
 Dependencies
 ------------
@@ -838,6 +840,11 @@ server instance is not available for your Linux distribution (e.g. check
 There is no automated version handling, include them in the package names.
 
 ### PostgreSQL server (or database instance) parameters:
+
+* **postgresql_default_timezone**. PostgreSQL timezone. Required for PostgreSQL v14+, especially for init server
+instance data directory on Alpine Linux. You can change it later, e.g: `SET TIME ZONE 'America/Montreal';` and/or add:
+`timezone: 'America/Montreal'` to `postgresql_conf` dict variable (See also a
+[list of timezone names](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)). Defaults: 'Europe/Moscow'
 
 * **postgresql_conf** (dict). Parameters from postgresql.conf with the same name here (see
 [documentation](https://www.postgresql.org/docs/current/config-setting.html)). Double quotes to keep single 

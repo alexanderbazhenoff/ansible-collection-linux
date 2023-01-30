@@ -7,11 +7,11 @@
   when: not check_postgresql_repo_url_results.failed
 
 - name: "install server debian | Include purge repo tasks when there is no postgresql repo for current linux distro"
-  ansible.builtin.include_tasks: "purge_pgdg_repo_{{ ansible_os_family | lower }}.yml"
+  ansible.builtin.include_tasks: purge_pgdg_repo_{{ ansible_os_family | lower }}.yml
   when: check_postgresql_repo_url_results.failed
 
 - name: "install server debian | Install packages depending on detected package manager"
-  ansible.builtin.include_tasks: "pkg_management/install_{{ ansible_pkg_mgr }}.yml"
+  ansible.builtin.include_tasks: pkg_management/install_{{ ansible_pkg_mgr }}.yml
 
 - name: "install server debian | Check data directory exists"
   ansible.builtin.find:
@@ -25,6 +25,10 @@
     -D /var/lib/postgresql/{{ postgresql_version }}/main;
     /usr/lib/postgresql/{{ postgresql_version }}/bin/pg_ctl start -D /var/lib/postgresql/{{ postgresql_version }}/main
     -o "-c config_file=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"'
+  environment:
+    LANG: en_US.utf8
+    TZ: "{{ postgresql_default_timezone }}"
+    PGTZ: "{{ postgresql_default_timezone }}"
   register: init_db_results
   changed_when: not init_db_results.failed
   when: not check_postgresql_repo_url_results.failed and postgresql_data_dir_found is defined and

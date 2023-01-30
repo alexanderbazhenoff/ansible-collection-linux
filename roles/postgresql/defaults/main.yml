@@ -41,6 +41,12 @@ firewall_control: True
 
 ### SERVER PARAMETERS:
 
+# PostgreSQL timezone. Required for PostgreSQL v14+, especially for init server instance data directory on Alpine Linux.
+# You can change it later, e.g: SET TIME ZONE 'America/Montreal';
+# and/or add: "timezone: 'America/Montreal'" to postgresql_conf dict variable. See also a list of timezone names:
+# https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+postgresql_default_timezone: 'Europe/Moscow'
+
 # Specify parameters from postgresql.conf with the same name here.
 # https://www.postgresql.org/docs/current/config-setting.html
 # Double quotes to keep single 'quotes of value'.

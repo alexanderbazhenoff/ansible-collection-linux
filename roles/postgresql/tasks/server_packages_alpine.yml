@@ -1,7 +1,7 @@
 ---
 
 - name: "server packages alpine | Check postgresql version is available to download"
-  ansible.builtin.shell: "apk info postgresql{{ postgresql_version | default('') }} || true"
+  ansible.builtin.shell: apk info postgresql{{ postgresql_version | default('') }} || true
   register: apk_info_results
   changed_when: False
 

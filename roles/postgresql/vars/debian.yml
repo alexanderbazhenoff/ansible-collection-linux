@@ -13,24 +13,23 @@ pgadmin_apt_keys_dir: /etc/apt/trusted.gpg.d
 
 postgresql_packages:
   - "{% if install_psycopg2 %}python{{ (ansible_python.version.major == 3) | ternary('3', '') }}-psycopg2{% endif %}"
-  - "postgresql{% if postgresql_version is defined and postgresql_version is not none and postgresql_version | string |
-    length > 0 %}-{{ postgresql_version | default('') }}{% endif %}"
+  - postgresql{% if postgresql_version is defined and postgresql_version is not none and postgresql_version | string |
+    length > 0 %}-{{ postgresql_version | default('') }}{% endif %}
 
 pgadmin_packages:
-  - package: >-
-      pgadmin4{% if pgadmin_installation_type is defined and pgadmin_installation_type is not none and
+  - package: pgadmin4{% if pgadmin_installation_type is defined and pgadmin_installation_type is not none and
       pgadmin_installation_type | length > 0 %}-{% if pgadmin_installation_type == 'web' %}web{% else -%}
       desktop{% endif %}{% endif -%}
 
-postgresql_data_path: "/var/lib/postgresql/{{ postgresql_version }}"
+postgresql_data_path: /var/lib/postgresql/{{ postgresql_version }}
 
-hba_conf_path_alternative_cmd: "find /etc/postgresql -name pg_hba.conf | head -1"
+hba_conf_path_alternative_cmd: find /etc/postgresql -name pg_hba.conf | head -1
 
-postgresql_conf_path_alternative_cmd: "find /etc/postgresql -name postgresql.conf | head -1"
+postgresql_conf_path_alternative_cmd: find /etc/postgresql -name postgresql.conf | head -1
 
-check_postgresql_packages_cmd: "dpkg -l | grep postgresql || true"
+check_postgresql_packages_cmd: dpkg -l | grep postgresql || true
 
-pgadmin_init_cmd: "/usr/pgadmin4/bin/setup-web.sh --yes"
+pgadmin_init_cmd: /usr/pgadmin4/bin/setup-web.sh --yes
 
 pgadmin_data_folders:
   - /var/lib/pgadmin

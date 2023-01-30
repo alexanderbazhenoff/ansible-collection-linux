@@ -41,10 +41,11 @@
 
 - name: "install server alpine | Init database"
   ansible.builtin.command:
-    cmd:
-      su {{ postgresql_become_user }} -c 'initdb -D {{ postgresql_data_path }}'
+    cmd: su {{ postgresql_become_user }} -c 'initdb -D {{ postgresql_data_path }}'
   environment:
-    LANG: "en_US.utf8"
+    LANG: en_US.utf8
+    TZ: "{{ postgresql_default_timezone }}"
+    PGTZ: "{{ postgresql_default_timezone }}"
   register: init_db_results
   changed_when: not init_db_results.failed
   when: postgresql_data_dir_found.matched == 0
