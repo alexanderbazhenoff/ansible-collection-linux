@@ -1,6 +1,6 @@
 ---
 
-- name: Converge
+- name: Prepare
   hosts: bareos_servers
   become: True
   become_method: sudo
