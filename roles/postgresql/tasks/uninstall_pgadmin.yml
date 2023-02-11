@@ -15,12 +15,13 @@
     - name: "| Purge packages"
       ansible.builtin.include_tasks: pkg_management/purge_{{ ansible_pkg_mgr }}.yml
 
-    - name: "| Check postgresql server version"
-      ansible.builtin.shell: "su - {{ postgresql_become_user }} -c 'psql --version' || true"
+    - name: "| Check postgresql server version"   # noqa command-instead-of-shell
+      ansible.builtin.shell: su - {{ postgresql_become_user }} -c 'psql --version'
       args:
         executable: /bin/sh
       register: postgresql_version_check_results
       changed_when: False
+      ignore_errors: True
 
     - name: "| Check postgresql packages"   # noqa command-instead-of-shell
       ansible.builtin.shell: "{{ check_postgresql_packages_cmd }}"
@@ -29,8 +30,8 @@
 
     - name: "| Include purge repo {{ ansible_os_family | lower }} tasks"
       ansible.builtin.include_tasks: purge_pgdg_repo_{{ ansible_os_family | lower }}.yml
-      when: not ("'psql (PostgreSQL)' in postgresql_version_check_results.stdout") and
-        postgresql_packages_check_results.stdout | length > 0
+      when: postgresql_version_check_results is defined and not ("'psql (PostgreSQL)' in
+        postgresql_version_check_results.stdout") and postgresql_packages_check_results.stdout | length > 0
 
     - name: "| Include check firewall {{ ansible_os_family | lower }} tasks"
       ansible.builtin.include_tasks: includes_misc/check_firewall_{{ ansible_os_family | lower }}.yml

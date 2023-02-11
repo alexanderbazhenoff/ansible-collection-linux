@@ -1,11 +1,5 @@
 ---
 
-# DEBUG SECTION
-- name: "server packages redhat | (debug) Required postgresql rpm repo URL to check"
-  ansible.builtin.debug:
-    msg: "{{ postgresql_packages[1].package }}"
-  when: postgresql_version is defined and postgresql_version is not none and postgresql_version | string | length > 0
-
 - name: "server packages redhat | Check required postgresql rpm repo is available"
   ansible.builtin.uri:
     url: "{{ postgresql_packages[1].package }}"
@@ -27,38 +21,69 @@
   failed_when: check_postgresql_version_url_results.status == 404
   when: postgresql_version is defined and postgresql_version is not none and postgresql_version | string | length > 0
 
-# DEBUG SECTION
-- name: "server packages redhat | (debug) Show check_postgresql_repo_url_results"
-  ansible.builtin.debug:
-    var: check_postgresql_repo_url_results
-
-- name: "server packages redhat | Set facts of disable/enable yum repos and version regex for non-versioned install"
-  ansible.builtin.set_fact:
-    postgresql_disable_repo: >-
-      {% if (postgresql_repo_settings | json_query(ansible_os_family | lower + ansible_distribution_major_version))
-      is not none %}'*'{% endif -%}
-    postgresql_enable_repo: >-
-      {{ postgresql_repo_settings | json_query(ansible_os_family | lower + ansible_distribution_major_version) |
-      default('') -}}
-    postgresql_version_regex: >-
-      {% if (check_postgresql_repo_url_results is defined and check_postgresql_repo_url_results.failed) or
-      (check_postgresql_version_url_results is defined and check_postgresql_version_url_results.failed) or
-      postgresql_recommended_version %}{{ postgresql_version | default('') }}{% endif %}
-
-# DEBUG SECTION
-- name: "server packages redhat | (debug) Show required version URL of postgresql is available to download"
-  ansible.builtin.debug:
-    msg: >-
-      {{ postgresql_url }}repos/yum/{{ postgresql_version }}/{% if ansible_distribution == 'Fedora' -%}
-      fedora/fedora-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}/{% else -%}
-      redhat/rhel-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}/{% endif %}
-      Regex: {{ postgresql_version_regex }}
-
 - name: "server packages redhat | Get postgresql dnf postgresql modules list"   # noqa risky-shell-pipe
   ansible.builtin.shell: dnf -qy module list | grep 'postgresql' || true
   register: dnf_postgresql_module_results
   changed_when: False
   when: ansible_pkg_mgr == 'dnf'
+
+- name: "server packages redhat | Install repo package to check versioned postgresql package is available"
+  ansible.builtin.dnf:
+    name: "{{ postgresql_packages[1].package }}"
+    state: latest   # noqa package-latest
+    update_cache: True
+    disable_gpg_check: "{{ postgresql_packages[1].disable_gpg_check | default(False) }}"
+  ignore_errors: True
+  register: install_pgdg_repo_package_results
+  until: install_pgdg_repo_package_results is succeeded
+  retries: 3
+  delay: 5
+  when: ansible_pkg_mgr == 'dnf' and check_postgresql_repo_url_results is defined and
+    not check_postgresql_repo_url_results.failed
+
+- name: "server packages redhat | Disable postgresql dnf module to install maximum available postgresql version"
+  ansible.builtin.command: dnf -qy module disable postgresql
+  changed_when: True
+  when: dnf_postgresql_module_results.stdout is defined and '[e]' in dnf_postgresql_module_results.stdout and
+    not postgresql_recommended_version
+
+- name: "server packages redhat | Check postgresql version package is available"   # noqa risky-shell-pipe
+  ansible.builtin.shell: >-
+    dnf info {{ postgresql_packages[3].package }} | grep Version | grep {{ postgresql_version }} || true
+  register: postgresql_version_package_results
+  when: ansible_pkg_mgr == 'dnf'
+
+- name: "server packages redhat | Enable dnf module postgresql version and check package version is available"
+  block:
+    - name: "| Enable postgresql module version"   # noqa ignore-errors
+      ansible.builtin.command: >-
+        dnf -qy module enable postgresql{% if postgresql_version | string in dnf_postgresql_module_results.stdout and
+        postgresql_version | int > 0 %}:{{ postgresql_version }}{% endif %}
+      changed_when: True
+      ignore_errors: True
+
+    - name: "| Check postgresql version package is available"   # noqa risky-shell-pipe
+      ansible.builtin.shell: >-
+        dnf info {{ postgresql_packages[3].package }} | grep Version | grep {{ postgresql_version }} || true
+      register: postgresql_version_package_results
+      changed_when: False
+  when: dnf_postgresql_module_results.stdout is defined and dnf_postgresql_module_results.stdout | length > 0 and
+    postgresql_version_package_results.stdout is defined and postgresql_version_package_results.stdout | length == 0 and
+    not postgresql_recommended_version
+
+- name: "server packages redhat | Set facts of disable/enable yum repos and version regex for non-versioned install"
+  ansible.builtin.set_fact:
+    postgresql_disable_repo: >-
+      {% if (postgresql_repo_settings | json_query(ansible_os_family | lower + ansible_distribution_major_version))
+      is not none %}'*'{% endif %}
+    postgresql_enable_repo: >-
+      {{ postgresql_repo_settings | json_query(ansible_os_family | lower + ansible_distribution_major_version) |
+      default('') }}
+    postgresql_version_regex: >-
+      {% if (postgresql_version_package_results.stdout is defined and postgresql_version_package_results.stdout |
+      length == 0 and ansible_pkg_mgr == 'dnf') or (check_postgresql_version_url_results is defined and
+      check_postgresql_version_url_results.failed and ansible_pkg_mgr == 'yum') or postgresql_recommended_version -%}
+      {{ postgresql_version | default('') }}{% endif %}
 
 - name: "server packages redhat | Set fact of main packages list and daemon name"
   ansible.builtin.set_fact:

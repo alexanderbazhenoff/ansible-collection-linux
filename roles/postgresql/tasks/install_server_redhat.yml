@@ -1,20 +1,5 @@
 ---
 
-- name: "install server redhat | Disable postgresql dnf module to install maximum available postgresql version"
-  ansible.builtin.command: dnf -qy module disable postgresql
-  changed_when: True
-  when: dnf_postgresql_module_results.stdout is defined and '[e]' in dnf_postgresql_module_results.stdout and
-    ansible_pkg_mgr == 'dnf' and not postgresql_recommended_version
-
-- name: "install server redhat | Enable postgresql module version"
-  ansible.builtin.command: >-
-    dnf -qy module enable postgresql{% if postgresql_version | string in dnf_postgresql_module_results.stdout and
-    postgresql_version | int > 0 %}:{{ postgresql_version }}{% endif -%}
-  changed_when: True
-  when: ansible_pkg_mgr == 'dnf' and not postgresql_recommended_version and
-    check_postgresql_repo_url_results is defined and check_postgresql_repo_url_results.failed and
-    dnf_postgresql_module_results.stdout is defined and dnf_postgresql_module_results.stdout | length > 0
-
 - name: "install server redhat | Install packages depending on detected package manager"
   ansible.builtin.include_tasks: pkg_management/install_{{ ansible_pkg_mgr }}.yml
 

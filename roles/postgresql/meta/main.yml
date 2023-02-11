@@ -1,6 +1,6 @@
 galaxy_info:
   role_name: postgresql
-  namespace: common
+  namespace: alexanderbazhenoff
   author: Aleksandr Bazhenov
   description: Install and configure PostgreSQL database instance and pgadmin.
   license: MIT-0

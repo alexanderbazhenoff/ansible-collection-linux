@@ -5,8 +5,8 @@
     name: "{{ item.package }}"
     state: latest
     update_cache: True
-  register: install_apt_results
-  until: install_apt_results is succeeded
+  register: install_results
+  until: install_results is succeeded
   retries: 5
   delay: 5
   when: item.package | length > 0

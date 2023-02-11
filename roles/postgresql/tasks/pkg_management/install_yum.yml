@@ -8,8 +8,8 @@
     disablerepo: "{{ item.disable_repo | default(omit) }}"
     enablerepo: "{{ item.enable_repo | default(omit) }}"
     validate_certs: "{{ ansible_python_version is version('2.7.5', '>=') }}"
-  register: install_yum_results
-  until: install_yum_results is succeeded
+  register: install_results
+  until: install_results is succeeded
   retries: 5
   delay: 5
   when: item.package | length > 0

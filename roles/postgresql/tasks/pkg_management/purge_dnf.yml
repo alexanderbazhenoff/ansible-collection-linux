@@ -6,7 +6,7 @@
       {% if item.package_name_short is defined %}{{ item.package_name_short }}{% else %}{{ item.package }}{% endif %}
     state: absent
     autoremove: True
-  when: item.package | length > 0 or (item.package_name_short is defined and item.package_name_short is not none and
-    item.package_name_short | length > 0)
+  when: (item.package is defined and item.package | length > 0) or (item.package_name_short is defined and
+    item.package_name_short is not none and item.package_name_short | length > 0)
   with_items:
     - "{{ packages_to_install }}"

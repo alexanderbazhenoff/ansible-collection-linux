@@ -6,8 +6,8 @@
     state: latest
     update_cache: True
     disable_gpg_check: "{{ item.disable_gpg_check | default(False) }}"
-  register: install_yum_results
-  until: install_yum_results is succeeded
+  register: install_results
+  until: install_results is succeeded
   retries: 5
   delay: 5
   when: item.package | length > 0
