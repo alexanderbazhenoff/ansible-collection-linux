@@ -1,5 +1,6 @@
 galaxy_info:
   role_name: bareos
+  namespace: alexanderbazhenoff
   author: Aleksandr Bazhenov
   description: Install and configure Bareos components.
   license: MIT-0
