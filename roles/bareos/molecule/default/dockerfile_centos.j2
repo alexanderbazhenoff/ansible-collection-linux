@@ -1,6 +1,4 @@
-ARG image_platform
-ARG image_tag
-FROM ${image_platform}:${image_tag}
+FROM {{ item.image }}
 
 # Switch Centos to Centos Stream and make dnf cache
 RUN if [ $(command -v dnf) ]; then dnf --disablerepo '*' --enablerepo extras swap centos-linux-repos centos-stream-repos -y; fi

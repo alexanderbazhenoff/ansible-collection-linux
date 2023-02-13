@@ -95,7 +95,7 @@ platforms:
 
   - name: centos7-instance
     image: centos:centos7
-    dockerfile: dockerfile_redhat.j2
+    dockerfile: dockerfile_centos.j2
     buildargs:
       image_platform: centos
       image_tag: centos7
@@ -115,7 +115,7 @@ platforms:
 
   - name: centos8-instance
     image: centos:8
-    dockerfile: dockerfile_redhat.j2
+    dockerfile: dockerfile_centos.j2
     buildargs:
       image_platform: centos
       image_tag: 8
