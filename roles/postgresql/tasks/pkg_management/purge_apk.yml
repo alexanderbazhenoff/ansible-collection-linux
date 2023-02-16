@@ -1,6 +1,6 @@
 ---
 
-- name: "purge apt | Purge packages"
+- name: "purge apk | Purge packages"
   community.general.apk:
     name: "{{ item.package }}"
     state: absent
