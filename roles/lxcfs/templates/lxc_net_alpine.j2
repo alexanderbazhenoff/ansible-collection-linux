@@ -1,0 +1,37 @@
+{% if True %}#!/sbin/openrc-run{% endif %}
+
+# lxc-net Alpine Linux init script for openrc
+#
+# Note: Condition in the first line is just a workaround of ansible-test sanity error:
+# 'ERROR: roles/lxcfs/templates/lxc_net_alpine.j2:1:1: unexpected non-module shebang: b'#!/sbin/openrc-run'
+
+name=$RC_SVCNAME
+command_background="yes"
+
+depend() {
+    need net
+}
+
+start() {
+    ebegin "Starting lxc-net"
+    source /etc/default/lxc-net
+    brctl addbr $LXC_BRIDGE
+    brctl setfd $LXC_BRIDGE 0
+    brctl addif $LXC_BRIDGE dummy0
+    ifconfig $LXC_BRIDGE $LXC_ADDR netmask $LXC_NETMASK up
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+    iptables --table nat --append POSTROUTING --out-interface {{ ansible_default_ipv4.interface }} -j MASQUERADE
+    iptables --append FORWARD --in-interface $LXC_BRIDGE -j ACCEPT
+    /etc/init.d/iptables save
+}
+
+stop() {
+    ebegin "Stopping lxc-net"
+    source /etc/default/lxc-net
+    iptables -D --table nat POSTROUTING --out-interface {{ ansible_default_ipv4.interface }} -j MASQUERADE
+    iptables -D FORWARD --in-interface $LXC_BRIDGE -j ACCEPT
+    /etc/init.d/iptables save
+    ifconfig $LXC_BRIDGE down
+    brctl delif $LXC_BRIDGE dummy0
+    brctl delbr $LXC_BRIDGE
+}

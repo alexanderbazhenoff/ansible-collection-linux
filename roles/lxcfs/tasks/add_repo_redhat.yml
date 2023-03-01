@@ -1,0 +1,20 @@
+---
+
+- name: "add repo redhat | Install additional repo"
+  ansible.builtin.template:
+    src: lxc.repo.j2
+    dest: /etc/yum.repos.d/lxc.repo
+    mode: 0644
+    owner: root
+    group: root
+
+- name: "add repo redhat | Enable addons repo (for container-selinux package)"
+  ansible.builtin.ini_file:
+    dest: /etc/yum.repos.d/{% if ansible_distribution_major_version | int == 7 %}oracle-linux{% else -%}
+      public-yum{% endif %}-ol{{ ansible_distribution_major_version }}.repo
+    section: "{% if ansible_distribution_major_version | int < 7 %}public_{% endif -%}
+      ol{{ ansible_distribution_major_version }}_addons"
+    option: enabled
+    value: 1
+    mode: 0644
+  when: ansible_distribution == 'OracleLinux' and ansible_pkg_mgr == 'yum'

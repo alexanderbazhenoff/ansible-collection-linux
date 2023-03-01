@@ -1,0 +1,36 @@
+---
+
+- name: "uninstall | Include purge packages {{ ansible_pkg_mgr }} tasks"
+  ansible.builtin.include_tasks: purge_packages_{{ ansible_pkg_mgr }}.yml
+
+- name: "uninstall | Include purge repo {{ ansible_os_family | lower }} tasks"
+  ansible.builtin.include_tasks: purge_repo_{{ ansible_os_family | lower }}.yml
+  when: ansible_os_family == 'RedHat'
+
+- name: "uninstall | Include uninstall {{ ansible_os_family | lower }}"
+  ansible.builtin.include_tasks: uninstall_{{ ansible_os_family | lower }}.yml
+  when: ansible_os_family == 'Alpine'
+
+- name: "install | Remove LXC GPG keyserver from environment variables"
+  ansible.builtin.lineinfile:
+    dest: /etc/environment
+    regexp: "^DOWNLOAD_KEYSERVER="
+    state: absent
+
+- name: "uninstall | Delete config files"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  when: item | length > 0
+  with_items:
+    - /etc/{% if ansible_os_family == 'RedHat' %}sysconfig{% else %}default{% endif %}/lxc-net
+    - "{% if ansible_os_family == 'Alpine' %}/etc/init.d/lxc-net{% endif %}"
+    - /etc/lxc
+
+- name: "uninstall | Remove {{ lxc_default_net_bridge }}"   # noqa risky-shell-pipe
+  ansible.builtin.shell: |
+    ip link set {{ lxc_default_net_bridge }} down
+    ip link del {{ lxc_default_net_bridge }} || echo 'del_fail'
+    ip link show {{ lxc_default_net_bridge }} 2>&1 || true
+  register: ip_link_results
+  changed_when: "'does not exist.' in ip_link_results.stdout and not 'del_fail' in ip_link_results.stdout"

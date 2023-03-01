@@ -1,0 +1,57 @@
+---
+
+- name: "uninstall alpine | Count the number of iptables rules"    # noqa risky-shell-pipe
+  ansible.builtin.shell: iptables --list --line-numbers | sed '/^num\|^$\|^Chain/d' | wc -l
+  register: iptables_rules_number
+  changed_when: False
+
+- name: "uninstall alpine | Stop services via rc-service"
+  ansible.builtin.shell: rc-service {{ item }} stop || true
+  register: rc_stop_results
+  changed_when: "'Stopping' in rc_stop_results.stdout"
+  when: item | length > 0
+  with_items:
+    - cgroups
+    - lxc
+    - "{% if lxc_technology == 'lxcfs' %}lxcfs{% endif %}"
+    - lxc-net
+    - "{% if iptables_rules_number.stdout is defined and iptables_rules_number.stdout | int <= 2 %}iptables{% endif %}"
+
+- name: "uninstall alpine | Delete services via rc-update"
+  ansible.builtin.shell: rc-update del {{ item }} || true
+  register: rc_delete_results
+  changed_when: "'removed from runlevel' in rc_delete_results.stdout"
+  when: item | length > 0
+  with_items:
+    - cgroups
+    - "{% if lxc_technology == 'lxcfs' %}lxcfs{% endif %}"
+    - lxc-net
+    - "{% if iptables_rules_number.stdout is defined and iptables_rules_number.stdout | int <= 2 %}iptables{% endif %}"
+
+- name: "uninstall alpine | Count dummy interfaces number on the host"   # noqa risky-shell-pipe
+  ansible.builtin.shell: ip a | grep dummy | wc -l
+  register: dummy_eth_results
+  changed_when: False
+
+- name: "uninstall alpine | Remove kernel module(s) from autoload"
+  ansible.builtin.lineinfile:
+    path: /etc/modules
+    regexp: "^{{ item }}.*"
+    line: "{{ item }}"
+    state: absent
+  when: item | length > 0
+  with_items:
+    - "{% if dummy_eth_results.stdout is defined and dummy_eth_results.stdout | int < 2 %}dummy{% endif %}"
+    - fuse
+
+- name: "uninstall alpine | Reboot host before unload fuse kernel module"
+  ansible.builtin.reboot:
+
+- name: "uninstall alpine | Unload kernel module(s)"
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: absent
+  when: item | length > 0
+  with_items:
+    - "{% if dummy_eth_results.stdout is defined and dummy_eth_results.stdout | int < 2 %}dummy{% endif %}"
+    - fuse

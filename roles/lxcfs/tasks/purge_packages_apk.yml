@@ -1,0 +1,22 @@
+---
+
+- name: "purge packages apk | Purge packages (with ansible apk module)"
+  community.general.apk:
+    name: "{{ item }}"
+    state: absent
+  register: purge_packages_apk
+  ignore_errors: True
+  when: item | length > 0
+  with_items:
+    - "{{ lxc_install_packages | sort(reverse=True) }}"
+
+- name: "pure packages apk | Force delete packages (with apk command)"
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    apk del $(apk del {{ item.item }} | grep '{{ item.item }}:' | awk '{ print $2 }')
+    apk del {{ item.item }}
+  register: apk_del_packages
+  changed_when: not "'World updated, but the following packages are not removed due to' in apk_del_packages.stdout"
+  when: item.failed is defined and item.failed
+  with_items:
+    - "{{ purge_packages_apk.results }}"

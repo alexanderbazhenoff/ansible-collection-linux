@@ -1,0 +1,51 @@
+---
+
+- name: "install alpine | Refresh kernel modules available"
+  ansible.builtin.command: depmod
+  changed_when: False
+
+- name: "install alpine | Load required kernel modules"
+  community.general.modprobe:
+    name: "{{ item }}"
+  when: item | length > 0
+  with_items:
+    - fuse
+    - "{% if check_host_is_lxc_ready %}configs{% endif %}"
+    - "{% if use_lxc_default_net %}dummy{% endif %}"
+
+- name: "install alpine | Add required kernel modules to autoload"
+  ansible.builtin.lineinfile:
+    path: /etc/modules
+    regexp: "^{{ item }}.*"
+    line: "{{ item }}"
+  when: item | length > 0
+  with_items:
+    - fuse
+    - "{% if use_lxc_default_net %}dummy{% endif %}"
+
+- name: "install alpine | Create kernel configs for lxc-checkonfig command"
+  ansible.builtin.shell: zcat /proc/config.gz > /boot/config-$(uname -r)
+  args:
+    creates: /boot/config-$(uname -r)
+  when: check_host_is_lxc_ready
+
+# Additional openrc script because after lxc install on Alpine Linux lxc-net bridge won't be initialized by default.
+# Alpine Linux wiki: https://wiki.alpinelinux.org/wiki/Writing_Init_Scripts
+# Gentoo wiki: https://wiki.gentoo.org/wiki/Handbook:X86/Working/Initscripts#Writing_initscripts
+- name: "create lxc net alpine | Copy and add Alpine openrc init script"
+  ansible.builtin.template:
+    src: lxc_net_alpine.j2
+    dest: /etc/init.d/lxc-net
+    mode: 0755
+  when: use_lxc_default_net
+
+- name: "install alpine | Add services via rc-update"
+  ansible.builtin.shell: rc-update add {{ item }} || true
+  register: rc_add_results
+  changed_when: "'added to runlevel' in rc_add_results.stdout"
+  when: ansible_os_family == 'Alpine' and item | length > 0
+  with_items:
+    - cgroups
+    - "{{ lxc_technology }}"
+    - "{% if use_lxc_default_net %}iptables{% endif %}"
+    - "{% if use_lxc_default_net %}lxc-net{% endif %}"

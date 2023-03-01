@@ -1,0 +1,27 @@
+---
+
+- hosts: all
+  become: True
+  become_method: sudo
+  gather_facts: True
+
+  tasks:
+
+    - name: "Install latest (as possible) version of LXCFS with default bridge-nat lxc network"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.lxcfs
+      vars:
+        use_lxc_default_net: True
+        clean_install: True
+        check_host_is_lxc_ready: False
+        append_lxc_config: |
+            lxc.net.0.type = veth
+            lxc.net.0.link = lxcbr0
+            lxc.net.0.name = eth0
+            lxc.net.0.flags = up
+            lxc.net.0.hwaddr = 00:16:3e:xx:xx:xx
+            lxc.net.0.veth.pair = veth-lxc
+            lxc.net.0.ipv4.address = 10.10.12.200/24
+            lxc.net.0.ipv4.gateway = 10.10.12.254
+            lxc.start.auto = 1
+            lxc.start.delay = 8

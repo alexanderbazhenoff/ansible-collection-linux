@@ -12,49 +12,35 @@
       ansible.builtin.include_vars:
         file: defaults/main.yml
 
-    - name: "default >>> verify | Include variable(s) for testing"
-      ansible.builtin.include_vars:
-        file: ../../vars/main.yml
+    - name: "default >>> verify | Create container"   # noqa command-instead-of-module command-instead-of-shell
+      ansible.builtin.shell: >-
+        lxc-create -t download -n ubuntu-focal -- -d ubuntu -r focal -a amd64
+        {% if ansible_os_family == 'Debian' and (ansible_distribution_major_version | int <= 9 or
+        ansible_distribution_major_version | int <= 16) %}--no-validate{% endif %}
+      register: container_create_results
+      changed_when: "'You just created an' in container_create_results.stdout"
 
-    - name: "default >>> verify | Set fact of installed packages"
-      ansible.builtin.package_facts:
-        manager: auto
+    # Workaround of possible apparmor error while trying to start nested container: 'Warning: unable to find a suitable
+    # fs in /proc/mounts, is it mounted? No such file or directory - Error removing AppArmor namespace'
+    - name: "default >>> verify | Remove apparmor profile from lxc container config(s)"
+      ansible.builtin.lineinfile:
+        path: /var/lib/lxc/ubuntu-focal/config
+        regexp: '^lxc.apparmor.profile = generated'
+        state: absent
+      when: ansible_distribution == 'Debian'
 
-    - name: "default >>> verify | Set fact for packages list to check"
-      ansible.builtin.set_fact:
-        packages_list: "{{ item }}"
-      with_items:
-        - "{{ lxc_packages | json_query((ansible_distribution | lower) + ansible_distribution_major_version) }}"
+    - name: "default >>> verify | Start container"
+      ansible.builtin.command: lxc-start ubuntu-focal
+      changed_when: True
 
-    - name: "default >>> verify | Assert when package(s) not installed"
-      ansible.builtin.assert:
-        that:
-          - item in ansible_facts.packages
-        fail_msg: |
-          Error. {{ item }} wasn't installed on the system.
-      with_items:
-        - "{{ packages_list }}"
-
-    - name: "default >>> verify | Get active status of the daemon"  # noqa command-instead-of-module
-      ansible.builtin.command: systemctl is-active {{ lxc_technology }}
-      register: daemon_is_active_results
-      until: daemon_is_active_results.stdout == 'active'
-      delay: 3
-      retries: 20
-      ignore_errors: True
+    - name: "default >>> verify | Get container state"   # noqa risky-shell-pipe
+      ansible.builtin.shell: lxc-ls -f | tail -1
+      register: lxc_container_results
       changed_when: False
 
-    - name: "default >>> verify | Get enabled status of the daemon"   # noqa command-instead-of-module
-      ansible.builtin.command: systemctl is-enabled {{ lxc_technology }}
-      register: daemon_is_enabled_results
-      ignore_errors: True
-      changed_when: False
-
-    - name: "default >>> verify | Assert when {{ lxc_technology }} is enabled and active"
+    - name: "default >>> verify | Make sure the container is running"
       ansible.builtin.assert:
         that:
-          - daemon_is_active_results.stdout == 'active'
-          - daemon_is_enabled_results.stdout == 'enabled'
-        fail_msg: |
-          Error. {{ lxc_technology }} states: {{ daemon_is_enabled_results.stdout }} /
-          {{ daemon_is_active_results.stdout }}
+          - lxc_container_results.stdout is defined and "'RUNNING' in lxc_container_results.stdout"
+        fail_msg: >-
+          Error. {% if not "'RUNNING' in lxc_container_results.stdout" %}Container is not running.{% endif %}

@@ -1,0 +1,23 @@
+---
+
+- hosts: all
+  become: True
+  become_method: sudo
+  gather_facts: True
+
+  tasks:
+
+    - name: "Install LXC 2.0 (for old systems, e.g. Centos 6, Debian Stretch, etc) with default bridge-nat lxc network."
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.lxcfs
+      vars:
+        use_lxc_default_net: True
+        clean_install: True
+        lxc_technology: lxc
+        lxc_version: '2.0'
+        append_lxc_config: |
+          lxc.network.type = veth
+          lxc.network.link = lxcbr0
+          lxc.network.flags = up
+          lxc.start.auto = 1
+          lxc.start.delay = 8

@@ -1,0 +1,11 @@
+---
+
+- name: "install debian | Add dhcp ufw rules"
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  when: ufw_state.stdout is defined and ' active' in ufw_state.stdout
+  with_items:
+    - { port: 67, proto: tcp }
+    - { port: 68, proto: any }

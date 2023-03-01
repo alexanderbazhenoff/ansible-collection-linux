@@ -1,18 +1,31 @@
 galaxy_info:
   author: Aleksandr Bazhenov
-  role_name: lxcfs
-  namespace: alexanderbazhenoff
-  description: Installs lxc/lxcfs on linux system
+  description: Installs and configures lxc/lxcfs on linux system
   license: MIT-0
+  namespace: alexanderbazhenoff
   min_ansible_version: 2.9.0
+
   platforms:
     - name: Ubuntu
       versions:
-        - bionic
-        - focal
+        - all
+    - name: Debian
+      versions:
+        - all
+    - name: EL
+      versions:
+        - all
+    - name: Fedora
+      versions:
+        - all
+    - name: Alpine
+      versions:
+        - all
+
   galaxy_tags:
     - lxc
     - lxcfs
-    - ubuntu
-    - rhel
+    - containers
+    - infrastructure
+
 dependencies: []

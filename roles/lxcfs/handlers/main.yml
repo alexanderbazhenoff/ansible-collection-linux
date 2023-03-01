@@ -1,0 +1,13 @@
+---
+
+- name: Enable and start daemons
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: True
+  when: item | length > 0
+  with_items:
+    - "{% if ansible_os_family == 'Alpine' %}cgroups{% endif %}"
+    - "{% if ansible_os_family != 'Alpine' and lxc_technology == 'lxc' %}lxc{% endif %}"
+    - "{% if lxc_technology == 'lxcfs' %}lxcfs{% endif %}"
+    - "{% if use_lxc_default_net %}lxc-net{% endif %}"

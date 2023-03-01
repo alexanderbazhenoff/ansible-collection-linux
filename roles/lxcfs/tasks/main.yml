@@ -1,34 +1,53 @@
 ---
 
-- name: "main | Include add fedora cloud repo (CentOS)"
-  include: add_fedora_cloud_repo_{{ ansible_distribution | lower }}{{ ansible_distribution_major_version | int }}.yml
-  when: ansible_distribution == "CentOS"
+- name: "main | Set fact for lxc pre-requirements packages"
+  ansible.builtin.set_fact:
+    lxc_install_packages:
+      - "{% if ansible_os_family == 'Alpine' %}xz{% endif %}"
+      - "{% if ansible_os_family == 'Alpine' %}linux-firmware-any{% endif %}"
+      - gnupg
+      - "{% if ansible_os_family == 'Alpine' and use_lxc_default_net %}iptables{% endif %}"
+      - "{% if ansible_distribution_major_version | int >= 7 and ansible_os_family == 'RedHat' -%}
+        {% if not ansible_distribution | regex_search('OracleLinux|Fedora') %}epel-release{% elif ansible_distribution |
+        regex_search('OracleLinux') %}oracle-epel-release-el{{ ansible_distribution_major_version }}{% endif -%}
+        {% endif %}"
 
-- name: "main | install packages"
-  include: install_packages.yml
+- name: "main | Upgrade apt package cache"
+  ansible.builtin.apt:
+    update_cache: True
+  when: ansible_pkg_mgr == 'apt'
 
-- name: "main | Include change lxc-net"
-  include: change_lxc_net.yml
-  when: not ansible_check_mode
+- name: "main | Install packages tasks (pre-requirements install)"
+  ansible.builtin.include_tasks: install_packages.yml
+  when: role_action == 'install'
 
-- name: "main | append lines to /etc/lxc/default.conf"
-  include: append_default_lxc_conf.yml
-  when: append_default_lxc_config | length > 0 and not ansible_check_mode
+- name: "main | Set fact for lxc version override"
+  ansible.builtin.set_fact:
+    lxc_version: >-
+      {% if lxc_version_override | json_query((ansible_os_family | lower) + ansible_distribution_major_version) is not
+      none %}{{ lxc_version_override | json_query((ansible_os_family | lower) + ansible_distribution_major_version) -}}
+      {% else %}{{ lxc_version }}{% endif %}
 
-- name: "main | check host is lxc-ready"
-  ansible.builtin.command: lxc-checkconfig | grep -v "CONFIG_NF_NAT_IPV" | grep "missing"
-  register: lxc_errors
-  changed_when: lxc_errors.stdout | length == 0
-  when: check_host_is_lxc_ready
+- name: "main | Set fact for lxc technology override"
+  ansible.builtin.set_fact:
+    lxc_technology: "{% if lxc_version == '2.0' %}lxc{% else %}{{ lxc_technology }}{% endif %}"
 
-- name: "main | Fail when host is not lxc-ready verification required, but didn't pass"
-  ansible.builtin.assert:
-    that:
-      - lxc_errors.stdout | length > 0
-    fail_msg: |
-      Is host lxc-ready checking enabled, but didn't pass. Please check your lxc-checkconfig command output:
-      {{ lxc_errors.stdout }}
-  when: check_host_is_lxc_ready
+- name: "main | Set fact for lxc packages"
+  ansible.builtin.set_fact:
+    lxc_install_packages: >-
+      {% if ansible_os_family | regex_search('RedHat|Alpine') %}{{ lxc_packages | json_query(ansible_os_family |
+      lower) }}{% elif ansible_distribution | regex_search('Debian|Ubuntu') -%}
+      {{ lxc_packages | json_query(ansible_distribution | lower) }}{% endif %}
 
-- name: "main | Enable daemons"
-  include: enable_daemons.yml
+- name: "main | Check firewalld is running"   # noqa command-instead-of-module
+  ansible.builtin.shell: systemctl is-active firewalld || true
+  register: firewalld_state
+  changed_when: False
+
+- name: "main | Check ufw status"
+  ansible.builtin.shell: ufw status || true
+  register: ufw_state
+  changed_when: False
+
+- name: "main | Include {{ role_action }} tasks"
+  ansible.builtin.include_tasks: "{{ role_action }}.yml"

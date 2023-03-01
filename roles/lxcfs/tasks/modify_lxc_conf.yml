@@ -1,0 +1,31 @@
+---
+
+- name: "modify lxc conf | Append lxc config string to dict conversion"
+  ansible.builtin.set_fact:
+    apply_config_dict: "{{ dict(keys | zip(vals)) }}"
+  vars:
+    arr: "{{ append_lxc_config.split('\n') | map('trim') | select() | list }}"
+    keys: "{{ arr | map('regex_replace', '^(.*?)=(.*)$', '\\1') | map('trim') | list }}"
+    vals: "{{ arr | map('regex_replace', '^(.*?)=(.*)$', '\\2') | map('trim') | list }}"
+
+- name: "modify lxc conf | Read existing lxc config"
+  ansible.builtin.shell: cat /etc/lxc/default.conf || true
+  register: existing_config_raw
+  changed_when: False
+
+- name: "modify lxc conf | Set fact of config changes"
+  ansible.builtin.set_fact:
+    new_config_string: "{{ (dict(keys | zip(vals)) | combine(apply_config_dict)).keys() | zip((dict(keys | zip(vals)) |
+      combine(apply_config_dict)).values()) | map('join', ' = ') | join('\n') }}"
+  vars:
+    arr: "{{ existing_config_raw.stdout.split('\n') | map('trim') | select() | list }}"
+    keys: "{{ arr | map('regex_replace', '^(.*?)=(.*)$', '\\1') | map('trim') | list }}"
+    vals: "{{ arr | map('regex_replace', '^(.*?)=(.*)$', '\\2') | map('trim') | list }}"
+
+- name: "modify lxc conf | Save new config"
+  ansible.builtin.copy:
+    dest: /etc/lxc/default.conf
+    content: "{{ new_config_string }}"
+    mode: 0644
+    owner: root
+    group: root

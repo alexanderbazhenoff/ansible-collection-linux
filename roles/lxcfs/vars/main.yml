@@ -1,17 +1,24 @@
 ---
 
+redhat_repo_url: https://copr-be.cloud.fedoraproject.org/results/thm/lxc{{ lxc_version }}
+
+lxc_version_override:
+  redhat6: 2.0
+
 lxc_packages:
-  centos7:
+  redhat:
     - lxc
     - "{{ lxc_technology }}"
     - bridge-utils
     - dnsmasq
-    - debootstrap
+    - "{% if ansible_distribution_major_version | int >= 7 or ansible_distribution == 'Fedora' %}debootstrap{% endif %}"
     - lxc-templates
     - fuse
     - libcap-devel
-    - libcgroup
-  ubuntu18:
+    - "{% if ansible_distribution_major_version | int < 7 or ansible_distribution == 'Fedora' %}libcgroup{% endif %}"
+    - "{% if ansible_distribution_major_version | int >= 7 or ansible_distribution == 'Fedora' -%}
+      container-selinux{% endif %}"
+  ubuntu:
     - lxc
     - "{{ lxc_technology }}"
     - bridge-utils
@@ -19,13 +26,24 @@ lxc_packages:
     - lxc-templates
     - fuse
     - libcap-dev
-    - cgroup-bin
-  ubuntu20:
+    - "{% if ansible_distribution_major_version | int >=19 %}cgroup-tools{% else %}cgroup-bin{% endif %}"
+  debian:
     - lxc
     - "{{ lxc_technology }}"
     - bridge-utils
-    - debootstrap
-    - lxc-templates
+    - "{% if ansible_distribution_major_version | int >= 10 %}lxc-templates{% endif %}"
     - fuse
     - libcap-dev
     - cgroup-tools
+  alpine:
+    - lxc
+    - "{{ lxc_technology }}"
+    - bridge
+    - fuse
+    - lxc-download
+    - lxc-templates
+    - rsync
+    - "{% if use_lxc_default_net %}dnsmasq{% endif %}"
+    - debootstrap
+    - cgroup-tools
+    - libcap-dev

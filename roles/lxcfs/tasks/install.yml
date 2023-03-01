@@ -1,0 +1,83 @@
+---
+
+- name: "install | Include uninstall tasks"
+  ansible.builtin.include_tasks: uninstall.yml
+  when: clean_install
+
+- name: "install | Include add repo {{ ansible_os_family | lower }} tasks"
+  ansible.builtin.include_tasks: add_repo_{{ ansible_os_family | lower }}.yml
+  when: ansible_os_family == 'RedHat'
+
+- name: "install | Include packages tasks (lxc(fs) packages install)"
+  ansible.builtin.include_tasks: install_packages.yml
+
+- name: "install | Change lxc-net config"
+  ansible.builtin.lineinfile:
+    path: /etc/{% if ansible_os_family == 'RedHat' %}sysconfig{% else %}default{% endif %}/lxc-net
+    regexp: "#?{{ item.key }}="
+    line: '{{ item.key }}="{{ item.value }}"'
+    state: present
+    create: True
+    mode: 0644
+    owner: root
+    group: root
+  when: item.value is defined and item.value | length > 0
+  with_items:
+    - { key: LXC_BRIDGE, value: "{{ lxc_default_net_bridge | default('lxcbr0') }}" }
+    - { key: LXC_ADDR, value: "{{ lxc_default_net_addr | default('10.0.3.1') }}" }
+    - { key: LXC_NETMASK, value: "{{ lxc_default_net_netmask | default('255.255.255.0') }}" }
+    - { key: LXC_NETWORK, value: "{{ lxc_default_net_network | default('10.0.3.0/24') }}" }
+    - { key: LXC_DHCP_RANGE, value: "{{ lxc_default_net_dhcp_range | default('10.0.3.2,10.0.3.254') }}" }
+    - { key: LXC_DHCP_MAX, value: "{{ lxc_default_net_dhcp_max | default('253') }}" }
+    - { key: USE_LXC_BRIDGE, value: "{{ use_lxc_default_net | lower }}" }
+    - { key: LXC_DHCP_CONFILE, value: "{% if use_lxc_default_net %}/etc/lxc/dnsmasq.conf{% endif %}" }
+  notify:
+    - Enable and start daemons
+
+- name: "install | Create /etc/lxc/dnsmasq.conf file"
+  ansible.builtin.file:
+    state: "{{ item.state }}"
+    path: "{{ item.path }}"
+    recurse: "{{ item.recurse }}"
+    mode: 0644
+  with_items:
+    - { path: /etc/lxc, state: directory, recurse: True }
+    - { path: /etc/lxc/dnsmasq.conf, state: touch, recurse: False }
+
+- name: "install | Include modify lxc conf tasks"
+  ansible.builtin.include_tasks: modify_lxc_conf.yml
+  when: append_lxc_config | length > 0
+
+- name: "install | Include install {{ ansible_os_family | lower }} tasks"
+  ansible.builtin.include_tasks: install_{{ ansible_os_family | lower }}.yml
+
+- name: "install | Add LXC GPG keyserver to environment variables"
+  ansible.builtin.lineinfile:
+    dest: /etc/environment
+    regexp: "^DOWNLOAD_KEYSERVER="
+    line: DOWNLOAD_KEYSERVER="{{ lxc_gpg_keyserver }}"
+    state: present
+  when: lxc_gpg_keyserver is defined and lxc_gpg_keyserver is not none and lxc_gpg_keyserver | length > 0
+
+- name: "install | Enable ipv4 forward in /etc/sysctl.conf"
+  ansible.builtin.lineinfile:
+    dest: /etc/sysctl.conf
+    regexp: "^net.ipv4.ip_forward="
+    line: net.ipv4.ip_forward=1
+    state: present
+    create: True
+    mode: 0644
+  when: use_lxc_default_net
+
+- name: "install | Apply sysctl params"
+  ansible.builtin.command: sysctl -p
+  register: sysctl_apply_results
+  changed_when: sysctl_apply_results.stdout is defined and "'net.ipv4.ip_forward' in sysctl_apply_results.stdout"
+  when: use_lxc_default_net
+
+- name: "install | Check host is ready for lxc usage (lxc-checkconfig)"   # noqa risky-shell-pipe
+  ansible.builtin.shell: lxc-checkconfig | grep -v "CONFIG_NF_NAT_IPV" | grep -iE "(missing|required)"
+  register: lxc_check_results
+  changed_when: False
+  failed_when: lxc_check_results.stdout | length > 0
+  when: check_host_is_lxc_ready

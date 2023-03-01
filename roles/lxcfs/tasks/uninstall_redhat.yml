@@ -1,0 +1,12 @@
+---
+
+- name: "uninstall redhat | Remove firewalld dhcp rules"
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    state: disabled
+    permanent: True
+    immediate: True
+  when: firewalld_state.stdout is defined and firewalld_state.stdout == 'active'
+  with_items:
+    - dhcp
+    - dhcpv6

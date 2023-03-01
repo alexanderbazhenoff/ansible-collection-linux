@@ -1,0 +1,11 @@
+[thm-lxc{{ lxc_version }}]
+name=Copr repo for lxc{{ lxc_version }} owned by thm
+baseurl={{ redhat_repo_url }}/{% if ansible_distribution == 'Fedora' %}fedora-rawhide{% else -%}
+epel-{{ ansible_distribution_major_version }}{% endif %}-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey={{ redhat_repo_url }}/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1

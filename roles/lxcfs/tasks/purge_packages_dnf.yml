@@ -1,0 +1,10 @@
+---
+
+- name: "purge packages dnf | Purge packages"
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: absent
+    autoremove: True
+  when: item | length > 0
+  with_items:
+    - "{{ lxc_install_packages }}"

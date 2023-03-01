@@ -1,7 +1,20 @@
 ---
 
+### ansible role settings ###
+
+# Role action: install or uninstall
+role_action: install
+# Perform clean install
+clean_install: True
+
+# Version of lxc/lxcfs. Affects only on RedHat repository URL. Please note: there is no lxcfs for 2.0, only lxc.
+lxc_version: '3.0'
+
 # Containers technology: lxc or lxcfs
-lxc_technology: lxc
+lxc_technology: lxcfs
+# Add LXC GPG keyserver (DOWNLOAD_KEYSERVER) to environment variables
+lxc_gpg_keyserver: keyserver.ubuntu.com
+
 # Check host is ready for lxc usage
 check_host_is_lxc_ready: True
 
@@ -21,15 +34,21 @@ lxc_default_net_dhcp_max: "253"
 
 ### Default container settings ###
 
-# Lines to append to default lxc config
-append_default_lxc_config: |
+# Append lines to default lxc config (/etc/lxc/default.conf)
+# Please note parameters between LXC version 2.0 and 3.0 will differ. For LXC 2.0:
+# lxc.network.type = veth
+# lxc.network.link = lxcbr0
+# lxc.network.flags = up
+# lxc.start.auto = 1
+# lxc.start.delay = 8
+append_lxc_config: |
   lxc.net.0.type = veth
   lxc.net.0.link = br0
   lxc.net.0.name = eth0
   lxc.net.0.flags = up
   lxc.net.0.hwaddr = 00:16:3e:xx:xx:xx
   lxc.net.0.veth.pair = 111-lxc
-  lxc.net.0.ipv4.address = 10.10.1.200/24
-  lxc.net.0.ipv4.gateway = 10.10.1.1
+  lxc.net.0.ipv4.address = 10.10.12.200/24
+  lxc.net.0.ipv4.gateway = 10.10.12.254
   lxc.start.auto = 1
   lxc.start.delay = 8

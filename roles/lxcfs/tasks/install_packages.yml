@@ -1,11 +1,16 @@
 ---
 
-- name: "install packages | (debug) List packages for linux distribution"
-  ansible.builtin.debug:
-    msg: "{{ lxc_packages | json_query((ansible_distribution | lower) + ansible_distribution_major_version) }}"
-
-- name: "install packages | Install packages depending on linux distribution"
+- name: "install packages | Install lxc(fs) packages depending on linux distribution"
   ansible.builtin.package:
     name: "{{ item }}"
+  register: install_package_results
+  until: install_package_results is succeeded
+  retries: 5
+  delay: 5
+  when: item | length > 0
   with_items:
-    - "{{ lxc_packages | json_query((ansible_distribution | lower) + ansible_distribution_major_version) }}"
+    - "{% if ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 7 -%}
+      {% if not ansible_distribution | regex_search('OracleLinux|Fedora') %}epel-release{% elif ansible_distribution |
+      regex_search('OracleLinux') %}oracle-epel-release-el{{ ansible_distribution_major_version }}{% endif -%}
+      {% endif %}"
+    - "{{ lxc_install_packages }}"
