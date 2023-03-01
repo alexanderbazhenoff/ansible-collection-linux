@@ -1,5 +1,5 @@
 [zabbix_clients]
-## specify hosts for init_new_hypervisor.yml
+## specify hosts for example playbooks
 ## e.g.
 ## 10.10.1.1
 ## 10.10.1.2
