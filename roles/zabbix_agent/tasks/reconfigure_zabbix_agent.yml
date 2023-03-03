@@ -4,8 +4,8 @@
 
 # re-configure, detect services and add related hostMetadata hashes:
 #
-# - 1. ff<platform_or_hardware_type> is for baremetal, containerization or virtualization subscription:
-#      baremetal server: ff6e6f6e65
+# - 1. ff<platform_or_hardware_type> is for bare-metal, containerization or virtualization subscription:
+#      bare-metal server: ff6e6f6e65
 #      kvm: ff6b766d
 #      lxc: ff6c7863
 #      docker: ff646f636b6572
@@ -150,7 +150,7 @@
     zabbix_host_metadata: "{{ zabbix_host_metadata }} ff{{ detect_virt.stdout }}"
   when: detect_virt.stdout is defined
 
-- name: "reconfigure zabbix agents | Install baremetal related packages (RedHat family)"
+- name: "reconfigure zabbix agents | Install bare-metal related packages (RedHat family)"
   ansible.builtin.yum:
     state: present
     update_cache: True
@@ -161,7 +161,7 @@
     - smartmontools
   when: ansible_os_family == "RedHat" and detect_virt.stdout == "6e6f6e65"
 
-- name: "reconfigure zabbix agents | Install baremetal related packages (Debian family)"
+- name: "reconfigure zabbix agents | Install bare-metal related packages (Debian family)"
   ansible.builtin.apt:
     state: present
     name: "{{ item }}"
@@ -172,14 +172,15 @@
     - smartmontools
   when: ansible_os_family == "Debian" and detect_virt.stdout == "6e6f6e65"
 
-- name: "reconfigure zabbix agents | Install baremetal related packages (Arch)"
+- name: "reconfigure zabbix agents | Install bare-metal related packages (Arch)"
   community.general.pacman:
-    name:
-      - dmidecode
-      - ipmitool
-      - smartmontools
+    name: "{{ item }}"
     state: present
     update_cache: True
+  with_items:
+    - dmidecode
+    - ipmitool
+    - smartmontools
   when: ansible_os_family == "Archlinux" and detect_virt.stdout == "6e6f6e65"
 
 - name: "reconfigure zabbix agents | Detect IPMI interface"
@@ -211,6 +212,7 @@
   when: detect_virt.stdout == "6e6f6e65" and detect_ipmi.stdout == "ok" and detect_virt.stdout | length > 0
 
 # check binaries on the system
+
 - name: "reconfigure zabbix agents | Check installed binaries (whereis)"
   ansible.builtin.shell: |
     set -e -o pipefail
@@ -272,7 +274,6 @@
   when: item.stdout is defined
 
 ## write config and restart section
-
 - name: "reconfigure zabbix agents | Check zabbix-agent version via dpkg (Debian family)"
   ansible.builtin.shell: |
     set -e -o pipefail
@@ -350,7 +351,7 @@
 
 - name: "reconfigure zabbix agents | Check AllowRoot parameter exists in the config"
   ansible.builtin.command: grep -Fq "# AllowRoot=" "/etc/zabbix/{{ zabbix_agent_conf_name }}.conf"
-  register: checkpath
+  register: check_path
   ignore_errors: True
   changed_when: False
 
@@ -366,7 +367,7 @@
   notify:
     - restart zabbix-agent svc
     - restart zabbix-agent sysv
-  when: zabbix_agent_version.stdout is defined and zabbix_agent_version.stdout | int >= 2.2 and checkpath.rc == 0
+  when: zabbix_agent_version.stdout is defined and zabbix_agent_version.stdout | int >= 2.2 and check_path.rc == 0
 
 - name: "reconfigure zabbix agents | Check zabbix_agent_conf includes directory"
   ansible.builtin.stat:
@@ -400,7 +401,7 @@
 
 - name: "reconfigure zabbix agents | Change lines in configs"
   ansible.builtin.lineinfile:
-    dest: "/etc/zabbix/{{ zabbix_agent_conf_name }}.conf"
+    dest: /etc/zabbix/{{ zabbix_agent_conf_name }}.conf
     regexp: "{{ item.var }}="
     line: "{{ item.var }}={{ item.value }}"
   with_items:
