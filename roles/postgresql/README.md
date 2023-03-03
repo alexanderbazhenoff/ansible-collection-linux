@@ -836,8 +836,9 @@ server instance is not available for your Linux distribution (e.g. check
 [RedHat repository](https://www.postgresql.org/download/linux/redhat/)).
 
 * (2) List of additional PostgreSQL related packages, e.g: 'postgresql-contrib' or 'postgresql14-contrib' for
-`postgresql_version_force = True` (explore what packages available [here](https://www.postgresql.org/download/linux/)).
-There is no automated version handling, include them in the package names.
+`postgresql_recommended_version: False` (explore what packages available
+[here](https://www.postgresql.org/download/linux/)). There is no automated version handling in this list, include 
+versions in package names.
 
 ### PostgreSQL server (or database instance) parameters:
 

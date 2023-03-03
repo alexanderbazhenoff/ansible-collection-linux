@@ -14,7 +14,7 @@
 
     - name: "| Download Zabbix release file (Debian family)"
       ansible.builtin.get_url:
-        url: |-
+        url: >-
           http://repo.zabbix.com/zabbix/{{ agent_version }}/{{ ansible_distribution | lower -}}
           /pool/main/z/zabbix-release/zabbix-release_{{ agent_version }}-1+{{ codename.stdout }}_all.deb
         dest: /tmp/zabbix-release.deb
@@ -28,7 +28,7 @@
 
 - name: "install zabbix agent | Install Zabbix release (RedHat family 7 or lower)"
   ansible.builtin.yum:
-    name: |-
+    name: >-
       http://repo.zabbix.com/zabbix/{{ agent_version }}/rhel/7/x86_64/zabbix-release-{{ agent_version -}}
       -1.el7.noarch.rpm
     state: present
@@ -69,7 +69,7 @@
 
     - name: "| Set fact for extracted package filename (ArchLinux)"
       ansible.builtin.set_fact:
-        package_filename: |-
+        package_filename: >-
           {{ get_url_results.stdout_lines | reject('search', '.sig') | last | regex_replace('(.+">)|(<\/a>.+)', '') -}}
 
     - name: "| (debug) Show package filename (ArchLinux)"
@@ -84,7 +84,7 @@
         validate_certs: "{{ repo_dl_validate_certs | bool }}"
 
   # I found some strange things installing agent v2 5.0 on Arch Linux when agent v1 6.2 also will be installed because
-  # of dependencies. So i put special clean-up of agent v1. Hope it helps. Otherwise you can install using bsdtar like:
+  # of dependencies. So i put special clean-up of agent v1. Hope it helps. Otherwise, you can install using bsdtar like:
   #
   #  - name: "| Install zabbix-agent package using bsdtar (ArchLinux)"
   #    ansible.builtin.command: bsdtar -C / -xvf /tmp/{{ package_filename }}

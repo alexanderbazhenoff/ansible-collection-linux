@@ -118,37 +118,37 @@
 - name: "reconfigure zabbix agents | Search systemd-detect-virt in the system"
   ansible.builtin.stat:
     path: /usr/bin/systemd-detect-virt
-  register: systemddetectvirtpackage
+  register: systemd_detect_virt_package
 
 - name: "reconfigure zabbix agents | Detect virtualization/containerization (with systemd)"
   ansible.builtin.shell: systemd-detect-virt | tr -d '\n' | xxd -ps -c 200    # noqa 306
   args:
     executable: /bin/bash
-  register: detectvirt
-  when: systemddetectvirtpackage.stat.exists
+  register: detect_virt
+  when: systemd_detect_virt_package.stat.exists
 
 - name: "reconfigure zabbix agents | Detect virtualization/containerization (with lscpu)"   # noqa 306
   ansible.builtin.shell: |
     lscpu | grep "Hypervisor vendor:" | awk '{print tolower($3)}' | tr -d '\n' | xxd -ps -c 200 || true
   args:
     executable: /bin/bash
-  register: detectvirt_lscpu
-  when: not systemddetectvirtpackage.stat.exists
+  register: detect_virt_lscpu
+  when: not systemd_detect_virt_package.stat.exists
 
 - name: "reconfigure zabbix agents | Set fact for virtualization/containerization (with lscpu)"
   ansible.builtin.set_fact:
-    detectvirt: "{{ detectvirt_lscpu }}"
-  when: not systemddetectvirtpackage.stat.exists
+    detect_virt: "{{ detect_virt_lscpu }}"
+  when: not systemd_detect_virt_package.stat.exists
 
 - name: "reconfigure zabbix agents | Detect virtualization/containerization debug"
   ansible.builtin.debug:
-    msg: "{{ detectvirt }}"
+    msg: "{{ detect_virt }}"
   when: debug_mode
 
 - name: "reconfigure zabbix agents | Set fact for virtualization/containerization detection"
   ansible.builtin.set_fact:
-    zabbix_host_metadata: "{{ zabbix_host_metadata }} ff{{ detectvirt.stdout }}"
-  when: detectvirt.stdout is defined
+    zabbix_host_metadata: "{{ zabbix_host_metadata }} ff{{ detect_virt.stdout }}"
+  when: detect_virt.stdout is defined
 
 - name: "reconfigure zabbix agents | Install baremetal related packages (RedHat family)"
   ansible.builtin.yum:
@@ -159,7 +159,7 @@
     - dmidecode
     - ipmitool
     - smartmontools
-  when: ansible_os_family == "RedHat" and detectvirt.stdout == "6e6f6e65"
+  when: ansible_os_family == "RedHat" and detect_virt.stdout == "6e6f6e65"
 
 - name: "reconfigure zabbix agents | Install baremetal related packages (Debian family)"
   ansible.builtin.apt:
@@ -170,7 +170,7 @@
     - dmidecode
     - ipmitool
     - smartmontools
-  when: ansible_os_family == "Debian" and detectvirt.stdout == "6e6f6e65"
+  when: ansible_os_family == "Debian" and detect_virt.stdout == "6e6f6e65"
 
 - name: "reconfigure zabbix agents | Install baremetal related packages (Arch)"
   community.general.pacman:
@@ -180,7 +180,7 @@
       - smartmontools
     state: present
     update_cache: True
-  when: ansible_os_family == "Archlinux" and detectvirt.stdout == "6e6f6e65"
+  when: ansible_os_family == "Archlinux" and detect_virt.stdout == "6e6f6e65"
 
 - name: "reconfigure zabbix agents | Detect IPMI interface"
   ansible.builtin.shell: |
@@ -188,12 +188,12 @@
     ipmitool mc info &> /dev/zero && echo "ok" || echo "none"
   args:
     executable: /bin/bash
-  register: detectipmi
-  changed_when: detectipmi.stdout
+  register: detect_ipmi
+  changed_when: detect_ipmi.stdout
 
 - name: "reconfigure zabbix agents | Detect IPMI debug"
   ansible.builtin.debug:
-    msg: "{{ detectipmi }}"
+    msg: "{{ detect_ipmi }}"
   when: debug_mode
 
 - name: "reconfigure zabbix agents | Detect vendor via IPMI tool"
@@ -202,13 +202,13 @@
     ipmitool mc info | grep 'Manufacturer Name' | awk '{print $4$5$6}' | tr -d '\n' | xxd -ps -c 200
   args:
     executable: /bin/bash
-  register: ipmivendor
-  when: detectvirt.stdout == "6e6f6e65" and detectipmi.stdout == "ok"
+  register: ipmi_vendor
+  when: detect_virt.stdout == "6e6f6e65" and detect_ipmi.stdout == "ok"
 
 - name: "reconfigure zabbix agents | Set fact for IPMI and vendor"
   ansible.builtin.set_fact:
-    zabbix_host_metadata: "{{ zabbix_host_metadata }} ee69706d69 ee{{ ipmivendor.stdout }}"
-  when: detectvirt.stdout == "6e6f6e65" and detectipmi.stdout == "ok" and detectvirt.stdout | length > 0
+    zabbix_host_metadata: "{{ zabbix_host_metadata }} ee69706d69 ee{{ ipmi_vendor.stdout }}"
+  when: detect_virt.stdout == "6e6f6e65" and detect_ipmi.stdout == "ok" and detect_virt.stdout | length > 0
 
 # check binaries on the system
 - name: "reconfigure zabbix agents | Check installed binaries (whereis)"
@@ -217,26 +217,29 @@
     if [[ $(whereis {{ item.name }} | awk '{print $2}') ]]; then printf '{{ item.hash }}'; fi
   args:
     executable: /bin/bash
-  with_items: "{{ binaries_tag_hashes }}"
-  register: checkbinaries
-  changed_when: checkbinaries.stdout
+  with_items:
+    - "{{ binaries_tag_hashes }}"
+  register: check_binaries
+  changed_when: check_binaries.stdout
 
 - name: "reconfigure zabbix agents | Check installed binaries debug"
   ansible.builtin.debug:
-    msg: "{{ checkbinaries.results }}"
+    msg: "{{ check_binaries.results }}"
   when: debug_mode
 
 - name: "reconfigure zabbix agents | Appending hash tags of binaries hashes to host zabbix_host_metadata"
   ansible.builtin.set_fact:
     zabbix_host_metadata: "{{ zabbix_host_metadata }} {{ item.stdout }}"
-  with_items: "{{ checkbinaries.results }}"
+  with_items:
+    - "{{ check_binaries.results }}"
   when: item.rc == 0 and item.stdout is defined and item.stdout | length > 0
 
   # check daemons on the system
 - name: "reconfigure zabbix agents | Check enabled daemons with systemctl"
   ansible.builtin.command: systemctl is-enabled --quiet "{{ item.name }}"    # noqa 303
   ignore_errors: True
-  with_items: "{{ daemon_tag_hashes }}"
+  with_items:
+    - "{{ daemon_tag_hashes }}"
   register: services_enabled
   changed_when: services_enabled.rc == 0
 
@@ -252,7 +255,8 @@
   args:
     executable: /bin/bash
   register: services_hashes
-  with_items: "{{ services_enabled.results }}"
+  with_items:
+    - "{{ services_enabled.results }}"
   when: item.rc == 0
 
 - name: "reconfigure zabbix agents | Getting hash tags of existing services names debug"
@@ -263,7 +267,8 @@
 - name: "reconfigure zabbix agents | Appending hash tags of existing services hashes to host's zabbix_host_metadata"
   ansible.builtin.set_fact:
     zabbix_host_metadata: "{{ zabbix_host_metadata }} dd{{ item.stdout }}"
-  with_items: "{{ services_hashes.results }}"
+  with_items:
+    - "{{ services_hashes.results }}"
   when: item.stdout is defined
 
 ## write config and restart section
@@ -317,7 +322,7 @@
 
 - name: "reconfigure zabbix agents | Change hostMetadata in zabbix configs (if some services/platforms detected)"
   ansible.builtin.lineinfile:
-    dest: "/etc/zabbix/{{ zabbix_agent_conf_name }}.conf"
+    dest: /etc/zabbix/{{ zabbix_agent_conf_name }}.conf
     regexp: "{{ item.var }}="
     line: "{{ item.var }}={{ item.value }}"
   with_items:
@@ -333,7 +338,7 @@
 
 - name: "reconfigure zabbix agents | Change user parameters in configs"
   ansible.builtin.lineinfile:
-    dest: "/etc/zabbix/{{ zabbix_agent_conf_name }}.conf"
+    dest: /etc/zabbix/{{ zabbix_agent_conf_name }}.conf
     regexp: "{{ item.var }}"
     line: "{{ item.var }},{{ item.value }}"
   with_items:
@@ -351,13 +356,13 @@
 
 - name: "reconfigure zabbix agents | Change AllowRoot parameter in config (if exists)"
   ansible.builtin.lineinfile:
-    dest: "/etc/zabbix/{{ zabbix_agent_conf_name }}.conf"
+    dest: /etc/zabbix/{{ zabbix_agent_conf_name }}.conf
     regexp: "{{ item.var }}="
     line: "{{ item.var }}={{ item.value }}"
-    insertafter: "{{ item.insafter }}"
+    insertafter: "{{ item.insert_after }}"
     backrefs: True
   with_items:
-    - { var: "AllowRoot", insafter: "# AllowRoot=0", value: "1" }
+    - { var: "AllowRoot", insert_after: "# AllowRoot=0", value: "1" }
   notify:
     - restart zabbix-agent svc
     - restart zabbix-agent sysv
@@ -365,12 +370,12 @@
 
 - name: "reconfigure zabbix agents | Check zabbix_agent_conf includes directory"
   ansible.builtin.stat:
-    path: "/etc/zabbix/{{ zabbix_agent_conf_name }}.d"
+    path: /etc/zabbix/{{ zabbix_agent_conf_name }}.d
   register: conf_incl_folder
 
 - name: "reconfigure zabbix agents | Create zabbix_agent_conf includes directory"
   ansible.builtin.file:
-    path: "/etc/zabbix/{{ zabbix_agent_conf_name }}.d"
+    path: /etc/zabbix/{{ zabbix_agent_conf_name }}.d
     state: directory
     mode: 0755
     group: root
@@ -379,7 +384,7 @@
 
 - name: "reconfigure zabbix agents | Register to delete include files inside of zabbix_agent's config directory"
   ansible.builtin.find:
-    path: "/etc/zabbix/{{ zabbix_agent_conf_name }}.d/"
+    path: /etc/zabbix/{{ zabbix_agent_conf_name }}.d/
     file_type: any
     hidden: True
   register: zabbix_agent_confd_files_to_delete
@@ -389,7 +394,8 @@
   ansible.builtin.file:
     state: absent
     path: "{{ item.path }}"
-  with_items: "{{ zabbix_agent_confd_files_to_delete.files }}"
+  with_items:
+    - "{{ zabbix_agent_confd_files_to_delete.files }}"
   when: zabbix_agent_conf_incl_dir_clean
 
 - name: "reconfigure zabbix agents | Change lines in configs"

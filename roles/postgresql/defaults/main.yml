@@ -23,7 +23,8 @@ cleanup_data_directory: True
 postgresql_recommended_version: False
 
 # List of additional PostgreSQL related packages, e.g: 'postgresql-contrib' or 'postgresql14-contrib' for
-# postgresql_version_force = True. So there is no automated version handling, include them in the package names.
+# postgresql_recommended_version: False. So there is no automated version handling in this list, include versions in
+# package names.
 postgresql_additional_packages: []
 
 # Install psycopg2: https://pypi.org/project/psycopg2/
