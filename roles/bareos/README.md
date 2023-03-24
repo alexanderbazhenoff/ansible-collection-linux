@@ -28,7 +28,7 @@ Additional usage scenarios:
 the same host, but without database (see 
 [example](#6-install-bareos-with-pre-installed-database-and-copy-pre-defined-configs)). So you can preinstall database
 first.
-- Installation of Bareos Web UI (e.g. connect to Bareos director on onther host). This usage scenario without Web UI
+- Installation of Bareos Web UI (e.g. connect Bareos director to another host). This usage scenario without Web UI
 pre-configuration, but you can upload additional predefined configs to `/etc` (optional, see 
 [**bareos_configs_to_copy** variable](#role-variables)).
 - Installation of Bareos Director without Web UI and pre-configuration (but you can also upload additional predefined 
@@ -45,7 +45,7 @@ Role limitations:
 Bareos or third-party components are not included in this role: e.g.
 [manual installation of php required](https://blog.remirepo.net/post/2019/12/03/Install-PHP-7.4-on-CentOS-RHEL-or-Fedora)
 instead of wrong versions by default like on Oracle Linux 8.7 or Fedora 45.
-- No Bareos resources like devices, storages, jobs, pools are possible to add. Only bareos file daemon add which is most
+- No Bareos resources like devices, storages, jobs, pools are possible to add. Only Bareos file daemon add which is most
 common.
 - Remove file daemon from Bareos server using this role is not possible. Some existing job configs might be linked with
 this filedaemon. Bareos server will not start after force remove until you delete or change job configs. Anyway there is
@@ -286,7 +286,7 @@ If you with to use Bareos with already preinstalled sqlite change set:
 
 #### 7. Copy Bareos configs without reinstall
 
-You can upload configs to already installed Bareos without comonents re-install, but you need to set what component(s)
+You can upload configs to already installed Bareos without components re-install, but you need to set what component(s)
 should be restarted to apply configuration change in `bareos_components` variable. The example belows shows how to apply
 bareos-dir, bareos-sd, bareos-fd and Bareos Web UI (by restart Apache web server):
 

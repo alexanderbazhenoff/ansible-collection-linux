@@ -3,7 +3,7 @@ zabbix_agent
 This role installs zabbix agent and configures them for services, apps and platform autodiscovery on
 [Zabbix Server side](#setup-on-zabbix-server-side).
 
-Configure tags for discovery of: mysql, postgresql, bareos, nginx, apache, isc-dhcp-server, memcached, virtualization,
+Configure tags for discovery of: mysql, postgresql, Bareos, nginx, apache, isc-dhcp-server, memcached, virtualization,
 containerization, baremetal platforms vendors and many more.
 
 Preamble
@@ -16,15 +16,15 @@ UserParameter=hostmetadata,echo 'Linux ff6e6f6e65 dd6a76'
 ```
 
 When Zabbix Server tries to discover hosts like this one, the next step is following: add the host to a specified 
-group (like Web servers, Cloud nodes, etc) and apply template to monitoring filesystems (ZFS, btrfs, mdadm), 
+group (like Web servers, Cloud nodes, etc...) and apply template to monitoring filesystems (ZFS, btrfs, mdadm), 
 application (nginx, etc), virtualization or containerization and another hardware and software platforms.
 
 Usage
 -----
 
 1. Download and [install](https://galaxy.ansible.com/docs/using/installing.html#roles) this ansible role from ansible
-galaxy or clone from github.
-2. Set-up your zabbix server IPs and other params in [defaults/main.yml](defaults/main.yml). If you need to add your
+galaxy or clone from GitHub.
+2. Set up your zabbix server IPs and other params in [defaults/main.yml](defaults/main.yml). If you need to add your
 custom daemon discovery (something you usually do like `systemctl start my-app-daemon`), add it in the 'daemon hashes'
 section.
 3. Fill-up [inventory file](examples/inventory) or prepare your
@@ -47,7 +47,7 @@ Requirements
 
 - **Zabbix agent configuration**. Platforms discovery use additional packages (like ipmitool), another platforms and
 services detects by binary files search, but the most of services detects by their enabled systemd daemons (`systemctl
-is-enabled` command). So deamons autodiscovery works only on linux distros with systemd. Already installed Zabbix agent
+is-enabled` command). So daemons autodiscovery works only on linux distros with systemd. Already installed Zabbix agent
 re-configuration (check `customize_agent_only` in [Role Variables](#role-variables) using this role also possible.
 
 Dependencies
@@ -117,12 +117,12 @@ Autodiscovery hashes:
 | zabbix-agent                | dd7a626131             | Zabbix agent v1 daemon discovery              |
 | zabbix-agent2               | dd7a626132             | Zabbix agent v2 daemon discovery              |
 |                             | ff6e6f6e65             | baremetal server instance discovery           |
-| kvm                         | ff6b766d               | KVM virtualization instance dicovery          |
+| kvm                         | ff6b766d               | KVM virtualization instance discovery         |
 | lxc                         | ff6c7863               | LXC container instance discovery              |
 | docker                      | ff646f636b6572         | Docker container instance discovery           |
 | ipmi                        | ee69706d69             | IPMI discovery                                |
-| Supermicro                  | ee53757065726d6963726f | Sumermicro(tm) hardware platform disovery     |
-|                             | ee<other_vendor_hash>  | <other vendor> hardware platform disovery     |
+| Supermicro                  | ee53757065726d6963726f | Sumermicro(tm) hardware platform discovery    |
+|                             | ee<other_vendor_hash>  | <other vendor> hardware platform discovery    |
 
 Example Playbook
 ----------------
