@@ -81,7 +81,7 @@ while uninstall the same version playbook tasks should look like:
 
 Role checks that specified version of PostgreSQL server is available for your Linux distribution: if this version is not
 available this will install default version from your distribution repositories or from dnf modules. If you wish install
-PostgreSQL of default version for your linux destribution set `postgresql_recommended_version: True`:
+PostgreSQL of default version for your linux distribution set `postgresql_recommended_version: True`:
 
         - name: "Install PostgreSQL of default version for your linux destribution"
           ansible.builtin.include_role:
@@ -942,13 +942,13 @@ Defaults:
  | ca_cert         | optional  | ''      | Specifies the name of a file containing SSL certificate authority (CA) (6)   |
  | trust_input     | optional  | True    | It makes sense only when SQL injections through the options are possible (7) |
 
-* (1) Collation order (LC_COLLATE) to use in the database must match collation order of template database unless 
+* (1) Collation order (`LC_COLLATE`) to use in the database must match collation order of template database unless 
 `template0` is used as template.
 * (2) The tablespace to set for the database (see
 [documentation](https://www.postgresql.org/docs/current/sql-alterdatabase.html)). If you want to move the database back
-to the default tablespace, explicitly set this to pg_default.
-* (3) Additional arguments for pg_dump or restore program (pg_restore or psql, depending on target's format). Used when
-role_action is `dump` or `restore`.
+to the default tablespace, explicitly set this to `pg_default`.
+* (3) Additional arguments for pg_dump or restore program (`pg_restore` or `psql`, depending on target's format). Used
+when role_action is `dump` or `restore`.
 * (4) Cannot be used with dump-file-format-related arguments like `–format=d`.
 * (5) Determines whether or with what priority a secure SSL TCP/IP connection will be negotiated with the server. See
 [libpq-ssl documentation] for more information on the modes. Default of `prefer` matches libpq default. Choices:
@@ -1043,10 +1043,10 @@ Defaults:
 
 * (1) Optional parameter that when `True` specifies that the LSN for this replication slot be reserved immediately,
 otherwise the default, `False`, specifies that the LSN is reserved on the first connection from a streaming replication
-client. Is available from PostgreSQL version 9.6. Uses only with *slot_type=physical*. Mutually exclusive with 
+client. Is available from PostgreSQL version 9.6. Uses only with `slot_type=physical`. Mutually exclusive with 
 *slot_type=logical*.
-* (2) This parameter does not apply to physical slots. It will be ignored with *slot_type=physical*. If wasn't set 
-(ommited) *"test_decoding"* will be set by default.
+* (2) This parameter does not apply to physical slots. It will be ignored with `slot_type=physical`. If wasn't set 
+(omitted) `"test_decoding"` will be set by default.
 
 License
 -------
