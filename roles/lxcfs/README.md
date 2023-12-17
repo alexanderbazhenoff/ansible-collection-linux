@@ -30,8 +30,8 @@ append_lxc_config: |
   lxc.net.0.flags = up
   lxc.net.0.hwaddr = 00:16:3e:xx:xx:xx
   lxc.net.0.veth.pair = pariname-lxc
-  lxc.net.0.ipv4.address = 10.10.12.200/24
-  lxc.net.0.ipv4.gateway = 10.10.12.254
+  lxc.net.0.ipv4.address = 10.0.0.200/24
+  lxc.net.0.ipv4.gateway = 10.0.0.254
   lxc.start.auto = 1
   lxc.start.delay = 8
 ```
@@ -102,8 +102,8 @@ More complex lxcfs usage with disabled default lxc-net for br0 usage with some s
               lxc.net.0.veth.pair = someprefix-lxc
               lxc.net.0.name = eth0
               lxc.net.0.link = br0
-              lxc.net.0.ipv4.address = 10.10.12.200/24
-              lxc.net.0.ipv4.gateway = 10.10.12.254
+              lxc.net.0.ipv4.address = 10.0.0.200/24
+              lxc.net.0.ipv4.gateway = 10.0.0.254
               lxc.start.auto = 1
               lxc.start.delay = 8
 
