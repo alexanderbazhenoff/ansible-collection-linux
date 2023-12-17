@@ -6,24 +6,24 @@ galaxy_info:
   author: Aleksandr Bazhenov
   description: Installs zabbix agent and configure services, apps and platform autodiscovery.
   license: MIT-0
-  min_ansible_version: 2.9.0
+  min_ansible_version: 2.9
   platforms:
     - name: Ubuntu
       versions:
-        - trusty
-        - xenial
-        - bionic
-        - focal
-        - jammy
+        - all
     - name: Debian
       versions:
-        - bullseye
-        - buster
-        - stretch
-        - jessie
-    - name: ArchLinux
+        - all
+    - name: rhel
       versions:
         - all
+    - name: Alpine
+      versions:
+        - all
+    - name: Archlinux
+      versions:
+        - all
+
   galaxy_tags:
     - monitoring
     - zabbix

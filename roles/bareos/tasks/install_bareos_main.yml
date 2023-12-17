@@ -10,7 +10,7 @@
 - name: "install bareos main | Install pre-requirements"
   ansible.builtin.include_tasks: install_pre_requirements.yml
 
-- name: "install bareos main | Include add bareos repo tasks"
+- name: "install bareos main | Include add Bareos repo tasks"
   ansible.builtin.include_tasks: add_bareos_repo_{{ ansible_os_family | lower }}.yml
   when: ansible_os_family != 'Alpine'
 
@@ -59,7 +59,7 @@
   when: bareos_components | regex_search('webui') and ansible_facts.selinux.status is defined and
     ansible_facts.selinux.status == 'enabled' and ansible_os_family == 'RedHat'
 
-- name: "install bareos main | Create bareos database, make bareos tables, grant privileges"
+- name: "install bareos main | Create Bareos database, make Bareos tables, grant privileges"
   ansible.builtin.shell: |
     su {{ postgresql_become_user }} -c 'cd {{ bareos_scripts_path | json_query(ansible_os_family | lower) }}; \
       ./create_bareos_database; ./make_bareos_tables; ./grant_bareos_privileges'
@@ -67,6 +67,6 @@
   changed_when: not pgsql_user_and_database_create_and_grant_results.failed
   when: bareos_components | regex_search('dir') and init_bareos_database
 
-- name: "install bareos main | Include enable start bareos tasks"
+- name: "install bareos main | Include enable start Bareos tasks"
   ansible.builtin.include_tasks: enable_start_bareos_{{ ansible_os_family | lower }}.yml
   when: ansible_os_family != 'Debian'

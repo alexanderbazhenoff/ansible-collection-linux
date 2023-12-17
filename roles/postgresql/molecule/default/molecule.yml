@@ -9,24 +9,6 @@ driver:
   name: docker
 platforms:
 
-  - name: debian10-instance
-    image: jrei/systemd-debian:10
-    dockerfile: dockerfile_debian.j2
-    buildargs:
-      image_platform: jrei/systemd-debian
-      image_tag: 10
-    pre_build_image: False
-    privileged: True
-    tmpfs:
-      - /run
-      - /tmp
-      - /run/lock
-    volumes:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-    capabilities:
-      - SYS_ADMIN
-    command: "/lib/systemd/systemd"
-
   - name: debian11-instance
     image: jrei/systemd-debian:11
     dockerfile: dockerfile_debian.j2
@@ -45,12 +27,12 @@ platforms:
       - SYS_ADMIN
     command: "/lib/systemd/systemd"
 
-  - name: ubuntu1804-instance
-    image: jrei/systemd-ubuntu:18.04
+  - name: debian12-instance
+    image: jrei/systemd-debian:12
     dockerfile: dockerfile_debian.j2
     buildargs:
-      image_platform: jrei/systemd-ubuntu
-      image_tag: 18.04
+      image_platform: jrei/systemd-debian
+      image_tag: 12
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -81,28 +63,29 @@ platforms:
       - SYS_ADMIN
     command: "/lib/systemd/systemd"
 
-  - name: centos7-instance
-    image: centos:centos7
-    dockerfile: dockerfile_centos.j2
+  - name: ubuntu2204-instance
+    image: jrei/systemd-ubuntu:22.04
+    dockerfile: dockerfile_debian.j2
     buildargs:
-      image_platform: centos
-      image_tag: centos7
+      image_platform: jrei/systemd-ubuntu
+      image_tag: 22.04
     pre_build_image: False
     privileged: True
     tmpfs:
       - /run
       - /tmp
+      - /run/lock
     volumes:
       - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
     capabilities:
       - SYS_ADMIN
     command: "/lib/systemd/systemd"
 
-  - name: centos8-instance
-    image: centos:8
-    dockerfile: dockerfile_centos.j2
+  - name: oraclelinux8-instance
+    image: oraclelinux:8
+    dockerfile: dockerfile_redhat.j2
     buildargs:
-      image_platform: centos
+      image_platform: oraclelinux
       image_tag: 8
     pre_build_image: False
     privileged: True
@@ -114,6 +97,40 @@ platforms:
     capabilities:
       - SYS_ADMIN
     command: "/lib/systemd/systemd"
+
+  - name: oraclelinux9-instance
+    image: oraclelinux:9
+    dockerfile: dockerfile_redhat.j2
+    buildargs:
+      image_platform: oraclelinux
+      image_tag: 9
+    pre_build_image: False
+    privileged: True
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+    capabilities:
+      - SYS_ADMIN
+    command: "/lib/systemd/systemd"
+
+  - name: alpine-latest-instance
+    image: alpine:latest
+    dockerfile: dockerfile_alpine.j2
+    buildargs:
+      image_platform: alpine
+      image_tag: latest
+    pre_build_image: False
+    privileged: True
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+    capabilities:
+      - SYS_ADMIN
+    command: "/sbin/init"
 
 scenario:
   test_sequence:

@@ -13,8 +13,8 @@
       vars:
         postgresql_version: 16
         install_pgadmin: True
-        pgadmin_email: john.doe@company.com
-        pgadmin_password: some_password_here
+        pgadmin_email: a.bazhenov@tm-industries.ru
+        pgadmin_password: Postgresql4Space
         postgresql_conf:
           port: 5432
           max_connections: 1000

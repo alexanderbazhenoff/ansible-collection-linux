@@ -1,0 +1,45 @@
+---
+
+- name: "install zabbix agent debian | Set facts for release package filename and zabbix daemon name"
+  ansible.builtin.set_fact:
+    zabbix_agent_daemon_name: >-
+      {% if install_v2_agent and (ansible_distribution_release != 'NA' and zbx_grep_geturl.results[0].stdout_lines |
+      select('match', '.+zabbix-agent2.+' + ansible_distribution_release + '.+') | default([]) | length > 0 or
+      zbx_grep_geturl.results[0].stdout_lines | select('match', '.+zabbix-agent2.+' + ansible_distribution | lower +
+      ansible_distribution_major_version + '.+') | default([]) | length > 0) %}zabbix-agent2{% else -%}
+      {{ zabbix_agent_daemon_name }}{% endif %}
+    package_filename: >-
+      {% if ansible_distribution_release != 'NA' and zbx_grep_geturl.results[1].stdout_lines |
+      select('match', '.+zabbix-release.+' + ansible_distribution_release + '.+') | length > 0 -%}
+      {{ zbx_grep_geturl.results[1].stdout_lines | select('match', '.+zabbix-release.+' +
+      ansible_distribution_release + '.+') | last | regex_replace('(.+">)|(<\/a>.+)', '') -}}
+      {% elif zbx_grep_geturl.results[1].stdout_lines | select('match', '.+zabbix-release.+' +
+      ansible_distribution | lower + ansible_distribution_major_version + '.+') | length > 0 -%}
+      {{ zbx_grep_geturl.results[1].stdout_lines | select('match', '.+zabbix-release.+' + ansible_distribution |
+      lower + ansible_distribution_major_version + '.+') | last | regex_replace('(.+">)|(<\/a>.+)', '') }}{% endif %}
+
+- name: "install zabbix agent debian | Checking that specified release is available for linux distribution"
+  ansible.builtin.assert:
+    that:
+      - package_filename | length > 0
+    fail_msg: >-
+      There is no 'zabbix-release' package version {{ zabbix_release }} for {{ ansible_distribution -}}
+      {{ ansible_distribution_major_version }}.x{% if ansible_distribution_release != 'NA' %}
+      or '{{ ansible_distribution_release }}'{% endif %}. Please set another zabbix release.
+    success_msg: "Found zabbix release package, URL: {{ zabbix_packages_url }}-release/{{ package_filename }}"
+    quiet: "{{ not debug_mode | bool }}"
+
+- name: "install zabbix agent debian | Download zabbix release package"
+  ansible.builtin.get_url:
+    url: "{{ zabbix_packages_url }}-release/{{ package_filename }}"
+    dest: /tmp/zabbix-release.deb
+    validate_certs: "{{ repo_dl_validate_certs | bool }}"
+    mode: 0644
+  register: get_url_results
+  until: get_url_results is succeeded
+  retries: 5
+  delay: 5
+
+- name: "install zabbix agent debian | Install zabbix release package"
+  ansible.builtin.apt:
+    deb: /tmp/zabbix-release.deb

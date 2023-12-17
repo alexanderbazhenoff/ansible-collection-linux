@@ -1,0 +1,91 @@
+---
+
+# An example playbook for test and troubleshoot on developing to installs a specified version of PostgreSQL,
+# control database instance, removes a specified version of PostgreSQL, then installs a maximum version of PosgreSQL.
+
+# Usage:
+# rm -f *.tar.gz; ansible-galaxy collection build; ansible-galaxy collection installs $(ls -1 | grep ".tar.gz") -f
+# ansible-playbook -i roles/postgresql/inventory.ini roles/postgresql/install_control_and_reinstall_example.yml
+
+- hosts: all
+  become: True
+  become_method: sudo
+  gather_facts: True
+
+  tasks:
+
+    - name: "install example | Include postgresql role for 15"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: install
+        postgresql_version: 15
+        clean_install: True
+        install_pgadmin: True
+        role_subject: server
+        pg_conf_content_mode: >-
+          {% if ansible_os_family == 'RedHat' and ansible_distribution_major_version | int <= 6 %}regex{% else -%}
+          pg_hba.conf.j2{% endif %}
+        postgresql_additional_packages:
+          - "postgresql{% if ansible_os_family == 'Debian' %}-client-{{ postgresql_version }}{% else -%}
+            {{ postgresql_version }}-contrib{% endif %}"
+
+    - name: "install example | Create user"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: create
+        role_subject: users
+
+    - name: "install example | Create database"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: create
+        role_subject: databases
+
+    - name: "install example | Dump database"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: dump
+        role_subject: databases
+        postgresql_databases:
+          - name: db_name
+            target: /tmp/acme.dir
+
+    - name: "install example | Check dumping database complete"
+      ansible.builtin.lineinfile:
+        dest: /tmp/acme.dir
+        line: "-- PostgreSQL database dump complete"
+      check_mode: True
+      register: dump_complete_line_results
+      failed_when: dump_complete_line_results.changed
+
+    - name: "install example | Include postgresql role for remove 14"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: uninstall
+        postgresql_version: 14
+        clean_install: True
+        postgresql_additional_packages:
+          - "postgresql{% if ansible_os_family == 'Debian' %}-client-14{% else %}14-contrib{% endif %}"
+
+    - name: "install example | Include postgresql role for max available version"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: uninstall
+        postgresql_version: 14
+        postgresql_max_recommended_version: True
+        clean_install: True
+        postgresql_additional_packages:
+          - "postgresql{% if ansible_os_family == 'Debian' %}-client-14{% else %}14-contrib{% endif %}"
+
+    - name: "install example | Configure server hba_conf"
+      ansible.builtin.include_role:
+        name: alexanderbazhenoff.linux.postgresql
+      vars:
+        role_action: configure
+        role_subject: hba_conf

@@ -5,10 +5,11 @@ FROM ${image_platform}:${image_tag}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update
-RUN apt-get install -y python3 sudo bash ca-certificates gnupg2 iproute2 python3-apt aptitude apt-utils lsb-release
-RUN apt-get install -y software-properties-common apt-utils dialog dbus wget procps
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*;
+RUN apt-get update; \
+    apt-get install -y python3 sudo bash ca-certificates gnupg2 iproute2 python3-apt aptitude apt-utils lsb-release; \
+    apt-get install -y software-properties-common apt-utils dialog dbus wget procps; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*
 
 VOLUME ["/sys/fs/cgroup"]
 CMD ["/lib/systemd/systemd"]

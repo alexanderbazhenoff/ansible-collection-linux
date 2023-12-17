@@ -7,10 +7,14 @@
 
   tasks:
 
-    - name: "default >>> converge | Include zabbix_agent role to install agent v2"
+    - name: "default >>> converge | Include of zabbix_agent role"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.zabbix_agent
       vars:
         zabbix_servers_passive: 127.0.0.1
         zabbix_servers_active: 127.0.0.1:10051
-        agent_version: 5.0
+        zabbix_release: >-
+          {% if (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 12) or
+          (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22) %}6.0{% else -%}
+          5.0{% endif %}
+        clean_install: False

@@ -1,0 +1,28 @@
+---
+
+required_packages:
+  redhat:
+    - vim-common
+    - "{% if ansible_distribution | regex_search('OracleLinux') %}python3-policycoreutils{% else %}
+      policycoreutils-python{% endif %}"
+    - wget
+  debian:
+    - vim-common
+    - util-linux
+    - wget
+    - "{% if ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 18 %}xxd{% endif %}"
+  archlinux:
+    - wget
+    - vim
+  alpine:
+    - vim-common
+    - util-linux
+    - wget
+    - xxd
+    - bash
+
+# Zabbix key name postfixes (RHEL):
+zabbix_repo_keyname_postfix:
+  redhat9: '-08EFA7DD'
+  redhat8: '-A14FE591'
+  redhat5: '-A14FE591-EL5'

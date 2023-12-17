@@ -25,16 +25,14 @@ platforms:
       - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
     capabilities:
       - SYS_ADMIN
-      - NET_ADMIN
-      - MKNOD
     command: "/lib/systemd/systemd"
 
-  - name: ubuntu1804-instance
-    image: jrei/systemd-ubuntu:18.04
+  - name: ubuntu2004-instance
+    image: jrei/systemd-ubuntu:20.04
     dockerfile: dockerfile_debian.j2
     buildargs:
       image_platform: jrei/systemd-ubuntu
-      image_tag: 18.04
+      image_tag: 20.04
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -47,12 +45,12 @@ platforms:
       - SYS_ADMIN
     command: "/lib/systemd/systemd"
 
-  - name: ubuntu2004-instance
-    image: jrei/systemd-ubuntu:20.04
+  - name: ubuntu2204-instance
+    image: jrei/systemd-ubuntu:22.04
     dockerfile: dockerfile_debian.j2
     buildargs:
       image_platform: jrei/systemd-ubuntu
-      image_tag: 20.04
+      image_tag: 22.04
     pre_build_image: False
     privileged: True
     tmpfs:

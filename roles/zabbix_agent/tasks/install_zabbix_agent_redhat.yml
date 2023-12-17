@@ -1,0 +1,49 @@
+---
+
+- name: "install zabbix agent redhat | Set facts for release package filename, zabbix daemon name and GPG key URL"
+  ansible.builtin.set_fact:
+    zabbix_agent_daemon_name: >-
+      {% if install_v2_agent and zbx_grep_geturl.results[0].stdout_lines | select('match', '.+zabbix-agent2.+el' +
+      ansible_distribution_major_version + '.+') | length > 0 %}zabbix-agent2{% else %}{{ zabbix_agent_daemon_name -}}
+      {% endif %}
+    package_filename: >-
+      {% if zbx_grep_geturl.results[1].stdout_lines | select('match', '.+zabbix-release.+el' +
+      ansible_distribution_major_version + '.+') | length > 0 -%}
+      {{ zbx_grep_geturl.results[1].stdout_lines | select('match', '.+zabbix-release.+el' +
+      ansible_distribution_major_version + '.+') | last | regex_replace('(.+">)|(<\/a>.+)', '') }}{% endif %}
+    repo_key_url: >-
+      {{ zabbix_repo_url }}/RPM-GPG-KEY-ZABBIX{{ zabbix_repo_keyname_postfix | json_query(ansible_os_family | lower +
+      ansible_distribution_major_version) }}
+
+- name: "install zabbix agent redhat | Facts for release package filename, zabbix daemon name and GPG key URL debug"
+  ansible.builtin.debug:
+    msg: "{{ zabbix_agent_daemon_name }} from {{ package_filename }} with GPG from {{ repo_key_url }}"
+  when: debug_mode
+
+- name: "install zabbix agent redhat | Checking that specified release is available for linux distribution"
+  ansible.builtin.assert:
+    that:
+      - package_filename | length > 0
+    fail_msg: >-
+      There is no 'zabbix-release' package version {{ zabbix_release }} for {{ ansible_distribution -}}
+      {{ ansible_distribution_major_version }}.x. Please set another zabbix release.
+    success_msg: "Found zabbix release package, URL: {{ zabbix_packages_url }}/{{ package_filename }}"
+    quiet: "{{ not debug_mode | bool }}"
+
+- name: "install zabbix agent redhat | Install repo key"
+  ansible.builtin.rpm_key:
+    key: "{{ repo_key_url }}"
+  register: get_url_results
+  until: get_url_results is succeeded
+  retries: 5
+  delay: 5
+
+- name: "install zabbix agent redhat | Download and install zabbix release package"
+  ansible.builtin.yum:
+    name: "{{ zabbix_packages_url }}/{{ package_filename }}"
+    state: present
+    validate_certs: "{{ repo_dl_validate_certs | bool }}"
+  register: install_package_results
+  until: install_package_results is succeeded
+  retries: 5
+  delay: 5

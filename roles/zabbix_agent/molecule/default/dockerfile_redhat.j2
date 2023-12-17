@@ -3,7 +3,7 @@ ARG image_tag
 FROM ${image_platform}:${image_tag}
 
 RUN dnf --assumeyes install /usr/bin/python3 /usr/bin/python3-config /usr/bin/dnf-3 && \
-    dnf --assumeyes install sudo bash iproute dbus && \
+    dnf --assumeyes install sudo bash iproute dbus gnupg2 && \
     dnf clean all
 
 SHELL ["/bin/bash", "-c"]

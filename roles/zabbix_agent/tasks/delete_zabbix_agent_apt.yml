@@ -1,0 +1,12 @@
+---
+
+- name: "delete zabbix agent apt | Remove zabbix agent packages"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: absent
+    autoremove: True
+    purge: True
+  with_items:
+    - zabbix-agent
+    - zabbix-agent2
+    - zabbix-release

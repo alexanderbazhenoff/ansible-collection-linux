@@ -8,130 +8,164 @@
 
   tasks:
 
-    - name: "default >>> verify | Collect facts about system services"
-      ansible.builtin.service_facts:
-      register: services_state
+    - name: "default >>> verify | Include zabbix_agent role variables to make debug_mode controllable"
+      ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
 
-    - name: "default >>> verify | Set fact for zabbix agent2 service json query"
-      ansible.builtin.set_fact:
-        zabbix_agent2_service_query: >
-          {{ services_state.ansible_facts.services | json_query('["zabbix-agent2.service"]') }}
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 18) or
-        (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 9) or
-        (ansible_distribution == "CentOS" and ansible_distribution_major_version | int >= 6) or
-        ansible_os_family == "Archlinux"
+    - name: "default >>> verify | Checking via ansible facts that corresponding version of zabbix agent is started"
+      block:
+        - name: "| Collect facts about system services"
+          ansible.builtin.service_facts:
+          register: services_state
 
-    - name: "default >>> verify | Set fact for zabbix agent service json query"
-      ansible.builtin.set_fact:
-        zabbix_agent_service_query: >
-          {{ services_state.ansible_facts.services | json_query('["zabbix-agent.service"]') }}
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int == 16) or
-        (ansible_distribution == "Debian" and ansible_distribution_major_version | int == 8) or
-        ansible_os_family == "Archlinux"
+        - name: "| Set fact for zabbix agent2 service json query"
+          ansible.builtin.set_fact:
+            zbx_agent2_service_query: >
+              {{ services_state.ansible_facts.services | json_query('["zabbix-agent2.service"]') }}
+          when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 18) or
+            (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 9) or
+            (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 6) or
+            ansible_os_family | regex_search('OracleLinux')
 
-    - name: "default >>> verify | Set fact for zabbix agent service json query"
-      ansible.builtin.set_fact:
-        zabbix_agent_query: >
-          {{ services_state.ansible_facts.services | json_query('["zabbix-agent"]') }}
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int <= 14) or
-        (ansible_distribution == "Debian" and ansible_distribution_major_version | int <= 7)
+        - name: "| Set fact for zabbix agent service json query"
+          ansible.builtin.set_fact:
+            zbx_agent_service_query: >
+              {{ services_state.ansible_facts.services | json_query('["zabbix-agent.service"]') }}
+          when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int == 16) or
+            (ansible_distribution == "Debian" and ansible_distribution_major_version | int == 8)
 
-  # DEBUG SECTION
-  # (uncomment for troubleshooting)
+        - name: "| Set fact for zabbix agent json query"
+          ansible.builtin.set_fact:
+            zbx_agent_query: >
+              {{ services_state.ansible_facts.services | json_query('["zabbix-agent"]') }}
+          when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int <= 14) or
+            (ansible_distribution == "Debian" and ansible_distribution_major_version | int <= 7)
+      when: ansible_os_family != "Alpine"
 
-    - name: "default >>> verify | (debug) Show services state"
-      ansible.builtin.debug:
-        var: services_state.ansible_facts.services
-      when: services_state.ansible_facts.services is defined
+    - name: "| debug_mode outputs"
+      block:
+        - name: "|| (debug) Show services state"
+          ansible.builtin.debug:
+            var: services_state.ansible_facts.services
+          when: services_state.ansible_facts.services is defined
 
-    - name: "default >>> verify | (debug) Show zabbix agent2 all query"
-      ansible.builtin.debug:
-        var: zabbix_agent2_service_query
-      when: zabbix_agent2_service_query is defined
+        - name: "|| (debug) Show zabbix agent v2 all query"
+          ansible.builtin.debug:
+            var: zbx_agent2_service_query
+          when: zbx_agent2_service_query is defined
 
-    - name: "default >>> verify | (debug) Show zabbix agent all query"
-      ansible.builtin.debug:
-        var: zabbix_agent_service_query
-      when: zabbix_agent_service_query is defined
+        - name: "|| (debug) Show zabbix agent all query"
+          ansible.builtin.debug:
+            var: zbx_agent_service_query
+          when: zbx_agent_service_query is defined
 
-    - name: "default >>> verify | (debug) Show zabbix agent2 status"
-      ansible.builtin.debug:
-        var: zabbix_agent2_service_query[0].state
-      when: zabbix_agent2_service_query[0].state is defined
+        - name: "|| (debug) Show zabbix agent v2 status"
+          ansible.builtin.debug:
+            var: zbx_agent2_service_query[0].state
+          when: zbx_agent2_service_query[0].state is defined
 
-    - name: "default >>> verify | (debug) Show zabbix agent status"
-      ansible.builtin.debug:
-        var: zabbix_agent_service_query[0].state
-      when: zabbix_agent_service_query[0].state is defined
+        - name: "|| (debug) Show zabbix agent status"
+          ansible.builtin.debug:
+            var: zbx_agent_service_query[0].state
+          when: zbx_agent_service_query[0].state is defined
 
-    - name: "default >>> verify | (debug) Show zabbix agent status"
-      ansible.builtin.debug:
-        var: zabbix_agent_query[0].state
-      when: zabbix_agent_query[0].state is defined
+        - name: "|| (debug) Show zabbix agent status"
+          ansible.builtin.debug:
+            var: zbx_agent_query[0].state
+          when: zbx_agent_query[0].state is defined
 
-    - name: "default >>> verify | Assert zabbix-agent version is running and enabled"
+        - name: "|| (debug) Show zabbix agent v2 status"
+          ansible.builtin.debug:
+            var: zbx_agent2_query[0].state
+          when: zbx_agent2_query[0].state is defined
+      when: debug_mode
+
+    - name: "| Ensure that zabbix-agent version is running and enabled"
       ansible.builtin.assert:
         that:
-          - (zabbix_agent_service_query[0].state is defined and zabbix_agent_service_query[0].state == 'running') or
-            (zabbix_agent2_service_query[0].state is defined and zabbix_agent2_service_query[0].state == 'running') or
-            (zabbix_agent_query[0].state is defined and zabbix_agent_query[0].state == 'running')
+          - (zbx_agent_service_query[0].state is defined and zbx_agent_service_query[0].state == 'running') or
+            (zbx_agent2_service_query[0].state is defined and zbx_agent2_service_query[0].state == 'running') or
+            (zbx_agent_query[0].state is defined and zbx_agent_query[0].state == 'running')
           - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int <= 16) or
             (ansible_distribution == "Debian" and ansible_distribution_major_version | int <= 7) or
-            (zabbix_agent_service_query[0].status is defined and zabbix_agent_service_query[0].status == 'enabled') or
-            (zabbix_agent2_service_query[0].status is defined and zabbix_agent2_service_query[0].status == 'enabled')
-        fail_msg: |
+            (ansible_os_family == "RedHat" and ansible_distribution_major_version | int <= 7) or
+            (zbx_agent_service_query[0].status is defined and zbx_agent_service_query[0].status == 'enabled') or
+            (zbx_agent2_service_query[0].status is defined and zbx_agent2_service_query[0].status == 'enabled')
+        fail_msg: >-
           Error.
-          {% if (zabbix_agent_service_query[0].state is not defined or
-          zabbix_agent2_service_query[0].state is not defined or
-          zabbix_agent_query[0].state is not defined) %}
+          {% if (zbx_agent_service_query[0].state is not defined or
+          zbx_agent2_service_query[0].state is not defined or
+          zbx_agent_query[0].state is not defined) %}
           No zabbix agent daemon state info found, perhaps it's not installed.
           {% endif %}
-          {% if ((zabbix_agent_query[0].state is defined and zabbix_agent_query[0].state != 'running') or
-          (zabbix_agent_service_query[0].state is defined and zabbix_agent_service_query[0].state != 'running') or
-          (zabbix_agent2_service_query[0].state is defined and zabbix_agent2_service_query[0].state != 'running')) %}
+          {% if ((zbx_agent_query[0].state is defined and zbx_agent_query[0].state != 'running') or
+          (zbx_agent_service_query[0].state is defined and zbx_agent_service_query[0].state != 'running') or
+          (zbx_agent2_service_query[0].state is defined and zbx_agent2_service_query[0].state != 'running')) %}
           Zabbix agent daemon state is not 'running'.
           {% endif %}
           {% if (((ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 18) or
-          (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 8)) and
-          ((zabbix_agent_service_query[0].status is defined and zabbix_agent_service_query[0].status != 'enabled') or
-          (zabbix_agent2_service_query[0].status is defined and zabbix_agent2_service_query[0].status != 'enabled'))) %}
-          Zabbix agent daemon not 'enabled', but systemd 'enable' is possible.
+          (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 8) or
+          (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 6)) and
+          ((zbx_agent_service_query[0].status is defined and zbx_agent_service_query[0].status != 'enabled') or
+          (zbx_agent2_service_query[0].status is defined and zbx_agent2_service_query[0].status != 'enabled'))) %}
+          Zabbix agent daemon not 'enabled', but systemd is present in the system.
           {% endif %}
+      when: ansible_os_family != "Alpine"
+
+    - name: "default >>> verify | Checking via openrc that corresponding version of zabbix agent is started"
+      block:
+        - name: "| Getting zabbix-agent2 status via openrc"
+          ansible.builtin.shell: rc-service zabbix-agent2 status 2> /dev/null || true
+          args:
+            executable: /bin/bash
+          register: zbx_agent_openrc_results
+          changed_when: False
+
+        - name: "| Ensure that zabbix-agent2 status is 'running'"
+          ansible.builtin.assert:
+            that:
+              - zbx_agent_openrc_results.stdout is defined and zbx_agent_openrc_results.stdout | regex_search('started')
+            fail_msg: >-
+              Error.
+              {% if zbx_agent_openrc_results.stdout is not defined %} zabbix-agent2 daemon not found.
+              {% elif zbx_agent_openrc_results.stdout is defined and zbx_agent_openrc_results.stdout |
+              regex_search('stopped') -%}zabbix-agent2 daemon is stopped.{% endif %}
+      when: ansible_os_family == "Alpine"
 
     - name: "default >>> verify | Find zabbix config file"
       ansible.builtin.find:
         paths: /etc/zabbix
         patterns: 'zabbix_agent*.conf'
-      register: zabbix_agent_config_found
+      register: zbx_agent_config_found
 
     - name: "default >>> verify | Find zabbix config sub-directory to include"
       ansible.builtin.find:
         paths: /etc/zabbix
         patterns: 'zabbix_agent*.d'
         file_type: directory
-      register: zabbix_agent_config_subdirectory_found
+      register: zbx_agent_config_subdirectory_found
 
     - name: "default >>> verify | (debug) Show zabbix config files found"
       ansible.builtin.debug:
-        var: zabbix_agent_config_found.files[0].path
+        var: zbx_agent_config_found.files[0].path
 
     - name: "default >>> verify | (debug) Show zabbix config files found"
       ansible.builtin.debug:
-        var: zabbix_agent_config_subdirectory_found.files[0].path
+        var: zbx_agent_config_subdirectory_found.files[0].path
 
     - name: "default >> verify | Assert there aren't two config files in /etc/zabbix"
       ansible.builtin.assert:
         that:
-          - zabbix_agent_config_found.files[0].path is defined and zabbix_agent_config_found.files | length == 1
+          - zbx_agent_config_found.files[0].path is defined and zbx_agent_config_found.files | length == 1
         fail_msg: Error. Two config files found.
 
     - name: "default >>> verify | Find and check regexp item(s) in zabbix agent configs"
       ansible.builtin.lineinfile:
-        dest: "{{ zabbix_agent_config_found.files[0].path }}"
+        dest: "{{ zbx_agent_config_found.files[0].path }}"
         regexp: "{{ item.key }}="
         line: "{{ item.key }}={{ item.value }}"
       with_items:
-        - { key: "Include", value: "{{ zabbix_agent_config_subdirectory_found.files[0].path }}/*.conf" }
+        - { key: "Include", value: "{{ zbx_agent_config_subdirectory_found.files[0].path }}/*.conf" }
         - { key: "AllowKey", value: "system.run[*]" }
       check_mode: True
       register: item_presence
@@ -139,5 +173,5 @@
 
     - name: "default >>> verify | Check host metadata tag line in zabbix agent configs"
       ansible.builtin.command:
-        cmd: grep "UserParameter=hostmetadata,echo 'Linux" {{ zabbix_agent_config_found.files[0].path }}
+        cmd: grep "UserParameter=hostmetadata,echo 'Linux" {{ zbx_agent_config_found.files[0].path }}
       changed_when: False

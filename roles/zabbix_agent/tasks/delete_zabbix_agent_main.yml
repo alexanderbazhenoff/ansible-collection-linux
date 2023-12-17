@@ -1,0 +1,25 @@
+---
+
+- name: "delete zabbix agent main | Include delete zabbix agent tasks depending on package manager"
+  ansible.builtin.include_tasks: delete_zabbix_agent_{{ ansible_pkg_mgr }}.yml
+
+- name: "delete zabbix agent main | Clean-up all zabbix directories and files"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/zabbix
+    - /usr/share/zabbix
+    - /var/lib/zabbix
+    - /var/log/zabbix
+    - /etc/default/zabbix-agent
+    - /usr/sbin/zabbix_agentd
+    - /tmp/zabbix-release.deb
+    - /tmp/zabbix_agent.html
+    - /usr/bin/zabbix_agent2
+    - /usr/bin/zabbix_agent
+    - /usr/lib/systemd/system/zabbix-agent2.service
+    - /usr/lib/systemd/system/zabbix-agent.service
+    - /usr/share/man/man8/zabbix_agent2.8.gz
+    - /usr/share/man/man8/zabbix_agent.8.gz
+  when: conf_with_dir_clean
