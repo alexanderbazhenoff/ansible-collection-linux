@@ -6,7 +6,7 @@
     state: restarted
   when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 12) or
     (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 9) or
-    (ansible_distribution == "CentOS" and ansible_distribution_major_version | int >= 6) or
+    (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 6) or
     ansible_os_family == "Archlinux"
 
 - name: restart zabbix-agent sysv
@@ -16,4 +16,4 @@
     enabled: True
   when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int < 12) or
     (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int < 9) or
-    (ansible_distribution == "CentOS" and ansible_distribution_major_version | int < 6)
+    (ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 6)

@@ -1,33 +1,36 @@
 ---
 
-# agent version here:
-agent_version: 5.0
+# Zabbix agent release:
+zabbix_release: 5.0
 
-# install zabbix-agent2 when possible:
+# Install zabbix-agent v2 when possible (v2 is available in zabbix repo for current linux distribution):
 install_v2_agent: True
 
-# customize agent for automatic services discovery and templates add:
+# Customize agent for automatic services discovery and templates add:
 customize_agent: True
 
-# delete all agents and config before install:
+# Delete all agents and config before install:
 clean_install: True
 
-# force install zabbix-agent v1:
-force_install_agent_v1: False
+# Lots of debug outputs:
+debug_mode: False
 
-# lots of debug outputs:
-debug_mode: True
+# Force cleanup zabbix agent directories and files (just to avoid installation/uninstallation scripts bugs):
+conf_with_dir_clean: True
 
-# force cleanup zabbix agent directories and files (just to avoid installation/uninstallation scripts bugs):
-zabbix_agent_conf_incl_dir_clean: True
-
-# only customzie and configure already installed zabbix agent:
+# Only customize and configure already installed zabbix agent:
 customize_agent_only: False
+
+# Zabbix repo URL:
+zabbix_repo_url: http://repo.zabbix.com
+
+# Archlinux repo URL prefix:
+archlinux_repo_url_prefix: https://archive.archlinux.org/packages
 
 # Validate certs when downloading packages (to avoid failure on some outdated virtual machines snapshots):
 repo_dl_validate_certs: False
 
-# parameters for zabbix agent settings
+# Parameters for zabbix agent settings
 zabbix_agent_conf_name: zabbix_agentd
 zabbix_agent_daemon_name: zabbix-agent
 zabbix_agent_binary: zabbix-agent
@@ -35,8 +38,10 @@ remote_cmd_key: EnableRemoteCommands
 remote_cmd_value: 1
 logfile_size_key: LogFileSize
 logfile_size_value: 100
-zabbix_servers_passive: 10.10.1.2,10.10.1.3
-zabbix_servers_active: 10.10.11.2:10051,10.10.1.3:10051
+# Specify Zabbix server(s) IP(s) for passive hosts discovery (e.g. '10.0.0.1,10.0.0.2'):
+zabbix_servers_passive: 10.0.0.1,10.0.0.2
+# Specify Zabbix server(s) IP(s) for active hosts discovery (e.g. '10.0.0.1:10051,10.0.0.2:10051'):
+zabbix_servers_active: 10.0.0.1:10051,10.0.0.2:10051
 zabbix_host_metadata: Linux
 
 
@@ -45,34 +50,30 @@ zabbix_host_metadata: Linux
 # binaries hashes:
 binaries_tag_hashes:
   - name: java
-    hash: jv
+    hash: dd6f76706e
   - name: openvpn
-    hash: ovd
+    hash: dd6a617661
 
 # daemon hashes:
 daemon_tag_hashes:
-  - name: cloudstack-agent
-    tag: csa                           # dd637361
-  - name: cloudstack-management
-    tag: csm                           # dd63736d
   - name: openvpn
-    tag: ovd                           # dd6f7664
+    tag: ovpn                          # dd6f76706e
   - name: mysql
-    tag: mql                           # dd6d716c
+    tag: mysql                         # dd6d7973716c
   - name: mariadb
-    tag: mql                           # dd6d716c
+    tag: mysql                         # dd6d7973716c
   - name: postgresql
-    tag: pql                           # dd70716c
+    tag: pgsql                         # dd706773716c
   - name: bareos-dir
-    tag: brdr                          # dd62726472
+    tag: brsdir                        # dd627273646972
   - name: bareos-fd
-    tag: brfd                          # dd62726664
+    tag: brsfd                         # dd6272736664
   - name: bareos-sd
-    tag: brsd                          # dd62727364
+    tag: brssd                         # dd6272737364
   - name: memcached
     tag: mmcchd                        # dd6d6d63636864
   - name: nginx
-    tag: ngx                           # dd6e6778
+    tag: ngnx                          # dd6e676e78
   - name: php-fpm
     tag: pfpm                          # dd7066706d
   - name: httpd
@@ -84,7 +85,7 @@ daemon_tag_hashes:
   - name: dnsmasq
     tag: dnsm                          # dd646e736d
   - name: fail2ban
-    tag: fbn                           # dd66626e
+    tag: f2b                           # dd663262
   - name: vsftpd
     tag: vsftp                         # dd7673667470
   - name: gitlab-runner

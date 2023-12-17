@@ -1,0 +1,19 @@
+---
+
+- name: "install zabbix agent main | Remove zabbix agent daemons from autorun via openrc"
+  ansible.builtin.shell: rc-update del {{ item }} || true    # noqa command-instead-of-shell
+  args:
+    executable: /bin/sh
+  register: zabbix_agent_rc_enable_results
+  changed_when: "'removed from runlevel' in zabbix_agent_rc_enable_results.stdout"
+  with_items:
+    - zabbix-agent
+    - zabbix-agent2
+
+- name: "delete zabbix agent apk | Remove zabbix agent packages"
+  community.general.apk:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - zabbix-agent
+    - zabbix-agent2

@@ -30,7 +30,7 @@ apps and platform autodiscovery on
 ```bash
 ansible-galaxy collection install alexanderbazhenoff.linux
 ```
-If you need to use custom installation path, e.g.
+If you need to use a custom installation path, e.g.
 ```bash
 ansible-galaxy collection install alexanderbazhenoff.linux -p /your/path
 ```
@@ -52,11 +52,11 @@ git clone https://github.com/alexanderbazhenoff/ansible-collection-linux.git
 ```bash
 cd ansible-collection-linux
 ```
-and build tar.gz archive of collection:
+and build tar.gz archive of a collection:
 ```bash
 ansible-galaxy collection build
 ```
-3. Install collection from created tar.gz archive:
+3. Install a collection from created tar.gz archive:
 ```bash
 ansible-galaxy collection install $(ls -1 | grep ".tar.gz")
 ```
@@ -67,4 +67,5 @@ ansible-galaxy collection install $(ls -1 | grep ".tar.gz")
 Create inventory and create playbook files. Include these roles into your playbook. These roles include example
 playbooks and inventory files already. You can also find usage examples in readme files or `/example` sub-folders.
 
-If you like it please vote on [ansible galaxy page](https://galaxy.ansible.com/alexanderbazhenoff/linux).
+If you like it, please vote on
+[ansible galaxy page](https://galaxy.ansible.com/ui/repo/published/alexanderbazhenoff/linux/).

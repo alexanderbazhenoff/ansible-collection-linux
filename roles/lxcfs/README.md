@@ -30,8 +30,8 @@ append_lxc_config: |
   lxc.net.0.flags = up
   lxc.net.0.hwaddr = 00:16:3e:xx:xx:xx
   lxc.net.0.veth.pair = pariname-lxc
-  lxc.net.0.ipv4.address = 10.10.12.200/24
-  lxc.net.0.ipv4.gateway = 10.10.12.254
+  lxc.net.0.ipv4.address = 10.0.0.200/24
+  lxc.net.0.ipv4.gateway = 10.0.0.254
   lxc.start.auto = 1
   lxc.start.delay = 8
 ```
@@ -51,10 +51,10 @@ for LXC2.0. So `append_lxc_config` lines will append to all new created containe
 interface. Disable (set `False`) if you want to connect with host bridge, pass-through, etc.
 - `lxc_default_net_bridge` - name of the interface for bridge-nat network (default: `xcbr0`).
 - `lxc_default_net_addr` - IP address for `xcbr0`, e.g: `"10.0.3.1"`.
-- `lxc_default_net_netmask` - subnet mask for bridge-nat network, e.g: `"255.255.255.0"`.
-- `lxc_default_net_network` - broadcast and CIDR prefix for bridge-nat network, e.g: `"10.0.3.0/24"`.
-- `lxc_default_net_dhcp_range` - DHCP range for bridge-nat network, e.g: `"10.0.3.2,10.0.3.254"`.
-- `lxc_default_net_dhcp_max` - max number of DHCP leases in `lxc_default_net_dhcp_range`, e.g: `"253"`.
+- `lxc_default_net_netmask` - subnet mask for bridge-nat network, e.g.: `"255.255.255.0"`.
+- `lxc_default_net_network` - broadcast and CIDR prefix for bridge-nat network, e.g.: `"10.0.3.0/24"`.
+- `lxc_default_net_dhcp_range` - DHCP range for bridge-nat network, e.g.: `"10.0.3.2,10.0.3.254"`.
+- `lxc_default_net_dhcp_max` - max number of DHCP leases in `lxc_default_net_dhcp_range`, e.g.: `"253"`.
 
 Example Playbook
 ----------------
@@ -102,8 +102,8 @@ More complex lxcfs usage with disabled default lxc-net for br0 usage with some s
               lxc.net.0.veth.pair = someprefix-lxc
               lxc.net.0.name = eth0
               lxc.net.0.link = br0
-              lxc.net.0.ipv4.address = 10.10.12.200/24
-              lxc.net.0.ipv4.gateway = 10.10.12.254
+              lxc.net.0.ipv4.address = 10.0.0.200/24
+              lxc.net.0.ipv4.gateway = 10.0.0.254
               lxc.start.auto = 1
               lxc.start.delay = 8
 

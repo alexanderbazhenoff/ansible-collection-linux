@@ -9,54 +9,12 @@ driver:
   name: docker
 platforms:
 
-  - name: debian10-instance
-    image: jrei/systemd-debian:10
+  - name: debian12-instance
+    image: jrei/systemd-debian:12
     dockerfile: dockerfile_debian.j2
     buildargs:
       image_platform: jrei/systemd-debian
-      image_tag: 10
-    pre_build_image: False
-    privileged: True
-    tmpfs:
-      - /run
-      - /tmp
-      - /run/lock
-    volumes:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-    capabilities:
-      - SYS_ADMIN
-    command: "/lib/systemd/systemd"
-    groups:
-      - bareos_servers
-      - bareos_clients
-
-  - name: debian11-instance
-    image: jrei/systemd-debian:11
-    dockerfile: dockerfile_debian.j2
-    buildargs:
-      image_platform: jrei/systemd-debian
-      image_tag: 11
-    pre_build_image: False
-    privileged: True
-    tmpfs:
-      - /run
-      - /tmp
-      - /run/lock
-    volumes:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-    capabilities:
-      - SYS_ADMIN
-    command: "/lib/systemd/systemd"
-    groups:
-      - bareos_servers
-      - bareos_clients
-
-  - name: ubuntu1804-instance
-    image: jrei/systemd-ubuntu:18.04
-    dockerfile: dockerfile_debian.j2
-    buildargs:
-      image_platform: jrei/systemd-ubuntu
-      image_tag: 18.04
+      image_tag: 12
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -93,17 +51,18 @@ platforms:
       - bareos_servers
       - bareos_clients
 
-  - name: centos7-instance
-    image: centos:centos7
-    dockerfile: dockerfile_centos.j2
+  - name: ubuntu2204-instance
+    image: jrei/systemd-ubuntu:22.04
+    dockerfile: dockerfile_debian.j2
     buildargs:
-      image_platform: centos
-      image_tag: centos7
+      image_platform: jrei/systemd-ubuntu
+      image_tag: 22.04
     pre_build_image: False
     privileged: True
     tmpfs:
       - /run
       - /tmp
+      - /run/lock
     volumes:
       - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
     capabilities:
@@ -113,12 +72,12 @@ platforms:
       - bareos_servers
       - bareos_clients
 
-  - name: centos8-instance
-    image: centos:8
-    dockerfile: dockerfile_centos.j2
+  - name: oraclelinux9-instance
+    image: oraclelinux:9
+    dockerfile: dockerfile_redhat.j2
     buildargs:
-      image_platform: centos
-      image_tag: 8
+      image_platform: oraclelinux
+      image_tag: 9
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -152,18 +111,14 @@ provisioner:
     ANSIBLE_FORCE_COLOR: '1'
   inventory:
     host_vars:
-      debian10-instance:
-        bareos_dir: debian11-instance
-      debian11-instance:
-        bareos_dir: debian10-instance
-      ubuntu1804-instance:
+      debian12-instance:
+        bareos_dir: oraclelinux9-instance
+      ubuntu2204-instance:
         bareos_dir: ubuntu2004-instance
       ubuntu2004-instance:
-        bareos_dir: ubuntu1804-instance
-      centos7-instance:
-        bareos_dir: centos7-instance
-      centos8-instance:
-        bareos_dir: centos8-instance
+        bareos_dir: ubuntu2204-instance
+      oraclelinux9-instance:
+        bareos_dir: debian12-instance
 lint: |
     export ANSIBLE_ROLES_PATH=${MOLECULE_PROJECT_DIRECTORY}/..
     export PY_COLORS=1

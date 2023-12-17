@@ -7,14 +7,17 @@
 
   tasks:
 
-    - name: "default >>> side effect | Include zabbix_agent role to perform clean install of agent v1"
+    - name: "default >>> side effect | Include of zabbix_agent role"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.zabbix_agent
       vars:
         zabbix_servers_passive: 127.0.0.1
         zabbix_servers_active: 127.0.0.1:10051
-        agent_version: 5.0
-        force_install_agent_v1: True
+        zabbix_release: >-
+          {% if (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 12) or
+          (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22) %}6.0{% else -%}
+          5.0{% endif %}
+        install_v2_agent: False
 
     - name: "default >>> side effect | Check there is no zabbix_agent2, but zabbix_agent process is running"
       ansible.builtin.shell: "{{ item }}"   # noqa command-instead-of-shell

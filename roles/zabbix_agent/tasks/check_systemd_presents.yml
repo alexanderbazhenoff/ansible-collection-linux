@@ -1,0 +1,9 @@
+---
+
+- name: "check systemd presents | Check systemd present in the system"
+  ansible.builtin.shell: systemctl --version 2> /dev/null || true   # noqa command-instead-of-module
+  args:
+    executable: /bin/sh
+  register: systemctl_check
+  changed_when: False
+  ignore_errors: True

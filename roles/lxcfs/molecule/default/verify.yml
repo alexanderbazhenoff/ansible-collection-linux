@@ -15,8 +15,8 @@
     - name: "default >>> verify | Create container"   # noqa command-instead-of-module command-instead-of-shell
       ansible.builtin.shell: >-
         lxc-create -t download -n ubuntu-focal -- -d ubuntu -r focal -a amd64
-        {% if ansible_os_family == 'Debian' and (ansible_distribution_major_version | int <= 9 or
-        ansible_distribution_major_version | int <= 16) %}--no-validate{% endif %}
+        {% if (ansible_distribution == 'Debian' and ansible_distribution_major_version | int <= 9) or
+        (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int <= 18) %}--no-validate{% endif %}
       register: container_create_results
       changed_when: "'You just created an' in container_create_results.stdout"
 

@@ -8,95 +8,51 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: debian8-instance
-    image: jrei/systemd-debian:8
-    build:
-      dockerfile: dockerfile_debian_all.j2
-      args:
-        MOLECULE_IMAGE: jrei/systemd-debian:8
-    pre_build_image: False
-    privileged: True
-    tmpfs:
-      - /run
-      - /tmp
-      - /run/lock
-    volumes:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-    capabilities:
-      - SYS_ADMIN
-    command: "/lib/systemd/systemd"
-  - name: debian9-instance
-    image: jrei/systemd-debian:9
-    build:
-      dockerfile: dockerfile_debian_all.j2
-      args:
-        MOLECULE_IMAGE: jrei/systemd-debian:9
-    pre_build_image: False
-    privileged: True
-    tmpfs:
-      - /run
-      - /tmp
-      - /run/lock
-    volumes:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-    capabilities:
-      - SYS_ADMIN
-    command: "/lib/systemd/systemd"
-  - name: debian10-instance
-    image: jrei/systemd-debian:10
-    build:
-      dockerfile: dockerfile_debian_all.j2
-      args:
-        MOLECULE_IMAGE: jrei/systemd-debian:10
-    pre_build_image: False
-    privileged: True
-    tmpfs:
-      - /run
-      - /tmp
-      - /run/lock
-    volumes:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-    capabilities:
-      - SYS_ADMIN
-    command: "/lib/systemd/systemd"
-  - name: debian11-instance
-    image: jrei/systemd-debian:11
-    build:
-      dockerfile: dockerfile_debian_all.j2
-      args:
-        MOLECULE_IMAGE: jrei/systemd-debian:11
-    pre_build_image: False
-    privileged: True
-    tmpfs:
-      - /run
-      - /tmp
-      - /run/lock
-    volumes:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-    capabilities:
-      - SYS_ADMIN
-    command: "/lib/systemd/systemd"
-  - name: ubuntu1404-instance
-    image: ubuntu:14.04
-    dockerfile: dockerfile_ubuntu14_04.j2
-    pre_build_image: False
-    privileged: True
-    tmpfs:
-      - /run
-      - /tmp
-      - /run/lock
-    volumes:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-      - "/sys/devices/system:/sys/devices/system:rw"
-    capabilities:
-      - SYS_ADMIN
-    command: "/sbin/init"
+
+
+# Uncomment if you wish to test it on:
+#  - name: debian11-instance
+#    image: jrei/systemd-debian:11
+#    dockerfile: dockerfile_debian.j2
+#    buildargs:
+#      image_platform: jrei/systemd-debian
+#      image_tag: 11
+#    pre_build_image: False
+#    privileged: True
+#    tmpfs:
+#      - /run
+#      - /tmp
+#      - /run/lock
+#    volumes:
+#      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+#    capabilities:
+#      - SYS_ADMIN
+#    command: "/lib/systemd/systemd"
+#
+#  - name: debian12-instance
+#    image: jrei/systemd-debian:12
+#    dockerfile: dockerfile_debian.j2
+#    buildargs:
+#      image_platform: jrei/systemd-debian
+#      image_tag: 12
+#    pre_build_image: False
+#    privileged: True
+#    tmpfs:
+#      - /run
+#      - /tmp
+#      - /run/lock
+#    volumes:
+#      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+#    capabilities:
+#      - SYS_ADMIN
+#    command: "/lib/systemd/systemd"
+
   - name: ubuntu1604-instance
     image: jrei/systemd-ubuntu:16.04
-    build:
-      dockerfile: dockerfile_ubuntu_16_04_or_newer.j2
-      args:
-        MOLECULE_IMAGE: jrei/systemd-ubuntu:16.04
+    dockerfile: dockerfile_debian.j2
+    buildargs:
+      image_platform: jrei/systemd-ubuntu
+      image_tag: 16.04
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -108,12 +64,13 @@ platforms:
     capabilities:
       - SYS_ADMIN
     command: "/lib/systemd/systemd"
+
   - name: ubuntu1804-instance
     image: jrei/systemd-ubuntu:18.04
-    build:
-      dockerfile: dockerfile_ubuntu_16_04_or_newer.j2
-      args:
-        MOLECULE_IMAGE: jrei/systemd-ubuntu:18.04
+    dockerfile: dockerfile_debian.j2
+    buildargs:
+      image_platform: jrei/systemd-ubuntu
+      image_tag: 18.04
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -125,12 +82,13 @@ platforms:
     capabilities:
       - SYS_ADMIN
     command: "/lib/systemd/systemd"
+
   - name: ubuntu2004-instance
     image: jrei/systemd-ubuntu:20.04
-    build:
-      dockerfile: dockerfile_ubuntu_16_04_or_newer.j2
-      args:
-        MOLECULE_IMAGE: jrei/systemd-ubuntu:20.04
+    dockerfile: dockerfile_debian.j2
+    buildargs:
+      image_platform: jrei/systemd-ubuntu
+      image_tag: 20.04
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -142,8 +100,50 @@ platforms:
     capabilities:
       - SYS_ADMIN
     command: "/lib/systemd/systemd"
-  - name: centos7-instance
-    image: centos:centos7
+
+# Uncomment if you wish to test it on:
+#  - name: ubuntu2204-instance
+#    image: jrei/systemd-ubuntu:22.04
+#    dockerfile: dockerfile_debian.j2
+#    buildargs:
+#      image_platform: jrei/systemd-ubuntu
+#      image_tag: 22.04
+#    pre_build_image: False
+#    privileged: True
+#    tmpfs:
+#      - /run
+#      - /tmp
+#      - /run/lock
+#    volumes:
+#      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+#    capabilities:
+#      - SYS_ADMIN
+#    command: "/lib/systemd/systemd"
+
+# Uncomment if you wish to test it on:
+#  - name: oraclelinux8-instance
+#    image: oraclelinux:8
+#    dockerfile: dockerfile_redhat.j2
+#    buildargs:
+#      image_platform: oraclelinux
+#      image_tag: 8
+#    pre_build_image: False
+#    privileged: True
+#    tmpfs:
+#      - /run
+#      - /tmp
+#    volumes:
+#      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+#    capabilities:
+#      - SYS_ADMIN
+#    command: "/lib/systemd/systemd"
+
+  - name: oraclelinux9-instance
+    image: oraclelinux:9
+    dockerfile: dockerfile_redhat.j2
+    buildargs:
+      image_platform: oraclelinux
+      image_tag: 9
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -154,9 +154,13 @@ platforms:
     capabilities:
       - SYS_ADMIN
     command: "/lib/systemd/systemd"
-  - name: arch-latest-instance
-    image: archlinux:latest
-    dockerfile: dockerfile_arch.j2
+
+  - name: alpine-latest-instance
+    image: alpine:latest
+    dockerfile: dockerfile_alpine.j2
+    buildargs:
+      image_platform: alpine
+      image_tag: latest
     pre_build_image: False
     privileged: True
     tmpfs:
@@ -166,7 +170,8 @@ platforms:
       - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
     capabilities:
       - SYS_ADMIN
-    command: "/lib/systemd/systemd"
+    command: "/sbin/init"
+
 scenario:
   test_sequence:
     - dependency

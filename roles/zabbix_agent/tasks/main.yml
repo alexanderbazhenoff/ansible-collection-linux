@@ -1,19 +1,11 @@
 ---
 
-- name: "main | Ubuntu <= 16.x or Debian <= 8 warning"
-  ansible.builtin.debug:
-    msg: |
-      Unable to install from packages zabbix-agent v2 on {{ ansible_distribution_major_version -}}
-      .x version of {{ ansible_distribution -}}
-  when: install_v2_agent and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int <= 16) or
-    (ansible_distribution == "Debian" and ansible_distribution_major_version | int <= 8))
-
 - name: "main | Include delete zabbix agent tasks"
-  include: delete_zabbix_agent.yml
+  include: delete_zabbix_agent_main.yml
   when: clean_install
 
 - name: "main | Include install zabbix agent tasks"
-  ansible.builtin.include_tasks: install_zabbix_agent.yml
+  ansible.builtin.include_tasks: install_zabbix_agent_main.yml
   when: not customize_agent_only
 
 - name: "main | Include reconfigure zabbix agent tasks"

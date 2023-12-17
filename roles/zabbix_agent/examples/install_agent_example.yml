@@ -1,6 +1,6 @@
 ---
 
-### This is the example yml for Zabbix role
+# This is an example of zabbix agent default version install
 
 - hosts: zabbix_clients
   become: True

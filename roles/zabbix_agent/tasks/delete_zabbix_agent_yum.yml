@@ -1,0 +1,11 @@
+---
+
+- name: "delete zabbix agent yum | Remove zabbix agent packages"
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: absent
+    autoremove: True
+  with_items:
+    - zabbix-agent
+    - zabbix-agent2
+    - zabbix-release

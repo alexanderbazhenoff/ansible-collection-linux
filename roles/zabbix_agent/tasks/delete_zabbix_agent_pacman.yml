@@ -1,0 +1,11 @@
+---
+
+- name: "delete zabbix agent pacman | Remove zabbix agent packages"
+  community.general.pacman:
+    name: "{{ item }}"
+    state: absent
+    force: True
+    remove_nosave: True
+  with_items:
+    - zabbix-agent
+    - zabbix-agent2

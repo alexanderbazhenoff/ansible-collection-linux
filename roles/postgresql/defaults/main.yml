@@ -17,26 +17,26 @@ postgresql_version: 15
 # Clean-up PostgreSQL data directory (also see $PGDATA env variable).
 cleanup_data_directory: True
 
-# Install only maximum recommended version based on dnf profile, e.g: https://www.postgresql.org/download/linux/redhat/
-# Affects only for systems with dnf package manager. Also read about dnf modules in specified Linux distribution, e.g:
+# Install only a maximum recommended version based on dnf profile (https://www.postgresql.org/download/linux/redhat/)
+# Affects only for systems with dnf package manager. Also read about dnf modules in specified Linux distribution, e.g.:
 # https://docs.fedoraproject.org/en-US/modularity/using-modules/
 postgresql_recommended_version: False
 
-# List of additional PostgreSQL related packages, e.g: 'postgresql-contrib' or 'postgresql14-contrib' for
-# postgresql_recommended_version: False. So there is no automated version handling in this list, include versions in
-# package names.
+# List of additional PostgreSQL related packages, e.g.: 'postgresql-contrib' or 'postgresql14-contrib' for
+# postgresql_recommended_version: False. So there is no automated version handling in this list, you should include
+# versions to package names.
 postgresql_additional_packages: []
 
 # Install psycopg2: https://pypi.org/project/psycopg2/
 install_psycopg2: True
 
-# Install pgadmin for web mode alongside with postgresql server: https://www.pgadmin.org/
+# Install pgadmin for web mode with postgresql server: https://www.pgadmin.org/
 install_pgadmin: False
 
-# pgadmin installation type: web or desktop. Leave them empty to install both web and desktop.
+# Pgadmin installation type: web or desktop. Leave them empty to install both web and desktop.
 pgadmin_installation_type: web
 
-# Add or remove firewalld and/or ufw rules on install or uninstall. Will be skipped when firewall disabled.
+# Add or remove firewalld and/or ufw rules on installation or uninstallation. Will be skipped when firewall disabled.
 firewall_control: True
 
 
@@ -48,9 +48,8 @@ firewall_control: True
 # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 postgresql_default_timezone: 'Europe/Moscow'
 
-# Specify parameters from postgresql.conf with the same name here.
-# https://www.postgresql.org/docs/current/config-setting.html
-# Double quotes to keep single 'quotes of value'.
+# Specify parameters from postgresql.conf with the same name here
+# (https://www.postgresql.org/docs/current/config-setting.html) Double quotes to keep single 'quotes of value'.
 postgresql_conf:
   port: 5432
   max_connections: 100

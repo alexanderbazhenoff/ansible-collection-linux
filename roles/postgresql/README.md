@@ -10,14 +10,15 @@ Specification
 
 This role provides the following install, uninstall and/or configuring operations:
 
-- Install or uninstall specified version of PostgreSQL database server (or database instance). When specified PostgreSQL
-version repository is not available for your Linux distribution this will install default (or recommended) version for
-your Linux distribution (see [example playbooks](#1-install-or-uninstall-postgresql-server-instance) for details).
+- Install or uninstall a specified version of PostgreSQL database server (or database instance). When specified
+PostgreSQL version repository is not available for your Linux distribution, this will install a default (or recommended)
+version for your Linux distribution (see [example playbooks](#1-install-or-uninstall-postgresql-server-instance) for 
+details).
 - Install or uninstall [pgadmin4](https://www.pgadmin.org/) alongside or single from database instance: pgadmin4 web
 version with Apache, pgadmin desktop version or both (see [example playbook tasks](#2-install-or-uninstall-pgadmin4) for
 details).
 - Applies firewall rules (ufw and firewalld) for database instance and/or pgadmin4 web version installation. Removes
-firewall rules during uninstall.
+firewall rules during uninstalling.
 - Configure `pg_hba.conf` on already installed database instance (see [example playbook tasks](#3-configure-pghbaconf)).
 - Configure `postgresql.conf` on already installed database instance 
 ([example playbook tasks](#4-configure-postgresqlconf)).
@@ -71,7 +72,7 @@ The shortest example playbook of database instance installation should look like
           ansible.builtin.include_role:
             name: alexanderbazhenoff.linux.postgresql
 
-while uninstall the same version playbook tasks should look like:
+while uninstall of the same version playbook tasks should look like:
 
         - name: "Uninstall PostgreSQL v15 instance(es) without database directory clean-up"
           ansible.builtin.include_role:
@@ -80,8 +81,8 @@ while uninstall the same version playbook tasks should look like:
             role_action: uninstall
 
 Role checks that specified version of PostgreSQL server is available for your Linux distribution: if this version is not
-available this will install default version from your distribution repositories or from dnf modules. If you wish install
-PostgreSQL of default version for your linux distribution set `postgresql_recommended_version: True`:
+available, this will install a default version from your distribution repositories or from dnf modules. If you wish to
+install PostgreSQL of a default version for your linux destribution set `postgresql_recommended_version: True`:
 
         - name: "Install PostgreSQL of default version for your linux destribution"
           ansible.builtin.include_role:
@@ -181,7 +182,7 @@ Replace mode will write the whole content of `hba_conf_content` variable to pg_h
               host    replication     all             0.0.0.0/24              scram-sha-256
               host    replication     all             0.0.0.0/0               scram-sha-256
 
-Or you can use templating from specified location:
+Or you can use templating from a specified location:
 
         - name: "Templating pg_hba.conf from /path/to/your/hba_conf/template/file"
           ansible.builtin.include_role:
@@ -831,14 +832,14 @@ Role Variables
  | firewall_control               | True    | Add or remove firewalld and/or ufw rules on install or uninstall. Will be skipped when firewall disabled.              |
 
 * (1) Recommended version install based on distribution repository or 
-[dnf modules](https://docs.fedoraproject.org/en-US/modularity/using-modules/). Useful when current version of PostgreSQL
-server instance is not available for your Linux distribution (e.g. check
+[dnf modules](https://docs.fedoraproject.org/en-US/modularity/using-modules/). Useful when the current version of
+PostgreSQL server instance is not available for your Linux distribution (e.g. check
 [RedHat repository](https://www.postgresql.org/download/linux/redhat/)).
 
 * (2) List of additional PostgreSQL related packages, e.g: 'postgresql-contrib' or 'postgresql14-contrib' for
-`postgresql_recommended_version: False` (explore what packages available
+`postgresql_recommended_version: True` (explore what packages available
 [here](https://www.postgresql.org/download/linux/)). There is no automated version handling in this list, include 
-versions in package names.
+versions to package names.
 
 ### PostgreSQL server (or database instance) parameters:
 
@@ -942,13 +943,13 @@ Defaults:
  | ca_cert         | optional  | ''      | Specifies the name of a file containing SSL certificate authority (CA) (6)   |
  | trust_input     | optional  | True    | It makes sense only when SQL injections through the options are possible (7) |
 
-* (1) Collation order (`LC_COLLATE`) to use in the database must match collation order of template database unless 
+* (1) Collation order (LC_COLLATE) to use in the database must match collation order of a template database unless 
 `template0` is used as template.
 * (2) The tablespace to set for the database (see
 [documentation](https://www.postgresql.org/docs/current/sql-alterdatabase.html)). If you want to move the database back
-to the default tablespace, explicitly set this to `pg_default`.
-* (3) Additional arguments for pg_dump or restore program (`pg_restore` or `psql`, depending on target's format). Used
-when role_action is `dump` or `restore`.
+to the default tablespace, explicitly set this to pg_default.
+* (3) Additional arguments for pg_dump or restore program (pg_restore or psql, depending on target's format). Used when
+role_action is `dump` or `restore`.
 * (4) Cannot be used with dump-file-format-related arguments like `–format=d`.
 * (5) Determines whether or with what priority a secure SSL TCP/IP connection will be negotiated with the server. See
 [libpq-ssl documentation] for more information on the modes. Default of `prefer` matches libpq default. Choices:
@@ -1043,10 +1044,10 @@ Defaults:
 
 * (1) Optional parameter that when `True` specifies that the LSN for this replication slot be reserved immediately,
 otherwise the default, `False`, specifies that the LSN is reserved on the first connection from a streaming replication
-client. Is available from PostgreSQL version 9.6. Uses only with `slot_type=physical`. Mutually exclusive with 
+client. Is available from PostgreSQL version 9.6. Uses only with *slot_type=physical*. Mutually exclusive with 
 *slot_type=logical*.
-* (2) This parameter does not apply to physical slots. It will be ignored with `slot_type=physical`. If wasn't set 
-(omitted) `"test_decoding"` will be set by default.
+* (2) This parameter does not apply to physical slots. It will be ignored with *slot_type=physical*. If it wasn't set 
+(ommited) *"test_decoding"* will be set by default.
 
 License
 -------

@@ -1,0 +1,89 @@
+---
+
+- name: "install zabbix agent main | Get info about zabbix-release package and agent v2 availability (RedHat/Debian)"
+  block:
+    - name: "| Setting fact for URL prefix for index page with packages"
+      ansible.builtin.set_fact:
+        zabbix_packages_url: "{% if ansible_os_family == 'RedHat' %}{{ zabbix_repo_url }}/zabbix/{{ zabbix_release -}}
+          /rhel/{{ ansible_distribution_major_version }}/{{ ansible_architecture -}}
+          {% elif ansible_os_family == 'Debian' %}{{ zabbix_repo_url }}/zabbix/{{ zabbix_release -}}
+          /{{ ansible_distribution | lower }}{% if ansible_distribution == 'Ubuntu' and
+          ansible_architecture == 'amd64' %}-amd64{% endif %}/pool/main/z/zabbix{% endif %}"
+
+    - name: "| Getting an index page(s) for required zabbix release"
+      ansible.builtin.get_url:
+        url: "{{ item.url }}"
+        dest: /tmp/{{ item.file }}.html
+        validate_certs: "{{ repo_dl_validate_certs | bool }}"
+        mode: 0644
+      register: get_url_results
+      until: get_url_results is succeeded
+      retries: 5
+      delay: 5
+      with_items:
+        - url: "{{ zabbix_packages_url }}"
+          file: zabbix
+        - url: "{{ zabbix_packages_url }}{% if ansible_os_family == 'Debian' %}-release{% endif %}"
+          file: zabbix-release
+
+    - name: "| Filter index page for required zabbix agent and release packages"   # noqa risky-shell-pipe
+      ansible.builtin.shell: >-
+        cat /tmp/{{ item }}.html | grep "{{ zabbix_release }}" |
+        grep "{% if ansible_os_family == 'RedHat' %}.rpm{% else %}.deb{% endif %}" || true
+      args:
+        executable: /bin/bash
+      changed_when: False
+      register: zbx_grep_geturl
+      with_items:
+        - zabbix
+        - zabbix-release
+  when: ansible_os_family | regex_search('RedHat|Debian')
+
+- name: "install zabbix agent main | Set facts for zabbix daemon name (Alpine/Archlinux)"
+  ansible.builtin.set_fact:
+    zabbix_agent_daemon_name: zabbix-agent2
+  when: install_v2_agent and ansible_os_family | regex_search('Alpine|Archlinux')
+
+- name: "install zabbix agent main | Include install zabbix agent/release tasks depending on package manager"
+  ansible.builtin.include_tasks: install_zabbix_agent_{{ ansible_os_family | lower }}.yml
+  when: ansible_os_family != "Alpine"
+
+- name: "install zabbix agent main | Install Zabbix agent package"
+  ansible.builtin.package:
+    name: "{{ zabbix_agent_daemon_name }}"
+    update_cache: True
+  register: install_package_results
+  until: install_package_results is succeeded
+  retries: 5
+  delay: 5
+  when: ansible_os_family != "Archlinux"
+
+- name: "install zabbix agent main | Include check systemd tasks"
+  ansible.builtin.include_tasks: check_systemd_presents.yml
+
+- name: "install zabbix agent main | Start and enable zabbix agent daemon via systemd"
+  ansible.builtin.systemd:
+    name: "{{ zabbix_agent_daemon_name }}"
+    state: started
+    enabled: True
+  when: systemctl_check.stdout | length > 0
+
+- name: "install zabbix agent main | Get zabbix agent daemon's name and add to autorun using openrc (non-systemd)"
+  block:
+    - name: "| Get daemon name of zabbix-agent from services list via openrc"
+      ansible.builtin.shell: rc-service --list | grep "{{ zabbix_agent_daemon_name }}"
+      args:
+        executable: /bin/sh
+      register: zabbix_agent_name_openrc
+      changed_when: False
+
+    - name: "install zabbix agent main | Add to autorun a received zabbix agent daemon's name via openrc"
+      ansible.builtin.command: rc-update add "{{ zabbix_agent_name_openrc.stdout }}"
+      register: zabbix_agent_rc_enable_results
+      changed_when: "'added to runlevel' in zabbix_agent_rc_enable_results.stdout"
+
+    - name: "enable and start alpine | Start a received zabbix agent daemon's name via openrc"
+      ansible.builtin.service:
+        name: "{{ zabbix_agent_name_openrc.stdout }}"
+        state: started
+  when: systemctl_check.stdout | length == 0

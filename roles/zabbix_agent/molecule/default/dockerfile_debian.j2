@@ -2,7 +2,6 @@ ARG image_platform
 ARG image_tag
 FROM ${image_platform}:${image_tag}
 
-
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
@@ -17,7 +16,6 @@ RUN apt-get update; \
         python3 \
         sudo \
         bash \
-        dialog \
         systemd \
         dbus \
         iproute2; \

@@ -11,6 +11,7 @@
       ansible.builtin.group:
         name: postgres
         state: present
+      when: ansible_os_family != 'Alpine'
 
     - name: "default >>> prepare | Create postgres user"
       ansible.builtin.user:
@@ -22,3 +23,4 @@
         state: present
         shell: /bin/bash
         home: /var/lib/postgresql
+      when: ansible_os_family != 'Alpine'
