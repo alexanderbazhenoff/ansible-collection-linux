@@ -10,7 +10,8 @@ required_packages:
     - vim-common
     - util-linux
     - wget
-    - "{% if ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 18 %}xxd{% endif %}"
+    - "{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int >= 18) or
+      (ansible_distribution == 'Debian' and ansible_distribution_major_version | int >= 10) %}xxd{% endif %}"
   archlinux:
     - wget
     - vim
