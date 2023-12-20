@@ -3,7 +3,7 @@
 - name: "add bareos repo redhat | Trying to set bareos repo URL by Linux distribution"
   ansible.builtin.set_fact:
     repo_url_to_install: >-
-      {{ bareos_url }}{{ bareos_release }}/{% if ansible_distribution == 'Red Hat Enterprise Linux' %}RHEL{% else -%}
+      {{ bareos_url }}/{{ bareos_release }}/{% if ansible_distribution == 'Red Hat Enterprise Linux' %}RHEL{% else -%}
       {{ ansible_distribution }}{% endif %}_{{ linux_distro_major_version }}/bareos.repo
 
 - name: "add bareos repo redhat | Include check repo url tasks with distribution-defined URL prefix"
@@ -11,7 +11,7 @@
 
 - name: "add bareos repo redhat | First retry to set bareos repo URL"
   ansible.builtin.set_fact:
-    repo_url_to_install: "{{ bareos_url }}{{ bareos_release }}/EL_{{ linux_distro_major_version }}/bareos.repo"
+    repo_url_to_install: "{{ bareos_url }}/{{ bareos_release }}/EL_{{ linux_distro_major_version }}/bareos.repo"
   when: check_repo_url_results.failed
 
 - name: "add bareos repo redhat | Include check repo url tasks with EL_ prefix"
@@ -20,7 +20,7 @@
 
 - name: "add bareos repo redhat | Second retry to set bareos URL"
   ansible.builtin.set_fact:
-    repo_url_to_install: "{{ bareos_url }}{{ bareos_release }}/RHEL_{{ linux_distro_major_version }}/bareos.repo"
+    repo_url_to_install: "{{ bareos_url }}/{{ bareos_release }}/RHEL_{{ linux_distro_major_version }}/bareos.repo"
   when: check_repo_url_results.failed
 
 - name: "add bareos repo redhat | Include check repo url tasks with RHEL_ prefix"

@@ -3,13 +3,13 @@
 - name: "add bareos repo debian | Set fact for bareos repo URL"
   ansible.builtin.set_fact:
     repo_url_to_install: >-
+      {{ bareos_url }}/{{ bareos_release -}}
       {% if ansible_distribution == "Debian" and linux_distro_major_version | int >= 10 -%}
-      {{ bareos_url }}{{ bareos_release }}/{{ ansible_distribution }}_{{ linux_distro_major_version -}}
+      /{{ ansible_distribution }}_{{ linux_distro_major_version -}}
       {% elif ansible_distribution == "Debian" and linux_distro_major_version | int <= 9 -%}
-      {{ bareos_url }}{{ bareos_release }}/{{ ansible_distribution }}_{{ linux_distro_major_version }}.0{% endif -%}
-      {% if ansible_distribution == "Ubuntu" -%}
-      {{ bareos_url }}{{ bareos_release }}/x{{ ansible_distribution }}_{{ linux_distro_major_version }}.04{% endif -%}
-      /Release
+      /{{ ansible_distribution }}_{{ linux_distro_major_version -}}
+      .0{% elif ansible_distribution == "Ubuntu" %}/x{{ ansible_distribution }}_{{ linux_distro_major_version -}}
+      .04{% endif %}/Release
 
 - name: "add bareos repo debian | (debug) Show repo URL"
   ansible.builtin.debug:
