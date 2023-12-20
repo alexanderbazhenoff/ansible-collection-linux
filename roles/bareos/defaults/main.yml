@@ -23,16 +23,19 @@ bareos_components: fd
 # Perform clean installation
 clean_install: True
 
-# Bareos release, e.g: 21, 20, 19.2, 18.2, etc (https://download.bareos.org/bareos/release/)
+# Bareos release, e.g.: 'current', 'next' or 'experimental/<postfix>' (https://download.bareos.org/).
+# If you have a valid Bareos subscription, please use the 'bareos/release/<version>' (see
+# https://download.bareos.com/bareos/). You can also set 'bareos/contrib/<release>' (deprecated),
+# 'bareos/experimental<postfix>' or 'bareos/people/<postfix> (see https://download.bareos.org/bareos/).
 # Affects only for Debian and Redhat Linux distribution families.
-bareos_release: 21
+bareos_release: current
 
 # Override ansible linux distribution major version. Useful when specified Bareos version repo is not available for your
 # Linux distribution version, but beware package dependencies problems. You can also override non-LTS Ubuntu versions.
 override_ansible_distribution_major_version:
 
 # Bareos repository URL prefix to download from
-bareos_url: https://download.bareos.org/bareos/release/
+bareos_url: https://download.bareos.org
 
 # More output for troubleshooting
 debug_mode: False
@@ -46,15 +49,15 @@ firewall_control: True
 
 ### Bareos related parameters:
 
-# Cleanup Bareos storage files on install or uninstall:
+# Cleanup Bareos storage files on installation or uninstall:
 cleanup_storage_files: True
 
-# Additional Bareos packages to install: [] or 	bareos-traymonitor, bareos-vmware-plugin etc...
+# Additional Bareos packages to install: [] or bareos-traymonitor, bareos-vmware-plugin etc...
 install_additional_bareos_packages:
   - "{% if ansible_os_family != 'Alpine' %}bareos-traymonitor{% endif %}"
 
-# List of additional configs to copy on components install. Performs copying items from item.source to item.destination
-# with item.owner, item.group and item.mode, otherwise set this list to []
+# List of additional configs to copy on component(s) installation. Performs copying items from item.source to
+# item.destination with item.owner, item.group and item.mode, otherwise set this list to []
 bareos_configs_to_copy:
   - source: etc/
     destination: /etc
@@ -71,11 +74,11 @@ webui_password: admin
 webui_profile: webui-admin
 webui_tls_enable: False
 
-# Default data to add client on Bareos server.
+# Default data to add a client on Bareos server.
 #
-# Component name to display on Bareos server. If undefined FQDN or hostname will be taken.
+# Component name to display on Bareos server. If undefined, FQDN or hostname will be taken.
 add_component_name: ''
-# Password to connect with Bareos server. If empty the random password will be generated.
+# Password to connect with Bareos server. If empty, the random password will be generated.
 add_component_password: ''
 # Length of the password to generate.
 add_component_password_gen_length: 16
@@ -91,11 +94,11 @@ add_component_force: False
 
 ### Database related parameters:
 
-# If you wish to use already preinstalled PostgreSQL. Mysql or Sqlite installations not supported in this role.
+# If you wish to use already preinstalled PostgreSQL. Mysql or Sqlite installations are not supported in this role.
 preinstalled_postgresql: False
 # Enable to use Bareos with PostgreSQL, disable for sqlite.
 use_postgresql: True
-# PostgreSQL version to install by this role. Leave it '' for default version.
+# PostgreSQL version to install by this role. Leave it '' for a default version.
 postgresql_version: 14
 # Install psycopg2: https://pypi.org/project/psycopg2/
 install_psycopg2: True
