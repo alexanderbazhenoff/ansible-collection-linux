@@ -11,7 +11,7 @@
 
 - name: "add bareos repo redhat | First retry to set bareos repo URL"
   ansible.builtin.set_fact:
-    repo_url_to_install: "{{ bareos_url }}{{ bareos_release }}/EL_{{ linux_distro_major_version }}/bareos.repo"
+    repo_url_to_install: "{{ bareos_url }}/{{ bareos_release }}/EL_{{ linux_distro_major_version }}/bareos.repo"
   when: check_repo_url_results.failed
 
 - name: "add bareos repo redhat | Include check repo url tasks with EL_ prefix"
@@ -20,7 +20,7 @@
 
 - name: "add bareos repo redhat | Second retry to set bareos URL"
   ansible.builtin.set_fact:
-    repo_url_to_install: "{{ bareos_url }}{{ bareos_release }}/RHEL_{{ linux_distro_major_version }}/bareos.repo"
+    repo_url_to_install: "{{ bareos_url }}/{{ bareos_release }}/RHEL_{{ linux_distro_major_version }}/bareos.repo"
   when: check_repo_url_results.failed
 
 - name: "add bareos repo redhat | Include check repo url tasks with RHEL_ prefix"
