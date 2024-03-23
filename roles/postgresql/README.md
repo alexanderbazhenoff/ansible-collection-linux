@@ -12,7 +12,7 @@ This role provides the following install, uninstall and/or configuring operation
 
 - Install or uninstall a specified version of PostgreSQL database server (or database instance). When specified
 PostgreSQL version repository is not available for your Linux distribution, this will install a default (or recommended)
-version for your Linux distribution (see [example playbooks](#1-install-or-uninstall-postgresql-server-instance) for 
+version for your Linux distribution (see [example playbooks](#1-install-or-uninstall-postgresql-server-instance) for
 details).
 - Install or uninstall [pgadmin4](https://www.pgadmin.org/) alongside or single from database instance: pgadmin4 web
 version with Apache, pgadmin desktop version or both (see [example playbook tasks](#2-install-or-uninstall-pgadmin4) for
@@ -20,7 +20,7 @@ details).
 - Applies firewall rules (ufw and firewalld) for database instance and/or pgadmin4 web version installation. Removes
 firewall rules during uninstalling.
 - Configure `pg_hba.conf` on already installed database instance (see [example playbook tasks](#3-configure-pghbaconf)).
-- Configure `postgresql.conf` on already installed database instance 
+- Configure `postgresql.conf` on already installed database instance
 ([example playbook tasks](#4-configure-postgresqlconf)).
 
 Limitations:
@@ -65,7 +65,7 @@ The shortest example playbook of database instance installation should look like
       become: true
       become_method: sudo
       gather_facts: true
-    
+
       tasks:
 
         - name: "Install PostgreSQL v15 instance(es)"
@@ -237,7 +237,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
             postgresql_users:
               - name: django
                 password: ceec4eif7ya
-    
+
         - name: "Add a comment on django user"
           ansible.builtin.include_role:
             name: alexanderbazhenoff.linux.postgresql
@@ -247,7 +247,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
             postgresql_users:
               - name: django
                 comment: This is a test user
-    
+
         - name: "Create rails user, set MD5-hashed password, grant privs"
           ansible.builtin.include_role:
             name: alexanderbazhenoff.linux.postgresql
@@ -521,7 +521,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
                 type: schema
                 objs: public,math
                 role: librarian
-        
+
         # Note the separation of arguments with colons.
         - name: "GRANT ALL PRIVILEGES ON FUNCTION math.add(int, int) TO librarian, reader"
           ansible.builtin.include_role:
@@ -536,7 +536,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
                 obj: add(int:int)
                 schema: math
                 roles: librarian,reader
-        
+
         # Note that group role memberships apply cluster-wide and therefore are not
         # restricted to database "library" here.
         - name: "GRANT librarian, reader TO alice, bob WITH ADMIN OPTION"
@@ -551,7 +551,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
                 objs: librarian,reader
                 roles: alice,bob
                 admin_option: true
-        
+
         # Note that here "db: postgres" specifies the database to connect to, not the
         # database to grant privileges on (which is specified via the "objs" param)
         - name: "GRANT ALL PRIVILEGES ON DATABASE library TO librarian"
@@ -566,7 +566,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
                 type: database
                 obj: library
                 role: librarian
-        
+
         # If objs is omitted for type "database", it defaults to the database
         # to which the connection is established
         - name: "GRANT ALL PRIVILEGES ON DATABASE library TO librarian"
@@ -613,7 +613,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
                 privs: SELECT
                 type: default_privs
                 role: reader
-        
+
         - name: "ALTER DEFAULT PRIVILEGES ON DATABASE library TO reader, step 2"
           ansible.builtin.include_role:
             name: alexanderbazhenoff.linux.postgresql
@@ -639,7 +639,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
                 privs: ALL
                 type: foreign_data_wrapper
                 role: reader
-        
+
         # Available since community.postgresql 0.2.0
         - name: "GRANT ALL PRIVILEGES ON TYPE customtype TO reader"
           ansible.builtin.include_role:
@@ -680,7 +680,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
                 roles: caller
                 objs: ALL_IN_SCHEMA
                 schema: common
-        
+
         # Available since collection version 1.3.0
         # Grant 'execute' permissions on all procedures in schema 'common' to role 'caller'
         # Needs PostreSQL 11 or higher and community.postgresql 1.3.0 or higher
@@ -734,7 +734,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
                 type: default_privs
                 role: reader
                 target_roles: librarian
-        
+
         # Available since community.postgresql 0.2.0
         - name: "Grant type privileges for pg_catalog.numeric type to alice"
           ansible.builtin.include_role:
@@ -749,7 +749,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
                 objs: numeric
                 schema: pg_catalog
                 database: acme
-        
+
         - name: "Alter default privileges grant usage on schemas to datascience"
           ansible.builtin.include_role:
             name: alexanderbazhenoff.linux.postgresql
@@ -775,7 +775,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
               - name: physical_one
                 database: ansible
           become_user: postgres
-        
+
         - name: "Remove physical_one slot if exists"
           ansible.builtin.include_role:
             name: alexanderbazhenoff.linux.postgresql
@@ -786,7 +786,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
               - name: physical_one
                 database: ansible
           become_user: postgres
-      
+
         - name: "Create logical_one logical slot to the database acme if doesn't exist"
           ansible.builtin.include_role:
             name: alexanderbazhenoff.linux.postgresql
@@ -798,7 +798,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
                 slot_type: logical
                 output_plugin: custom_decoder_one
                 database: "acme"
-      
+
         - name: "Remove logical_one slot if exists from the cluster running on another host and non-standard port"
           ansible.builtin.include_role:
             name: alexanderbazhenoff.linux.postgresql
@@ -831,14 +831,14 @@ Role Variables
  | pgadmin_installation_type      | web     | pgadmin installation type: web or desktop. Leave them empty to install both web and desktop.                           |
  | firewall_control               | true    | Add or remove firewalld and/or ufw rules on install or uninstall. Will be skipped when firewall disabled.              |
 
-* (1) Recommended version install based on distribution repository or 
+* (1) Recommended version install based on distribution repository or
 [dnf modules](https://docs.fedoraproject.org/en-US/modularity/using-modules/). Useful when the current version of
 PostgreSQL server instance is not available for your Linux distribution (e.g. check
 [RedHat repository](https://www.postgresql.org/download/linux/redhat/)).
 
 * (2) List of additional PostgreSQL related packages, e.g: 'postgresql-contrib' or 'postgresql14-contrib' for
 `postgresql_recommended_version: true` (explore what packages available
-[here](https://www.postgresql.org/download/linux/)). There is no automated version handling in this list, include 
+[here](https://www.postgresql.org/download/linux/)). There is no automated version handling in this list, include
 versions to package names.
 
 ### PostgreSQL server (or database instance) parameters:
@@ -849,7 +849,7 @@ instance data directory on Alpine Linux. You can change it later, e.g: `SET TIME
 [list of timezone names](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)). Defaults: 'Europe/Moscow'
 
 * **postgresql_conf** (dict). Parameters from postgresql.conf with the same name here (see
-[documentation](https://www.postgresql.org/docs/current/config-setting.html)). Double quotes to keep single 
+[documentation](https://www.postgresql.org/docs/current/config-setting.html)). Double quotes to keep single
 `'quotes of value'`. Defaults:
 ```yaml
   port: 5432
@@ -858,7 +858,7 @@ instance data directory on Alpine Linux. You can change it later, e.g: `SET TIME
   listen_addresses: "'*'"
 ```
 * **pg_conf_content_mode** (string). `pg_hba.conf` write content mode to perform configure hba_conf (see
-[documentation](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html)): `regex` (ensure line(s) presents) or 
+[documentation](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html)): `regex` (ensure line(s) presents) or
 `block` (replace original file with), otherwise set template filename here (from /templates sub-folder) or full path to
 replace with (e.g. `pg_hba.conf.j2`). Defaults: `pg_hba.conf.j2`
 
@@ -871,14 +871,14 @@ Both parameters are affects only for pgadmin4 web version:
 | Variable         | Default             | Comment                                              |
 |------------------|---------------------|------------------------------------------------------|
 | pgadmin_email    | my.name@company.com | pgadmin4 email for administrator login via web UI    |
-| pgadmin_password | my_password         | pgadmin4 password for administrator login via web UI |                                          
+| pgadmin_password | my_password         | pgadmin4 password for administrator login via web UI |
 
 ### PostgreSQL management parameters:
 
 #### User (role) management.
 
 * **postgresql_users** (list of dicts). List of postgresql users (roles) parameters to perform role action (create,
-alter or drop) from database instance (see also 
+alter or drop) from database instance (see also
 [postgresql_user module documentation](https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_user_module.html)).
 Defaults:
 ```yaml
@@ -889,7 +889,7 @@ Defaults:
 | Parameter           | Type      | Default | Comment                                                                                   |
 |---------------------|-----------|---------|-------------------------------------------------------------------------------------------|
 | name                | mandatory |         | Name of the user (role) to add or remove.                                                 |
-| comment             | optional  | (omit)  | Adds a comment on the user (equivalent to the COMMENT ON ROLE statement)                  |  
+| comment             | optional  | (omit)  | Adds a comment on the user (equivalent to the COMMENT ON ROLE statement)                  |
 | password            | optional  | (omit)  | Set the user's password                                                                   |
 | conn_limit          | optional  | (omit)  | Specifies the user (role) connection limit.                                               |
 | no_password_changes | optional  | false   | If true, does not inspect the database for password changes (1)                           |
@@ -943,7 +943,7 @@ Defaults:
  | ca_cert         | optional  | ''      | Specifies the name of a file containing SSL certificate authority (CA) (6)   |
  | trust_input     | optional  | true    | It makes sense only when SQL injections through the options are possible (7) |
 
-* (1) Collation order (LC_COLLATE) to use in the database must match collation order of a template database unless 
+* (1) Collation order (LC_COLLATE) to use in the database must match collation order of a template database unless
 `template0` is used as template.
 * (2) The tablespace to set for the database (see
 [documentation](https://www.postgresql.org/docs/current/sql-alterdatabase.html)). If you want to move the database back
@@ -954,7 +954,7 @@ role_action is `dump` or `restore`.
 * (5) Determines whether or with what priority a secure SSL TCP/IP connection will be negotiated with the server. See
 [libpq-ssl documentation] for more information on the modes. Default of `prefer` matches libpq default. Choices:
 "allow", "disable", "prefer", "require", "verify-ca", "verify-full".
-* (6) The name of a file containing SSL certificate authority (CA) certificate(s). If the file exists, the server's 
+* (6) The name of a file containing SSL certificate authority (CA) certificate(s). If the file exists, the server's
 certificate will be verified to be signed by one of these authorities.
 * (7) If `false`, check whether values of parameters owner, conn_limit, encoding, db, template, tablespace,
 session_role are potentially dangerous. It makes sense to use `false` only when SQL injections via the parameters are
@@ -996,7 +996,7 @@ Defaults:
 |--------------|-----------|----------|------------------------------------------------------------------------------------------|
 | database     | mandatory |          | Name of database to connect to                                                           |
 | roles        | mandatory |          | Comma separated list of role (user/group) names to set permissions for (1)               |
-| grant_option | optional  | (omit)   | Whether `role` may grant/revoke the specified privileges/group memberships to others (2) | 
+| grant_option | optional  | (omit)   | Whether `role` may grant/revoke the specified privileges/group memberships to others (2) |
 | objs         | optional  | (omit)   | Comma separated list of database objects to set privileges on (3)                        |
 | privs        | optional  | (omit)   | Comma separated list of privileges to grant/revoke                                       |
 | schema       | optional  | (omit)   | Schema that contains the database objects specified via objs                             |
@@ -1007,12 +1007,12 @@ Defaults:
  | trust_input  | optional  | true     | It makes sense only when SQL injections through the options are possible                 |
 
 * (1) The special value `PUBLIC` can be provided instead to set permissions for the implicitly defined PUBLIC group.
-* (2) Set to `false` to revoke GRANT OPTION, leave unspecified to make no changes. grant_option only has an effect if 
+* (2) Set to `false` to revoke GRANT OPTION, leave unspecified to make no changes. grant_option only has an effect if
 `role_action` is `grant`. Choices: `true`, `false`.
 * (3) If type is `table`, `partition table`, `sequence`, `function` or `procedure`, the special value `ALL_IN_SCHEMA`
 can be provided instead to specify all database objects of type in the schema specified via schema. (This also works
 with PostgreSQL < 9.0). `procedure` is supported since PostgreSQL 11 and community.postgresql collection 1.3.0. If type
-is `database`, this parameter can be omitted, in which case privileges are set for the database specified via 
+is `database`, this parameter can be omitted, in which case privileges are set for the database specified via
 *database*. If type is `function` or `procedure`, colons (":") in object names will be replaced with commas (needed to
 specify signatures, see examples).
 * (4) A list of existing role (user/group) names to set as the default permissions for database objects subsequently
@@ -1044,9 +1044,9 @@ Defaults:
 
 * (1) Optional parameter that when `true` specifies that the LSN for this replication slot be reserved immediately,
 otherwise the default, `false`, specifies that the LSN is reserved on the first connection from a streaming replication
-client. Is available from PostgreSQL version 9.6. Uses only with *slot_type=physical*. Mutually exclusive with 
+client. Is available from PostgreSQL version 9.6. Uses only with *slot_type=physical*. Mutually exclusive with
 *slot_type=logical*.
-* (2) This parameter does not apply to physical slots. It will be ignored with *slot_type=physical*. If it wasn't set 
+* (2) This parameter does not apply to physical slots. It will be ignored with *slot_type=physical*. If it wasn't set
 (ommited) *"test_decoding"* will be set by default.
 
 License

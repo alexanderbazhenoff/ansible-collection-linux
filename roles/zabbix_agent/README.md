@@ -5,46 +5,46 @@ This role installs zabbix agent and configures them for services, apps and platf
 
 Preamble
 --------
-Zabbix server can detect applications, services, platforms and virtualization by a special hash value (see 
+Zabbix server can detect applications, services, platforms and virtualization by a special hash value (see
 autodiscovery hashes) predefined in a Zabbix agent configuration file. For example:
 
 ```
 UserParameter=hostmetadata,echo 'Linux ff6e6f6e65 dd6a617661'
 ```
 
-When Zabbix Server tries to discover hosts like this one, the next step is following: add the host to a specified 
-group (like Web servers, Cloud nodes, etc) and apply template to monitoring filesystems (ZFS, btrfs, mdadm), 
+When Zabbix Server tries to discover hosts like this one, the next step is following: add the host to a specified
+group (like Web servers, Cloud nodes, etc) and apply template to monitoring filesystems (ZFS, btrfs, mdadm),
 application (nginx, etc), virtualization or containerization and other hardware and software platforms.
 
 Requirements
 ------------
 - **Zabbix version.** Written for Zabbix 5.0 automation, but probably works for other versions of Zabbix agent. Before
-  you setup please confirm a package version is available for your version of Linux distribution visiting 
-[Zabbix download page](https://www.zabbix.com/download?zabbix=5.0) or directly 
+  you setup please confirm a package version is available for your version of Linux distribution visiting
+[Zabbix download page](https://www.zabbix.com/download?zabbix=5.0) or directly
 [repository](https://repo.zabbix.com/zabbix/).
 
 - **Supported Linux distribution**. Works only with x86_64 architecture:
     - **Ubuntu: 14.04, 16.04, 18.04, 20.04, 22.04**. Perhaps this role also works on Non-LTS or older versions, but
       wasn't tested.
     - **Debian: 8, 9, 10, 11, 12**. Perhaps this role also works on another version of Debian distro, but wasn't tested.
-    - **RHEL: 6, 7, 8, 9**. Perhaps this role also works on older versions of RHEL distro, but tested on CentOS and 
+    - **RHEL: 6, 7, 8, 9**. Perhaps this role also works on older versions of RHEL distro, but tested on CentOS and
       Oracle Linux distributions.
     - **Alpine Linux: 3.18**. Perhaps this role also works on another version of distro, but wasn't tested.
     - Other Linux distributions, Windows, Solaris, FreeBSD, AIX and armv7/aarch64 architectures aren't supported.
 
 - **Zabbix agent configuration**. Platforms discovery uses additional packages (like ipmitool), other platforms and
-services detects by binary files search, but the most of the services detects by their enabled systemd daemons 
+services detects by binary files search, but the most of the services detects by their enabled systemd daemons
 (`systemctl is-enabled` command) or rc-service (Alpine linux). So daemons autodiscovery works only on linux distros with
-systemd. Already installed Zabbix agent re-configuration (check `customize_agent_only` in 
+systemd. Already installed Zabbix agent re-configuration (check `customize_agent_only` in
 [Role Variables](#role-variables) using this role also possible).
 
 Dependencies
 ------------
 - [pacman module](https://docs.ansible.com/ansible/latest/collections/community/general/pacman_module.html)
 from community.general;
-- `xxd` or `vim-common`, `wget` and `policycoreutils-python` packages (will be automatically installed on supported 
+- `xxd` or `vim-common`, `wget` and `policycoreutils-python` packages (will be automatically installed on supported
 Linux distributions, otherwise install them manually);
-- `sudo` package on Debian systems installed via 'netinstall' source or docker images. 
+- `sudo` package on Debian systems installed via 'netinstall' source or docker images.
 
 Role Variables
 --------------
