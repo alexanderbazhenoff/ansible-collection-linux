@@ -30,7 +30,7 @@
 - name: "server packages redhat | Install repo package to check versioned postgresql package is available"
   ansible.builtin.dnf:
     name: "{{ postgresql_packages[1].package }}"
-    state: latest   # noqa package-latest
+    state: latest   # noqa package-latest # kics-scan ignore-line
     update_cache: True
     disable_gpg_check: "{{ postgresql_packages[1].disable_gpg_check | default(False) }}"
   ignore_errors: True

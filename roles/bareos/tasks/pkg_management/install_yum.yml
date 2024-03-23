@@ -3,7 +3,7 @@
 - name: "install yum | Install packages"   # noqa package-latest
   ansible.builtin.yum:
     name: "{{ item }}"
-    state: latest
+    state: latest   # kics-scan ignore-line
     update_cache: true
   register: install_yum_results
   until: install_yum_results is succeeded

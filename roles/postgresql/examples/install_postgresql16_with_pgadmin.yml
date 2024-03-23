@@ -13,8 +13,8 @@
       vars:
         postgresql_version: 16
         install_pgadmin: true
-        pgadmin_email: a.bazhenov@tm-industries.ru
-        pgadmin_password: Postgresql4Space
+        pgadmin_email: admin@domain.com
+        pgadmin_password: my_pgadmin_password   # kics-scan ignore-line
         postgresql_conf:
           port: 5432
           max_connections: 1000
