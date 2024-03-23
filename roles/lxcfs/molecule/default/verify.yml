@@ -1,4 +1,5 @@
 ---
+
 - name: Verify
   hosts: all
   gather_facts: true
@@ -6,11 +7,12 @@
   become_method: sudo
 
   tasks:
+
     - name: "default >>> verify | Include default(s) for testing"
       ansible.builtin.include_vars:
         file: defaults/main.yml
 
-    - name: "default >>> verify | Create container" # noqa command-instead-of-module command-instead-of-shell
+    - name: "default >>> verify | Create container"   # noqa command-instead-of-module command-instead-of-shell
       ansible.builtin.shell: >-
         lxc-create -t download -n ubuntu-focal -- -d ubuntu -r focal -a amd64
         {% if (ansible_distribution == 'Debian' and ansible_distribution_major_version | int <= 9) or
@@ -23,7 +25,7 @@
     - name: "default >>> verify | Remove apparmor profile from lxc container config(s)"
       ansible.builtin.lineinfile:
         path: /var/lib/lxc/ubuntu-focal/config
-        regexp: "^lxc.apparmor.profile = generated"
+        regexp: '^lxc.apparmor.profile = generated'
         state: absent
       when: ansible_distribution == 'Debian'
 
@@ -31,7 +33,7 @@
       ansible.builtin.command: lxc-start ubuntu-focal
       changed_when: true
 
-    - name: "default >>> verify | Get container state" # noqa risky-shell-pipe
+    - name: "default >>> verify | Get container state"   # noqa risky-shell-pipe
       ansible.builtin.shell: lxc-ls -f | tail -1
       register: lxc_container_results
       changed_when: false

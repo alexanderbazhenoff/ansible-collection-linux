@@ -1,4 +1,5 @@
 ---
+
 - name: "main | Include delete zabbix agent tasks"
   include: delete_zabbix_agent_main.yml
   when: clean_install

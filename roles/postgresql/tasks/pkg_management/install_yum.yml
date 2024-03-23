@@ -1,8 +1,9 @@
 ---
-- name: "install yum | Install packages" # noqa package-latest
+
+- name: "install yum | Install packages"   # noqa package-latest
   ansible.builtin.yum:
     name: "{{ item.package }}"
-    state: latest # kics-scan ignore-line
+    state: latest   # kics-scan ignore-line
     update_cache: True
     disablerepo: "{{ item.disable_repo | default(omit) }}"
     enablerepo: "{{ item.enable_repo | default(omit) }}"

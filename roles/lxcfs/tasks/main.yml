@@ -1,4 +1,5 @@
 ---
+
 - name: "main | Set fact for lxc pre-requirements packages"
   ansible.builtin.set_fact:
     lxc_install_packages:
@@ -38,7 +39,7 @@
       lower) }}{% elif ansible_distribution | regex_search('Debian|Ubuntu') -%}
       {{ lxc_packages | json_query(ansible_distribution | lower) }}{% endif %}
 
-- name: "main | Check firewalld is running" # noqa command-instead-of-module
+- name: "main | Check firewalld is running"   # noqa command-instead-of-module
   ansible.builtin.shell: systemctl is-active firewalld || true
   register: firewalld_state
   changed_when: false

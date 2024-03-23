@@ -1,4 +1,5 @@
 ---
+
 lxc_technology: lxc
 use_lxc_default_net: true
 check_host_is_lxc_ready: false

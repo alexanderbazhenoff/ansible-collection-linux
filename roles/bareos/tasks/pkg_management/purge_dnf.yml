@@ -1,4 +1,5 @@
 ---
+
 - name: "purge dnf | Purge packages"
   ansible.builtin.dnf:
     name: "{{ item }}"

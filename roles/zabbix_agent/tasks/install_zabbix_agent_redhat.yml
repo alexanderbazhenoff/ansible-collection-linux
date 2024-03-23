@@ -1,4 +1,5 @@
 ---
+
 - name: "install zabbix agent redhat | Set facts for release package filename, zabbix daemon name and GPG key URL"
   ansible.builtin.set_fact:
     zabbix_agent_daemon_name: >-

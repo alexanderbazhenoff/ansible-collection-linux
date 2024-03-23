@@ -1,4 +1,5 @@
 ---
+
 - name: "Populate service facts"
   ansible.builtin.service_facts:
 

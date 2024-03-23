@@ -1,4 +1,5 @@
 ---
+
 - name: "slots | Add or remove replication slots from a database"
   community.postgresql.postgresql_slot:
     name: "{{ item.name | mandatory }}"

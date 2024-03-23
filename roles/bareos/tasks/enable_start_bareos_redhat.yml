@@ -1,7 +1,8 @@
 ---
+
 - name: "enable start bareos redhat | Enable and start daemons via systemctl"
   ansible.builtin.command:
-    cmd: systemctl enable --now {{ item }} # noqa command-instead-of-module
+    cmd: systemctl enable --now {{ item }}   # noqa command-instead-of-module
   register: systemctl_results
   changed_when: not systemctl_results.failed
   when: item is defined and item is not none and item | length > 0

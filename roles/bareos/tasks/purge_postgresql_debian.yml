@@ -1,4 +1,5 @@
 ---
+
 - name: "purge postgresql debian | Purge postgresql server (and psycopg2)"
   ansible.builtin.apt:
     name: "{{ item }}"

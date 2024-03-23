@@ -1,4 +1,5 @@
 ---
+
 - name: "uninstall server alpine | Delete postgresql service from autorun"
   ansible.builtin.shell: rc-update del postgresql || true
   register: postgresql_rc_delete_results

@@ -1,4 +1,5 @@
 ---
+
 - name: "uninstall redhat | Remove firewalld dhcp rules"
   ansible.posix.firewalld:
     service: "{{ item }}"

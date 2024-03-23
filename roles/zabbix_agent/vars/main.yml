@@ -1,4 +1,5 @@
 ---
+
 required_packages:
   redhat:
     - vim-common
@@ -23,6 +24,6 @@ required_packages:
 
 # Zabbix key name postfixes (RHEL):
 zabbix_repo_keyname_postfix:
-  redhat9: "-08EFA7DD"
-  redhat8: "-A14FE591"
-  redhat5: "-A14FE591-EL5"
+  redhat9: '-08EFA7DD'
+  redhat8: '-A14FE591'
+  redhat5: '-A14FE591-EL5'

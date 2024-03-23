@@ -1,4 +1,5 @@
 ---
+
 - name: "purge bareos alpine | Cleanup bareos packages depending on components to install selection"
   community.general.apk:
     name: "{{ item }}"
@@ -7,6 +8,7 @@
   when: item is defined and item is not none and item | length > 0
   with_items:
     - "{{ bareos_packages | json_query(bareos_components) + install_additional_bareos_packages }}"
+
 
 - name: "purge bareos alpine | Delete daemons via rc-update"
   ansible.builtin.shell: rc-update del {{ item }} || true

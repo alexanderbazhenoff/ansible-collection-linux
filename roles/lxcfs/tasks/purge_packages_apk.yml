@@ -1,4 +1,5 @@
 ---
+
 - name: "purge packages apk | Purge packages (with ansible apk module)"
   community.general.apk:
     name: "{{ item }}"

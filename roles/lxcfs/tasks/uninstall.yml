@@ -1,4 +1,5 @@
 ---
+
 - name: "uninstall | Include purge packages {{ ansible_pkg_mgr }} tasks"
   ansible.builtin.include_tasks: purge_packages_{{ ansible_pkg_mgr }}.yml
 
@@ -26,7 +27,7 @@
     - "{% if ansible_os_family == 'Alpine' %}/etc/init.d/lxc-net{% endif %}"
     - /etc/lxc
 
-- name: "uninstall | Remove {{ lxc_default_net_bridge }}" # noqa risky-shell-pipe
+- name: "uninstall | Remove {{ lxc_default_net_bridge }}"   # noqa risky-shell-pipe
   ansible.builtin.shell: |
     ip link set {{ lxc_default_net_bridge }} down
     ip link del {{ lxc_default_net_bridge }} || echo 'del_fail'

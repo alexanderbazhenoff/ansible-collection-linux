@@ -1,4 +1,5 @@
 ---
+
 # Zabbix agent release:
 zabbix_release: 5.0
 
@@ -43,6 +44,7 @@ zabbix_servers_passive: 10.0.0.1,10.0.0.2
 zabbix_servers_active: 10.0.0.1:10051,10.0.0.2:10051
 zabbix_host_metadata: Linux
 
+
 ### services discovery parameters for templates add:
 
 # binaries hashes:
@@ -55,42 +57,42 @@ binaries_tag_hashes:
 # daemon hashes:
 daemon_tag_hashes:
   - name: openvpn
-    tag: ovpn # dd6f76706e
+    tag: ovpn                          # dd6f76706e
   - name: mysql
-    tag: mysql # dd6d7973716c
+    tag: mysql                         # dd6d7973716c
   - name: mariadb
-    tag: mysql # dd6d7973716c
+    tag: mysql                         # dd6d7973716c
   - name: postgresql
-    tag: pgsql # dd706773716c
+    tag: pgsql                         # dd706773716c
   - name: bareos-dir
-    tag: brsdir # dd627273646972
+    tag: brsdir                        # dd627273646972
   - name: bareos-fd
-    tag: brsfd # dd6272736664
+    tag: brsfd                         # dd6272736664
   - name: bareos-sd
-    tag: brssd # dd6272737364
+    tag: brssd                         # dd6272737364
   - name: memcached
-    tag: mmcchd # dd6d6d63636864
+    tag: mmcchd                        # dd6d6d63636864
   - name: nginx
-    tag: ngnx # dd6e676e78
+    tag: ngnx                          # dd6e676e78
   - name: php-fpm
-    tag: pfpm # dd7066706d
+    tag: pfpm                          # dd7066706d
   - name: httpd
-    tag: apch # dd61706368
+    tag: apch                          # dd61706368
   - name: named
-    tag: ndns # dd6e646e73
+    tag: ndns                          # dd6e646e73
   - name: isc-dhcp-server
-    tag: iscdhcp # dd69736364686370
+    tag: iscdhcp                       # dd69736364686370
   - name: dnsmasq
-    tag: dnsm # dd646e736d
+    tag: dnsm                          # dd646e736d
   - name: fail2ban
-    tag: f2b # dd663262
+    tag: f2b                           # dd663262
   - name: vsftpd
-    tag: vsftp # dd7673667470
+    tag: vsftp                         # dd7673667470
   - name: gitlab-runner
-    tag: gtrn # dd6774726e
+    tag: gtrn                          # dd6774726e
   - name: nfs-server
-    tag: nfs # dd6e6673
+    tag: nfs                           # dd6e6673
   - name: zabbix-agent
-    tag: zba1 # dd7a626131
+    tag: zba1                          # dd7a626131
   - name: zabbix-agent2
-    tag: zba2 # dd7a626132
+    tag: zba2                          # dd7a626132

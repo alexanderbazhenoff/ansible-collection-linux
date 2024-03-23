@@ -5,7 +5,7 @@ Installs and configures [lxc](https://linuxcontainers.org/lxc/introduction/) or
 
 Requirements
 ------------
-- Any Debian or Ubuntu (tested on LTS version, but perhaps work on any version), any RedHat and Alpine Linux
+- Any Debian or Ubuntu (tested on LTS version, but perhaps work on any version), any RedHat and Alpine Linux 
 distributive.
 - jmespath installed: `python3 -m pip install jmespath`.
 
@@ -19,7 +19,7 @@ is no lxcfs for 2.0, only lxc.
 - `lxc_gpg_keyserver` - add LXC GPG keyserver (`DOWNLOAD_KEYSERVER`) to environment variables, e.g:
 `keyserver.ubuntu.com`.
 - `check_host_is_lxc_ready` - check host is lxc-ready (run `lxc-checkconfig` command when *true*). Version of lxc may
-differ from distribution to distribution where lxc-checkconfig script could be
+differ from distribution to distribution where lxc-checkconfig script could be 
 [a bit outdated](https://github.com/lxc/lxc/issues/4070#issuecomment-1374883653).
 - `append_lxc_config` - append config lines to default lxc config. Paste something for default container settings, e.g:
 ```

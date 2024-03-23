@@ -1,4 +1,5 @@
 ---
+
 ### ansible role settings ###
 
 # Role action: install or uninstall
@@ -7,7 +8,7 @@ role_action: install
 clean_install: true
 
 # Version of lxc/lxcfs. Affects only on RedHat repository URL. Please note: there is no lxcfs for 2.0, only lxc.
-lxc_version: "3.0"
+lxc_version: '3.0'
 
 # Containers technology: lxc or lxcfs
 lxc_technology: lxcfs
@@ -16,6 +17,7 @@ lxc_gpg_keyserver: keyserver.ubuntu.com
 
 # Check host is ready for lxc usage
 check_host_is_lxc_ready: true
+
 
 ### lxc-net settings ###
 
@@ -28,6 +30,7 @@ lxc_default_net_netmask: "255.255.255.0"
 lxc_default_net_network: "10.0.3.0/24"
 lxc_default_net_dhcp_range: "10.0.3.2,10.0.3.254"
 lxc_default_net_dhcp_max: "253"
+
 
 ### Default container settings ###
 

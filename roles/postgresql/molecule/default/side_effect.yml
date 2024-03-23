@@ -1,10 +1,12 @@
 ---
+
 - name: Side Effect
   hosts: all
   become: True
   become_method: sudo
 
   tasks:
+
     - name: "default >>> side effect | Include postgresql role create test user"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.postgresql
@@ -13,7 +15,7 @@
         role_subject: users
         postgresql_users:
           - name: test
-            password: my_password # kics-scan ignore-line
+            password: my_password   # kics-scan ignore-line
 
     - name: "default >>> side effect | Include postgresql role to create database"
       ansible.builtin.include_role:

@@ -1,4 +1,5 @@
 ---
+
 galaxy_info:
   author: Aleksandr Bazhenov
   description: Installs and configures lxc/lxcfs on linux system

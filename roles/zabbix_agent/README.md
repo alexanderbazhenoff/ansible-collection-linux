@@ -5,113 +5,113 @@ This role installs zabbix agent and configures them for services, apps and platf
 
 Preamble
 --------
-Zabbix server can detect applications, services, platforms and virtualization by a special hash value (see
+Zabbix server can detect applications, services, platforms and virtualization by a special hash value (see 
 autodiscovery hashes) predefined in a Zabbix agent configuration file. For example:
 
 ```
 UserParameter=hostmetadata,echo 'Linux ff6e6f6e65 dd6a617661'
 ```
 
-When Zabbix Server tries to discover hosts like this one, the next step is following: add the host to a specified
-group (like Web servers, Cloud nodes, etc) and apply template to monitoring filesystems (ZFS, btrfs, mdadm),
+When Zabbix Server tries to discover hosts like this one, the next step is following: add the host to a specified 
+group (like Web servers, Cloud nodes, etc) and apply template to monitoring filesystems (ZFS, btrfs, mdadm), 
 application (nginx, etc), virtualization or containerization and other hardware and software platforms.
 
 Requirements
 ------------
 - **Zabbix version.** Written for Zabbix 5.0 automation, but probably works for other versions of Zabbix agent. Before
-  you setup please confirm a package version is available for your version of Linux distribution visiting
-[Zabbix download page](https://www.zabbix.com/download?zabbix=5.0) or directly
+  you setup please confirm a package version is available for your version of Linux distribution visiting 
+[Zabbix download page](https://www.zabbix.com/download?zabbix=5.0) or directly 
 [repository](https://repo.zabbix.com/zabbix/).
 
 - **Supported Linux distribution**. Works only with x86_64 architecture:
-  - **Ubuntu: 14.04, 16.04, 18.04, 20.04, 22.04**. Perhaps this role also works on Non-LTS or older versions, but
+    - **Ubuntu: 14.04, 16.04, 18.04, 20.04, 22.04**. Perhaps this role also works on Non-LTS or older versions, but
       wasn't tested.
-  - **Debian: 8, 9, 10, 11, 12**. Perhaps this role also works on another version of Debian distro, but wasn't tested.
-  - **RHEL: 6, 7, 8, 9**. Perhaps this role also works on older versions of RHEL distro, but tested on CentOS and
+    - **Debian: 8, 9, 10, 11, 12**. Perhaps this role also works on another version of Debian distro, but wasn't tested.
+    - **RHEL: 6, 7, 8, 9**. Perhaps this role also works on older versions of RHEL distro, but tested on CentOS and 
       Oracle Linux distributions.
-  - **Alpine Linux: 3.18**. Perhaps this role also works on another version of distro, but wasn't tested.
-  - Other Linux distributions, Windows, Solaris, FreeBSD, AIX and armv7/aarch64 architectures aren't supported.
+    - **Alpine Linux: 3.18**. Perhaps this role also works on another version of distro, but wasn't tested.
+    - Other Linux distributions, Windows, Solaris, FreeBSD, AIX and armv7/aarch64 architectures aren't supported.
 
 - **Zabbix agent configuration**. Platforms discovery uses additional packages (like ipmitool), other platforms and
-services detects by binary files search, but the most of the services detects by their enabled systemd daemons
+services detects by binary files search, but the most of the services detects by their enabled systemd daemons 
 (`systemctl is-enabled` command) or rc-service (Alpine linux). So daemons autodiscovery works only on linux distros with
-systemd. Already installed Zabbix agent re-configuration (check `customize_agent_only` in
+systemd. Already installed Zabbix agent re-configuration (check `customize_agent_only` in 
 [Role Variables](#role-variables) using this role also possible).
 
 Dependencies
 ------------
 - [pacman module](https://docs.ansible.com/ansible/latest/collections/community/general/pacman_module.html)
 from community.general;
-- `xxd` or `vim-common`, `wget` and `policycoreutils-python` packages (will be automatically installed on supported
+- `xxd` or `vim-common`, `wget` and `policycoreutils-python` packages (will be automatically installed on supported 
 Linux distributions, otherwise install them manually);
-- `sudo` package on Debian systems installed via 'netinstall' source or docker images.
+- `sudo` package on Debian systems installed via 'netinstall' source or docker images. 
 
 Role Variables
 --------------
 Main parameters:
 
-| Variable                    | default                                  | Comment                                                                |
-|-----------------------------|------------------------------------------|------------------------------------------------------------------------|
-| `zabbix_release`            | 5.0                                      | Zabbix release (not effective for Alpine)                              |
-| `install_v2_agent`          | true                                     | Install Zabbix agent v2 when possible, otherwise install v1            |
-| `customize_agent`           | true                                     | Configure agent for automatic services discovery and templates add     |
-| `clean_install`             | true                                     | Perform clean install (re-install agent with clean-up)                 |
-| `conf_with_dir_clean`       | True                                     | Configure or perform clean installation with config directory clean-up |
-| `debug_mode`                | True                                     | More outputs                                                           |
-| `customize_agent_only`      | false                                    | Re-configure agent without Zabbix install                              |
-| `zabbix_repo_url`           | <http://repo.zabbix.com>                 | Zabbix repo URL                                                        |
-| `archlinux_repo_url_prefix` | <https://archive.archlinux.org/packages> | Archlinux repo URL prefix                                              |
-| `repo_dl_validate_certs`    | false                                    | Check certificates on Zabbix repo package download (required on        |
-|                             |                                          | outdated virtual machines snapshots)                                   |
+| Variable                    | default                                | Comment                                                                |
+|-----------------------------|----------------------------------------|------------------------------------------------------------------------|
+| `zabbix_release`            | 5.0                                    | Zabbix release (not effective for Alpine)                              |
+| `install_v2_agent`          | true                                   | Install Zabbix agent v2 when possible, otherwise install v1            |
+| `customize_agent`           | true                                   | Configure agent for automatic services discovery and templates add     |
+| `clean_install`             | true                                   | Perform clean install (re-install agent with clean-up)                 |
+| `conf_with_dir_clean`       | True                                   | Configure or perform clean installation with config directory clean-up |
+| `debug_mode`                | True                                   | More outputs                                                           |
+| `customize_agent_only`      | false                                  | Re-configure agent without Zabbix install                              |
+| `zabbix_repo_url`           | http://repo.zabbix.com                 | Zabbix repo URL                                                        |
+| `archlinux_repo_url_prefix` | https://archive.archlinux.org/packages | Archlinux repo URL prefix                                              |
+| `repo_dl_validate_certs`    | false                                  | Check certificates on Zabbix repo package download (required on        |
+|                             |                                        | outdated virtual machines snapshots)                                   |
 
 Zabbix agent settings:
 
-| Parameter                | Default                       | Comment                         |
-|--------------------------|-------------------------------|---------------------------------|
-| `remote_cmd_key`         | EnableRemoteCommands          | Enable remote commands key name |
-| `remote_cmd_value`       | 1                             | Enable remote commands value    |
-| `logfile_size_key`       | LogFileSize                   | Logfile size key name           |
-| `logfile_size_value`     | 100                           | Logfile size value              |
-| `zabbix_servers_passive` | 10.0.0.1,10.0.0.2             | Zabbix server IP passive checks |
-| `zabbix_servers_active`  | 10.0.0.1:10051,10.0.0.2:10051 | Zabbix server IP active checks  |
-| `zabbix_host_metadata`   | Linux                         | Zabbix host metadata            |
+| Parameter                  | Default                       | Comment                         |
+|----------------------------|-------------------------------|---------------------------------|
+| `remote_cmd_key`           | EnableRemoteCommands          | Enable remote commands key name |
+| `remote_cmd_value`         | 1                             | Enable remote commands value    |
+| `logfile_size_key`         | LogFileSize                   | Logfile size key name           |
+| `logfile_size_value`       | 100                           | Logfile size value              |
+| `zabbix_servers_passive`   | 10.0.0.1,10.0.0.2             | Zabbix server IP passive checks |
+| `zabbix_servers_active`    | 10.0.0.1:10051,10.0.0.2:10051 | Zabbix server IP active checks  |
+| `zabbix_host_metadata`     | Linux                         | Zabbix host metadata            |
 
 There are also agent settings related variables like `zabbix_agent_conf_name` or`zabbix_agent_binary`, but
 changing them is useless. This is for Zabbix agents versions differences discovery.
 
 Autodiscovery hashes:
 
-| Variable      | hex hash               | Comment                                   |
-|---------------|------------------------|-------------------------------------------|
-| openvpn_bin   | dd6f76706e             | Openvpn binary discovery                  |
-| java_bin      | dd6a617661             | Java platform binary discovery            |
-| mysql         | dd6d7973716c           | MySQL daemon discovery                    |
-| postgresql    | dd706773716c           | PostgreSQL daemon discovery               |
-| openvpn       | dd6f76706e             | Openvpn daemon discovery                  |
-| bareos_fd     | dd6272736664           | Bareos File Daemon discovery              |
-| bareos_dir    | dd627273646972         | Bareos Director Daemon discovery          |
-| bareos_sd     | dd6272737364           | Bareos Storage Daemon discovery           |
-| memcached     | dd6d6d63636864         | Memcached daemon discovery                |
-| nginx         | dd6e676e78             | Nginx daemon discovery                    |
-| php_fpm       | dd7066706d             | php-fpm daemon discovery                  |
-| apache        | dd61706368             | Apache web serve daemon discovery         |
-| named         | dd6e646e73             | Named (dhcpd) daemon discovery            |
-| dhcpd         | dd69736364686370       | isc-dhcp-server daemon discovery          |
-| dnsmasq       | dd646e736d             | dnsmasq daemon discovery                  |
-| fail2ban      | dd663262               | fail2ban daemon discovery                 |
-| vsftpd        | dd7673667470           | vstftpd daemon discovery                  |
-| gitlabrunner  | dd6774726e             | Gitlab runner daemon discovery            |
-| nfs           | dd6e6673               | NFS Server daemon discovery               |
-| zabbix_agent  | dd7a626131             | Zabbix agent v1 daemon discovery          |
-| zabbix_agent2 | dd7a626132             | Zabbix agent v2 daemon discovery          |
-|               | ff6e6f6e65             | baremetal server discovery                |
-|               | ff6b766d               | KVM virtualization dicovery               |
-|               | ff6c7863               | LXC container discovery                   |
-|               | ff646f636b6572         | Docker container discovery                |
-|               | ee69706d69             | IPMI discovery                            |
-|               | ee53757065726d6963726f | Sumermicro(tm) hardware platform disovery |
-|               | ee416476616e74656368   | Advantech(tm) hardware platform disovery  |
-|               | ee<other_vendor_hash>  | <other vendor> hardware platform disovery |
+| Variable              | hex hash                | Comment                                       |
+|-----------------------|-------------------------|-----------------------------------------------|
+| openvpn_bin           | dd6f76706e              | Openvpn binary discovery                      |
+| java_bin              | dd6a617661              | Java platform binary discovery                |
+| mysql                 | dd6d7973716c            | MySQL daemon discovery                        |
+| postgresql            | dd706773716c            | PostgreSQL daemon discovery                   |
+| openvpn               | dd6f76706e              | Openvpn daemon discovery                      |
+| bareos_fd             | dd6272736664            | Bareos File Daemon discovery                  |
+| bareos_dir            | dd627273646972          | Bareos Director Daemon discovery              |
+| bareos_sd             | dd6272737364            | Bareos Storage Daemon discovery               |
+| memcached             | dd6d6d63636864          | Memcached daemon discovery                    |
+| nginx                 | dd6e676e78              | Nginx daemon discovery                        |
+| php_fpm               | dd7066706d              | php-fpm daemon discovery                      |
+| apache                | dd61706368              | Apache web serve daemon discovery             |
+| named                 | dd6e646e73              | Named (dhcpd) daemon discovery                |
+| dhcpd                 | dd69736364686370        | isc-dhcp-server daemon discovery              |
+| dnsmasq               | dd646e736d              | dnsmasq daemon discovery                      |
+| fail2ban              | dd663262                | fail2ban daemon discovery                     |
+| vsftpd                | dd7673667470            | vstftpd daemon discovery                      |
+| gitlabrunner          | dd6774726e              | Gitlab runner daemon discovery                |
+| nfs                   | dd6e6673                | NFS Server daemon discovery                   |
+| zabbix_agent          | dd7a626131              | Zabbix agent v1 daemon discovery              |
+| zabbix_agent2         | dd7a626132              | Zabbix agent v2 daemon discovery              |
+|                       | ff6e6f6e65              | baremetal server discovery                    |
+|                       | ff6b766d                | KVM virtualization dicovery                   |
+|                       | ff6c7863                | LXC container discovery                       |
+|                       | ff646f636b6572          | Docker container discovery                    |
+|                       | ee69706d69              | IPMI discovery                                |
+|                       | ee53757065726d6963726f  | Sumermicro(tm) hardware platform disovery     |
+|                       | ee416476616e74656368    | Advantech(tm) hardware platform disovery      |
+|                       | ee<other_vendor_hash>   | <other vendor> hardware platform disovery     |
 
 Example Playbook
 ----------------
@@ -243,7 +243,7 @@ restorecon -R /var/lib/zabbix
 fi
 ```
 5. Put your script to restart zabbix-agent daemon (to apply config change) available to download from Zabbix Server,
-e.g. `/usr/share/zabbix/downloads/restart_daemon.sh`:
+e.g. ` /usr/share/zabbix/downloads/restart_daemon.sh`:
 ```
 #!/usr/bin/env bash
 

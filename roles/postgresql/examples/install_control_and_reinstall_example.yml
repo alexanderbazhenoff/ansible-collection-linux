@@ -1,4 +1,5 @@
 ---
+
 # An example playbook for test and troubleshoot on developing to installs a specified version of PostgreSQL,
 # control database instance, removes a specified version of PostgreSQL, then installs a maximum version of PosgreSQL.
 
@@ -12,6 +13,7 @@
   gather_facts: true
 
   tasks:
+
     - name: "install example | Include postgresql role for 15"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.postgresql

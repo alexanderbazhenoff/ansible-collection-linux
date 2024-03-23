@@ -1,4 +1,5 @@
 ---
+
 - name: "purge apk | Purge packages"
   community.general.apk:
     name: "{{ item.package }}"

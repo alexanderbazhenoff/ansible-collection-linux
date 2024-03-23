@@ -1,4 +1,5 @@
 ---
+
 - name: "check postgresql repo url redhat | Set postgresql repo package URL"
   ansible.builtin.set_fact:
     repo_url_to_install: >-

@@ -1,4 +1,5 @@
 ---
+
 - name: "install postgresql redhat | Install repository key"
   ansible.builtin.rpm_key:
     key: "{{ postgresql_url }}repos/yum/RPM-GPG-KEY-PGDG"
@@ -8,9 +9,8 @@
 - name: "install postgresql redhat | Include check repo url tasks"
   ansible.builtin.include_tasks: check_postgresql_repo_url_redhat.yml
 
-- name: "install postgresql redhat | Get postgresql dnf postgresql modules list" # noqa risky-shell-pipe
-  ansible.builtin.shell:
-    dnf -qy module list | grep 'postgresql' {% if postgresql_version | string | length > 0 %} |
+- name: "install postgresql redhat | Get postgresql dnf postgresql modules list"   # noqa risky-shell-pipe
+  ansible.builtin.shell: dnf -qy module list | grep 'postgresql' {% if postgresql_version | string | length > 0 %} |
     grep {{ postgresql_version }}{% endif %} || true
   register: dnf_postgresql_module_results
   changed_when: false
@@ -55,8 +55,7 @@
 
 - name: "install postgresql redhat | Check postgresql data directory files"
   ansible.builtin.find:
-    paths:
-      /var/lib/pgsql/{% if not check_repo_url_results.failed and postgresql_version is not none and
+    paths: /var/lib/pgsql/{% if not check_repo_url_results.failed and postgresql_version is not none and
       postgresql_version | string | length > 0 %}{{ postgresql_version }}/{% endif %}data
   register: postgresql_data_files_found
 

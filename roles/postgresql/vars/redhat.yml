@@ -1,4 +1,5 @@
 ---
+
 postgresql_repo_settings:
   redhat7: pgdg{{ postgresql_version }},base,epel
   redhat6: pgdg{{ postgresql_version }},base,vault
@@ -26,13 +27,11 @@ pgadmin_packages:
       redhat{% endif %}-repo-2-1.noarch.rpm
     package_name_short: pgadmin4-{% if ansible_distribution == 'Fedora' %}fedora{% else %}redhat{% endif %}-repo
     disable_gpg_check: True
-  - package:
-      pgadmin4{% if pgadmin_installation_type is defined and pgadmin_installation_type is not none and
+  - package: pgadmin4{% if pgadmin_installation_type is defined and pgadmin_installation_type is not none and
       pgadmin_installation_type | length > 0 %}-{% if pgadmin_installation_type == 'web' %}web{% else -%}
       desktop{% endif %}{% endif -%}
 
-postgresql_data_path:
-  /var/lib/pgsql/{% if not (postgresql_version_regex is defined and postgresql_version_regex |
+postgresql_data_path: /var/lib/pgsql/{% if not (postgresql_version_regex is defined and postgresql_version_regex |
   length > 0) %}{{ postgresql_version }}/{% endif %}data
 
 hba_conf_path_alternative_cmd: >-

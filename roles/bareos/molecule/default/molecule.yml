@@ -1,4 +1,5 @@
 ---
+
 dependency:
   name: galaxy
   options:
@@ -7,6 +8,7 @@ dependency:
 driver:
   name: docker
 platforms:
+
   - name: debian12-instance
     image: jrei/systemd-debian:12
     dockerfile: dockerfile_debian.j2
@@ -105,8 +107,8 @@ scenario:
 provisioner:
   name: ansible
   env:
-    PY_COLORS: "1"
-    ANSIBLE_FORCE_COLOR: "1"
+    PY_COLORS: '1'
+    ANSIBLE_FORCE_COLOR: '1'
   inventory:
     host_vars:
       debian12-instance:
@@ -118,11 +120,11 @@ provisioner:
       oraclelinux9-instance:
         bareos_dir: debian12-instance
 lint: |
-  export ANSIBLE_ROLES_PATH=${MOLECULE_PROJECT_DIRECTORY}/..
-  export PY_COLORS=1
-  export ANSIBLE_FORCE_COLOR=1
-  yamllint .
-  ansible-lint .
-  flake8 .
+    export ANSIBLE_ROLES_PATH=${MOLECULE_PROJECT_DIRECTORY}/..
+    export PY_COLORS=1
+    export ANSIBLE_FORCE_COLOR=1
+    yamllint .
+    ansible-lint .
+    flake8 .
 verifier:
   name: ansible

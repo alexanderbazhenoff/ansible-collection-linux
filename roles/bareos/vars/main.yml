@@ -1,4 +1,5 @@
 ---
+
 bareos_packages:
   fd:
     - bareos-filedaemon

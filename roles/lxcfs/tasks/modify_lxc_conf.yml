@@ -1,4 +1,5 @@
 ---
+
 - name: "modify lxc conf | Append lxc config string to dict conversion"
   ansible.builtin.set_fact:
     apply_config_dict: "{{ dict(keys | zip(vals)) }}"
@@ -14,8 +15,7 @@
 
 - name: "modify lxc conf | Set fact of config changes"
   ansible.builtin.set_fact:
-    new_config_string:
-      "{{ (dict(keys | zip(vals)) | combine(apply_config_dict)).keys() | zip((dict(keys | zip(vals)) |
+    new_config_string: "{{ (dict(keys | zip(vals)) | combine(apply_config_dict)).keys() | zip((dict(keys | zip(vals)) |
       combine(apply_config_dict)).values()) | map('join', ' = ') | join('\n') }}"
   vars:
     arr: "{{ existing_config_raw.stdout.split('\n') | map('trim') | select() | list }}"

@@ -1,4 +1,5 @@
 ---
+
 - name: "delete zabbix agent pacman | Remove zabbix agent packages"
   community.general.pacman:
     name: "{{ item }}"

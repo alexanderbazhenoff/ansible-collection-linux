@@ -1,4 +1,5 @@
 ---
+
 - name: "install server debian | Install debian repository and update apt cache"
   ansible.builtin.apt_repository:
     repo: "{{ postgresql_repo_file }}"
@@ -30,6 +31,5 @@
     PGTZ: "{{ postgresql_default_timezone }}"
   register: init_db_results
   changed_when: not init_db_results.failed
-  when:
-    not check_postgresql_repo_url_results.failed and postgresql_data_dir_found is defined and
+  when: not check_postgresql_repo_url_results.failed and postgresql_data_dir_found is defined and
     postgresql_data_dir_found.matched == 0

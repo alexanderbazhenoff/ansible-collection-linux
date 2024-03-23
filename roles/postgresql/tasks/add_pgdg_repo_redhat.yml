@@ -1,4 +1,5 @@
 ---
+
 - name: "add pgdg repo redhat | Install repository key"
   ansible.builtin.rpm_key:
     key: "{{ postgresql_url }}repos/yum/RPM-GPG-KEY-PGDG"

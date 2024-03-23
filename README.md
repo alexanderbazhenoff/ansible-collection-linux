@@ -1,9 +1,9 @@
 An ansible collection with linux-related roles to perform various setups.
 
 
-## Project content
+## Project content.
 
-#### Roles
+#### Roles:
 
 - [**bareos**](roles/bareos/README.md) - Installs and configures [Bareos](https://www.bareos.com/) and third-party
 components, adds Bareos file daemons to Bareos server, create or revoke user profiles and uploads Bareos configs to the
@@ -22,11 +22,11 @@ apps and platform autodiscovery on
 
 
 
-## Installation
+## Installation.
 
-#### Install from ansible galaxy
+#### Install from ansible galaxy:
 
-1. Set-up collection from ansible galaxy:
+1. Set-up collection from ansible galaxy: 
 ```bash
 ansible-galaxy collection install alexanderbazhenoff.linux
 ```
@@ -38,7 +38,7 @@ then edit ansible.cfg. Use `ansible --version` command to find the path of confi
 [docs.ansible.com](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#installing-collections-with-ansible-galaxy)
 for more info.
 
-#### Install from sources
+#### Install from sources:
 
 1. Clone via ssh:
 ```bash
@@ -62,7 +62,7 @@ ansible-galaxy collection install $(ls -1 | grep ".tar.gz")
 ```
 
 
-## Usage
+## Usage.
 
 Create inventory and create playbook files. Include these roles into your playbook. These roles include example
 playbooks and inventory files already. You can also find usage examples in readme files or `/example` sub-folders.

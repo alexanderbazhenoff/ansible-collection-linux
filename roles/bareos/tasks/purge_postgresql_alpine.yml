@@ -1,4 +1,5 @@
 ---
+
 - name: "purge postgresql alpine | Delete postgresql service via rc-update"
   ansible.builtin.shell: rc-update del postgresql || true
   register: postgresql_rc_delete_results

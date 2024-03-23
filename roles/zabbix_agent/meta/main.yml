@@ -1,4 +1,5 @@
 ---
+
 galaxy_info:
   role_name: zabbix_agent
   namespace: alexanderbazhenoff

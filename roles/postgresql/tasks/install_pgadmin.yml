@@ -1,4 +1,5 @@
 ---
+
 - name: "install pgadmin | Install pgadmin4"
   block:
     - name: "| Include uninstall pgadmin tasks"
@@ -18,15 +19,14 @@
 
     - name: "| Include firewall control {{ ansible_os_family | lower }} tasks"
       ansible.builtin.include_tasks: "includes_misc/firewall_control_{{ ansible_os_family | lower }}.yml"
-      when:
-        not check_pgadmin_repo_url_results.failed and pgadmin_installation_type is defined and
+      when: not check_pgadmin_repo_url_results.failed and pgadmin_installation_type is defined and
         pgadmin_installation_type != 'desktop'
 
     - name: "| Install packages depending on detected package manager"
       ansible.builtin.include_tasks: pkg_management/install_{{ ansible_pkg_mgr }}.yml
 
     - name: "| Init pgadmin"
-      ansible.builtin.shell: "{{ pgadmin_init_cmd }}" # noqa command-instead-of-shell
+      ansible.builtin.shell: "{{ pgadmin_init_cmd }}"   # noqa command-instead-of-shell
       environment:
         PGADMIN_SETUP_PASSWORD: "{{ pgadmin_password }}"
         PGADMIN_SETUP_EMAIL: "{{ pgadmin_email }}"

@@ -7,7 +7,7 @@ Specification
 Normally this role is for the next cases:
 
 - Typical installation of Bareos director using PostgreSQL, Bareos Web UI using Apache, Bareos storage and Bareos
-file daemon on the same host and upload predefined configs to `/etc` (optional, see
+file daemon on the same host and upload predefined configs to `/etc` (optional, see 
 [**bareos_configs_to_copy** variable](#role-variables)). This type of installation is the most ready-to-use (see
 [example playbook](#1-install-bareos-director-web-ui-storage-file-daemon-on-the-same-host) for details).
 - Create or revoke user profile to access Bareos Web UI (see
@@ -15,7 +15,7 @@ file daemon on the same host and upload predefined configs to `/etc` (optional, 
 - Typical installation of Bareos file-daemon and add them to Bareos director. This type of installation is also
 ready-to-use (check see [**role_action**](#role-variables) variable description and
 [example playbook](#3-install-bareos-file-daemon-and-add-to-server) for details).
-- Install a list of additional Bareos packages, e.g.: bareos-traymonitor (optional, see
+- Install a list of additional Bareos packages, e.g.: bareos-traymonitor (optional, see 
 [example playbook](#4-install-bareos-components-with-an-additional-list-of-packages)). No additional custom settings for
 these components will be performed running this role, just default installation(s).
 - Uninstall Bareos components: Bareos Director, Bareos UI, Bareos Director, Bareos Storage (check
@@ -26,15 +26,15 @@ these components will be performed running this role, just default installation(
 Additional usage scenarios:
 
 - Installation of Bareos director using PostgreSQL, Bareos Web UI using Apache, Bareos storage and bareos file daemon on
-the same host, but without a database (see
+the same host, but without a database (see 
 [example](#6-install-bareos-with-a-pre-installed-database-and-copy-pre-defined-configs)). So you can preinstall a
 database first.
 - Installation of Bareos Web UI (e.g. connect to Bareos director on another host). This usage scenario without Web UI
-pre-configuration, but you can upload additional predefined configs to `/etc` (optional, see
+pre-configuration, but you can upload additional predefined configs to `/etc` (optional, see 
 [**bareos_configs_to_copy** variable](#role-variables)).
-- Installation of Bareos Director without Web UI and pre-configuration (but you can also upload additional predefined
+- Installation of Bareos Director without Web UI and pre-configuration (but you can also upload additional predefined 
 configs to `/etc`).
-- Installation of Bareos Storage separately without pre-configuration (but you can also upload additional predefined
+- Installation of Bareos Storage separately without pre-configuration (but you can also upload additional predefined 
 configs to `/etc`).
 
 Role limitations:
@@ -50,8 +50,8 @@ instead of wrong versions by default like on Oracle Linux 8.7 or Fedora 45.
 the most common role usage.
 - Remove file daemon from Bareos server using this role is not possible. Some existing job configs might be linked with
 this file-daemon. Bareos server will not start after force remove until you delete or change job configs. Anyway, there
-is no normal scenario when you want to remove file daemon from the server while you can change job configs and
-optionally disable on Bareos server.
+is no normal scenario when you want to remove file daemon from the server while you can change job configs and 
+optionally disable on Bareos server. 
 - Firewall rules will be applied only when firewalld (RedHat) or ufw (Ubuntu) enabled. This will not affect to iptables
 on Debian, so use external or manual iptables control.
 - TLS certificates and setting not supported in this role, but you can copy all required files setting up
@@ -66,18 +66,18 @@ Dependencies
 ------------
 - PostgreSQL which can be installed using this role or not.
 - [python-psycopg](https://www.psycopg.org/) is not required for Bareos, but will be installed together with PostgreSQL.
-- Apache2 web server and Epel repo (for `libzstd` package download on CentOS) which will be automatically installed
+- Apache2 web server and Epel repo (for `libzstd` package download on CentOS) which will be automatically installed 
 running this role.
 - This role using 'sudo' become method, so Debian distribution should have them already pre-installed.
-- Alpine Linux binaries built unofficially they could have some bugs
+- Alpine Linux binaries built unofficially they could have some bugs 
 ([like this one](https://gitlab.alpinelinux.org/alpine/aports/-/issues/14570)). Before you run this role on Alpine Linux
 set your `/etc/apk/repositories` manually (read [documentation](https://wiki.alpinelinux.org/wiki/Repositories)).
 
 Example Playbooks
 -----------------
-The easiest ways to use this role should look like typical installation:
+The easiest ways to use this role should look like typical installation: 
 [all Bareos components](https://docs.bareos.org/IntroductionAndTutorial/InstallingBareosWebui.html#installation) on the
-same host and/or
+same host and/or 
 [install Bareos file daemon](https://docs.bareos.org/master/IntroductionAndTutorial/InstallingBareosClient.html)
 (client) then [add them](https://docs.bareos.org/IntroductionAndTutorial/Tutorial.html#director-configure-client) to
 Bareos director (server). You may also wish to create a client user profile to access
@@ -211,7 +211,7 @@ and ansible playbook like:
             postgresql_version: 14
             init_bareos_database: "{{ (ansible_distribution == 'CentOS') }}"
 
-The example below shows how to install a client with only
+The example below shows how to install a client with only 
 [**bareos-traymonitor**](https://docs.bareos.org/Configuration/Monitor.html) in the list of additional packages:
 
     - hosts: all
@@ -313,18 +313,18 @@ how to apply bareos-dir, bareos-sd, bareos-fd and Bareos Web UI (by restart Apac
 Role Variables
 --------------
 
-#### Main role variables
+#### Main role variables:
 
 - **role_action** *[Default: install, possible values: install/uninstall/access/add_client/copy_configs]*: Role action
 to be performed: install or uninstall Bareos components, create user profile to access Bareos Web UI *(access)*, add
 already installed file daemon *(client)* on Bareos server *(add_client)*, copy Bareos config to already installed Bareos
 component(s).
 - **bareos_components** *[Default: fd, possible values: fd, sd, dir, webui, dir_webui]*: Bareos components to install or
-uninstall: Bareos file daemon or client *(fd)*, Bareos storage daemon *(sd)*, Bareos Director *(dir)*, Bareos director
+uninstall: Bareos file daemon or client *(fd)*, Bareos storage daemon *(sd)*, Bareos Director *(dir)*, Bareos director 
 and Web UI *(dir_webui)*.
 - **clean_install** *[Default: true]*: Perform clean installation. All packages and configs will be purged before
 install.
-- **bareos_release** *[Default: 21]*: [Bareos release version](https://download.bareos.org/bareos/release/), e.g.: 'current', 'next' or
+- **bareos_release** *[Default: 21]*: [Bareos release version](https://download.bareos.org/bareos/release/), e.g.: 'current', 'next' or 
 'experimental/<postfix>'. Affects only for Debian and Redhat Linux distribution families.
 - **bareos_url** *[Default: https://download.bareos.org/bareos/release/]*: Bareos repository URL prefix to download from
 (for example, if you with to use local or another repo).
@@ -334,11 +334,11 @@ dependencies problems (example: Bareos v21 currently is [not available](https://
 for any RedHat v9, so try to set `8` here).
 - **debug_mode** *[Default: false]*: Verbose output.
 
-#### Firewall related variables
+#### Firewall related variables:
 
 - **firewall_control** *[Default: true]*: Add firewall rules for firewalld and ufw.
 
-#### Bareos related variables
+#### Bareos related variables:
 
 - **cleanup_storage_files** *[Default: true]*: Cleanup Bareos storage files on installation or uninstall. Please keep in
 mind these files are useless without an indexes stored in the database.
@@ -361,12 +361,12 @@ bareos_configs_to_copy:
 
 For creating client user profile to access Bareos Web UI (role_action == *'access'*) you could use:
 
-| Variable         | Default value | Comment                                                                    |
-|------------------|---------------|----------------------------------------------------------------------------|
-| webui_username   | Admin         | Profile username to login with.                                            |
-| webui_password   | admin         | Profile password to login with.                                            |
-| webui_profile    | webui-admin   | Access profile, e.g: webui-admin, operator, webui-readonly, webui-limited. |
-| webui_tls_enable | false         | Use TLS.                                                                   |
+| Variable          | Default value | Comment                                                                    |
+|-------------------|---------------|----------------------------------------------------------------------------|
+| webui_username    | Admin         | Profile username to login with.                                            |
+| webui_password    | admin         | Profile password to login with.                                            |
+| webui_profile     | webui-admin   | Access profile, e.g: webui-admin, operator, webui-readonly, webui-limited. |
+| webui_tls_enable  | false         | Use TLS.                                                                   |
 
 All available profiles are stored in the directory /etc/bareos/bareos-dir.d/profile (read
 [here](https://www.bareos.com/bareos-webui-installation-and-configuration/) for details).
@@ -383,7 +383,7 @@ To add file daemon on Bareos server, you could define the next variables:
 | add_component_server              | 127.0.0.1 | Bareos server IP address, hostname or inventory item to delegate. |
 | add_component_force               | false     | Force try to add file daemon when already exists                  |
 
-#### Database related parameters
+#### Database related parameters:
 
 The most useful settings are stored in:
 
@@ -392,7 +392,7 @@ The most useful settings are stored in:
 - **postgresql_version** *[Default: 14]*: PostgreSQL version to install by this role. Leave it `''` for a default
 version.
 - **install_psycopg2** *[Default: true]*: Install [psycopg2](https://pypi.org/project/psycopg2/).
-- **postgresql_timezone** *[Default: 'Europe/Moscow']*: PostgreSQL timezone (read
+- **postgresql_timezone** *[Default: 'Europe/Moscow']*: PostgreSQL timezone (read 
 [manual](https://www.postgresql.org/docs/15/datatype-datetime.html)).
 
 Another variables:
@@ -405,7 +405,7 @@ for Debian.
 path.
 - **postgresql_debian_apt_repo_url_prefix** *[Default: http://apt.postgresql.org/pub/repos/apt/]*: Debian PostgreSQL
 URL prefix for apt repo.
-- **postgresql_debian_repo** *[Default:*
+- **postgresql_debian_repo** *[Default:* 
 ```
   deb [signed-by={{ postgresql_debian_key_destination }}] {{ postgresql_debian_apt_repo_url_prefix }}
   {{ ansible_distribution_release }}-pgdg main

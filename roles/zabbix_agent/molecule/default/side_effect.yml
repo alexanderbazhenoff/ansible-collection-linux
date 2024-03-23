@@ -1,10 +1,12 @@
 ---
+
 - name: Side effect
   hosts: all
   become: true
   become_method: sudo
 
   tasks:
+
     - name: "default >>> side effect | Include of zabbix_agent role"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.zabbix_agent
@@ -18,7 +20,7 @@
         install_v2_agent: false
 
     - name: "default >>> side effect | Check there is no zabbix_agent2, but zabbix_agent process is running"
-      ansible.builtin.shell: "{{ item }}" # noqa command-instead-of-shell
+      ansible.builtin.shell: "{{ item }}"   # noqa command-instead-of-shell
       with_items:
         - pgrep zabbix_agent2 || true
         - ps aux | grep "zabbix_agent" | grep -v "grep"

@@ -1,4 +1,5 @@
 ---
+
 redhat_repo_url: https://copr-be.cloud.fedoraproject.org/results/thm/lxc{{ lxc_version }}
 
 lxc_version_override:

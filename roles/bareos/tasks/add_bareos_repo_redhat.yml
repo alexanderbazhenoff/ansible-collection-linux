@@ -1,4 +1,5 @@
 ---
+
 - name: "add bareos repo redhat | Trying to set bareos repo URL by Linux distribution"
   ansible.builtin.set_fact:
     repo_url_to_install: >-

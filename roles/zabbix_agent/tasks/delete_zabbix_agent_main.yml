@@ -1,4 +1,5 @@
 ---
+
 - name: "delete zabbix agent main | Include delete zabbix agent tasks depending on package manager"
   ansible.builtin.include_tasks: delete_zabbix_agent_{{ ansible_pkg_mgr }}.yml
 

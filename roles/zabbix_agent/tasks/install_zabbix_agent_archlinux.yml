@@ -1,4 +1,5 @@
 ---
+
 - name: "install zabbix agent archlinux | Getting index page from archive.archlinux.org"
   ansible.builtin.get_url:
     url: "{{ archlinux_repo_url_prefix }}/z/{{ zabbix_agent_daemon_name }}/"
@@ -27,8 +28,7 @@
       - package_filename is defined and package_filename | length > 0
     fail_msg: >-
       There is no 'zabbix-release' package version {{ zabbix_release }}. Please set another zabbix release.
-    success_msg:
-      "Found zabbix release package, URL: {{ archlinux_repo_url_prefix }}/z/{{ zabbix_agent_daemon_name -}}
+    success_msg: "Found zabbix release package, URL: {{ archlinux_repo_url_prefix }}/z/{{ zabbix_agent_daemon_name -}}
       /{{ package_filename }}"
 
 - name: "install zabbix agent archlinux | Download required zabbix-agent package"

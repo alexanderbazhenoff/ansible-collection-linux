@@ -1,4 +1,5 @@
 ---
+
 - name: "purge packages apt | Purge packages"
   ansible.builtin.apt:
     name: "{{ item }}"

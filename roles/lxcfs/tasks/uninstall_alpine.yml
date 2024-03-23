@@ -1,5 +1,6 @@
 ---
-- name: "uninstall alpine | Count the number of iptables rules" # noqa risky-shell-pipe
+
+- name: "uninstall alpine | Count the number of iptables rules"    # noqa risky-shell-pipe
   ansible.builtin.shell: iptables --list --line-numbers | sed '/^num\|^$\|^Chain/d' | wc -l
   register: iptables_rules_number
   changed_when: false
@@ -27,7 +28,7 @@
     - lxc-net
     - "{% if iptables_rules_number.stdout is defined and iptables_rules_number.stdout | int <= 2 %}iptables{% endif %}"
 
-- name: "uninstall alpine | Count dummy interfaces number on the host" # noqa risky-shell-pipe
+- name: "uninstall alpine | Count dummy interfaces number on the host"   # noqa risky-shell-pipe
   ansible.builtin.shell: ip a | grep dummy | wc -l
   register: dummy_eth_results
   changed_when: false

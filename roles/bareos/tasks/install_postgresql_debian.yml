@@ -1,8 +1,8 @@
 ---
+
 - name: "install postgresql debian | Check required repo URL is available"
   ansible.builtin.uri:
-    url:
-      "{{ postgresql_debian_apt_repo_url_prefix }}/dists/{{ ansible_distribution_release -}}
+    url: "{{ postgresql_debian_apt_repo_url_prefix }}/dists/{{ ansible_distribution_release -}}
       -pgdg/{{ postgresql_version | default('') }}/"
   register: check_repo_url_results
   ignore_errors: true

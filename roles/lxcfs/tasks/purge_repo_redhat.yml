@@ -1,4 +1,5 @@
 ---
+
 - name: "purge repo redhat | Remove additional repo"
   ansible.builtin.file:
     path: /etc/yum.repos.d/lxc.repo
@@ -6,11 +7,9 @@
 
 - name: "purge repo redhat | Disable addons repo (for container-selinux package)"
   ansible.builtin.ini_file:
-    dest:
-      /etc/yum.repos.d/{% if ansible_distribution_major_version | int == 7 %}oracle-linux{% else -%}
+    dest: /etc/yum.repos.d/{% if ansible_distribution_major_version | int == 7 %}oracle-linux{% else -%}
       public-yum{% endif %}-ol{{ ansible_distribution_major_version }}.repo
-    section:
-      "{% if ansible_distribution_major_version | int < 7 %}public_{% endif -%}
+    section: "{% if ansible_distribution_major_version | int < 7 %}public_{% endif -%}
       ol{{ ansible_distribution_major_version }}_addons"
     option: enabled
     value: 0

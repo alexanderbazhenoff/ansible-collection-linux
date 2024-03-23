@@ -1,4 +1,5 @@
 ---
+
 ### Main role variables:
 
 # Role action to be performed. Possible values:
@@ -39,10 +40,12 @@ bareos_url: https://download.bareos.org
 # More output for troubleshooting
 debug_mode: false
 
+
 ### Firewall related parameters:
 
 # Add firewall rules (ufw or firewalld):
 firewall_control: true
+
 
 ### Bareos related parameters:
 
@@ -74,9 +77,9 @@ webui_tls_enable: false
 # Default data to add a client on Bareos server.
 #
 # Component name to display on Bareos server. If undefined, FQDN or hostname will be taken.
-add_component_name: ""
+add_component_name: ''
 # Password to connect with Bareos server. If empty, the random password will be generated.
-add_component_password: ""
+add_component_password: ''
 # Length of the password to generate.
 add_component_password_gen_length: 16
 # Use TLS to connect between file daemon and server.
@@ -87,6 +90,7 @@ add_component_max_jobs: 1
 add_component_server: 127.0.0.1
 # Force try to add file daemon when already exists
 add_component_force: false
+
 
 ### Database related parameters:
 
