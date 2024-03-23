@@ -1,0 +1,5 @@
+[*]
+insert_final_newline = true
+
+[*.{yml,yaml}]
+max_line_length = 120
