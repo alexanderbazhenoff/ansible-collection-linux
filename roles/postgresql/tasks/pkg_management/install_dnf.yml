@@ -3,7 +3,8 @@
 - name: "install dnf | Install packages"   # noqa package-latest
   ansible.builtin.dnf:
     name: "{{ item.package }}"
-    state: latest   # kics-scan ignore-line
+    # kics-scan ignore-line
+    state: latest
     update_cache: true
     disable_gpg_check: "{{ item.disable_gpg_check | default(false) }}"
   register: install_results

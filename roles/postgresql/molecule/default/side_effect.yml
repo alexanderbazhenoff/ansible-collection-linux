@@ -15,7 +15,8 @@
         role_subject: users
         postgresql_users:
           - name: test
-            password: my_password   # kics-scan ignore-line
+            # kics-scan ignore-line
+            password: my_password
 
     - name: "default >>> side effect | Include postgresql role to create database"
       ansible.builtin.include_role:

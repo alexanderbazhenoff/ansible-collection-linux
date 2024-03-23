@@ -3,7 +3,8 @@
 - name: "install apk | Install packages"
   community.general.apk:
     name: "{{ item.package }}"
-    state: latest   # kics-scan ignore-line
+    # kics-scan ignore-line
+    state: latest
     update_cache: true
   register: install_results
   until: install_results is succeeded

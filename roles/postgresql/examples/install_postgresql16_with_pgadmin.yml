@@ -14,7 +14,8 @@
         postgresql_version: 16
         install_pgadmin: true
         pgadmin_email: admin@domain.com
-        pgadmin_password: my_pgadmin_password   # kics-scan ignore-line
+        # kics-scan ignore-line
+        pgadmin_password: my_pgadmin_password
         postgresql_conf:
           port: 5432
           max_connections: 1000

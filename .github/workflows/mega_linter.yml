@@ -35,14 +35,16 @@ jobs:
           fetch-depth: 0
 
       - name: MegaLinter
-        uses: oxsecurity/megalinter@latest   # kics-scan ignore-line
+        # kics-scan ignore-line
+        uses: oxsecurity/megalinter@latest
         id: ml
         env:
           VALIDATE_ALL_CODEBASE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v4   # kics-scan ignore-line
+        # kics-scan ignore-line
+        uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: MegaLinter reports
@@ -81,7 +83,8 @@ jobs:
       # Create pull request if applicable
       # (for now works only on PR from the same repository, not from forks)
       - name: Create Pull Request with applied fixes
-        uses: peter-evans/create-pull-request@v6   # kics-scan ignore-line
+        # kics-scan ignore-line
+        uses: peter-evans/create-pull-request@v6
         id: cpr
         if: env.APPLY_FIXES_IF_PR == 'true'
         with:
@@ -103,7 +106,8 @@ jobs:
         run: sudo chown -Rc $UID .git/
 
       - name: Commit and push applied linter fixes
-        uses: stefanzweifel/git-auto-commit-action@latest   # kics-scan ignore-line
+        # kics-scan ignore-line
+        uses: stefanzweifel/git-auto-commit-action@latest
         if: env.APPLY_FIXES_IF_COMMIT == 'true'
         with:
           branch: >-
