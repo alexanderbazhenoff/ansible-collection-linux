@@ -6,12 +6,12 @@
 - name: "configure postgresql conf | Get postgresql.conf path with standard command"
   ansible.builtin.shell: "{{ postgresql_conf_path_standard_cmd }}"   # noqa command-instead-of-shell
   register: postgresql_conf_path_results
-  changed_when: False
+  changed_when: false
 
 - name: "configure postgresql conf | Get postgresql.conf path alternative way"
   ansible.builtin.shell: "{{ postgresql_conf_path_alternative_cmd }}"   # noqa command-instead-of-shell
   register: postgresql_conf_path_retry_results
-  changed_when: False
+  changed_when: false
   when: not ("'postgresql.conf' in postgresql_conf_path_results.stdout") or
     (postgresql_conf_path_results.stderr is defined and postgresql_conf_path_results.stderr | length > 0)
 

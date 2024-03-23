@@ -15,7 +15,7 @@ postgresql_packages:
       EL{% endif %}-{{ ansible_distribution_major_version }}-{{ ansible_architecture -}}
       /pgdg-{% if ansible_distribution == 'Fedora' %}fedora{% else %}redhat{% endif %}-repo-latest.noarch.rpm{% endif %}
     package_name_short: pgdg-{% if ansible_distribution == 'Fedora' %}fedora{% else %}redhat{% endif %}-repo
-    disable_gpg_check: True
+    disable_gpg_check: true
   - package: >-
       {% if install_psycopg2 %}python{% if ansible_python_version is version('2.7.5', '>=') and
       ansible_distribution_major_version | int >= 7 %}{{ ansible_python.version.major }}{% endif %}-psycopg2{% endif %}
@@ -26,7 +26,7 @@ pgadmin_packages:
       {{ postgresql_url }}pgadmin/pgadmin4/yum/pgadmin4-{% if ansible_distribution == 'Fedora' %}fedora{% else -%}
       redhat{% endif %}-repo-2-1.noarch.rpm
     package_name_short: pgadmin4-{% if ansible_distribution == 'Fedora' %}fedora{% else %}redhat{% endif %}-repo
-    disable_gpg_check: True
+    disable_gpg_check: true
   - package: pgadmin4{% if pgadmin_installation_type is defined and pgadmin_installation_type is not none and
       pgadmin_installation_type | length > 0 %}-{% if pgadmin_installation_type == 'web' %}web{% else -%}
       desktop{% endif %}{% endif -%}

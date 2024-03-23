@@ -9,13 +9,13 @@ role_action: install
 role_subject: server
 
 # Perform clean install
-clean_install: True
+clean_install: true
 
 # Version of pgsql repository.
 postgresql_version: 15
 
 # Clean-up PostgreSQL data directory (also see $PGDATA env variable).
-cleanup_data_directory: True
+cleanup_data_directory: true
 
 # Install only a maximum recommended version based on dnf profile (https://www.postgresql.org/download/linux/redhat/)
 # Affects only for systems with dnf package manager. Also read about dnf modules in specified Linux distribution, e.g.:
@@ -28,7 +28,7 @@ postgresql_recommended_version: false
 postgresql_additional_packages: []
 
 # Install psycopg2: https://pypi.org/project/psycopg2/
-install_psycopg2: True
+install_psycopg2: true
 
 # Install pgadmin for web mode with postgresql server: https://www.pgadmin.org/
 install_pgadmin: false
@@ -37,7 +37,7 @@ install_pgadmin: false
 pgadmin_installation_type: web
 
 # Add or remove firewalld and/or ufw rules on installation or uninstallation. Will be skipped when firewall disabled.
-firewall_control: True
+firewall_control: true
 
 
 ### SERVER PARAMETERS:

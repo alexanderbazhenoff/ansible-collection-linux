@@ -4,13 +4,13 @@
   ansible.builtin.uri:
     url: "{{ (pgadmin_repo_file.split(' '))[1] }}/dists/pgadmin4/Release"
   register: check_pgadmin_repo_url_results
-  ignore_errors: True
+  ignore_errors: true
   failed_when: check_pgadmin_repo_url_results.status == 404
 
 - name: "pgadmin packages debian | Set facts for pgadmin install"
   ansible.builtin.set_fact:
     firewall_port: 80
-    firewall_state: "{% if check_pgadmin_repo_url_results.failed %}False{% else %}True{% endif %}"
+    firewall_state: "{% if check_pgadmin_repo_url_results.failed %}false{% else %}true{% endif %}"
     packages_to_install: "{% if check_pgadmin_repo_url_results.failed %}[]{% else %}{{ pgadmin_packages }}{% endif %}"
 
 - name: "pgadmin packages debian | Include purge repo tasks when there is no pgadmin repo for current linux distro"
@@ -20,5 +20,5 @@
 - name: "pgadmin packages debian | Install debian repository and update apt cache"
   ansible.builtin.apt_repository:
     repo: "{{ pgadmin_repo_file }}"
-    update_cache: True
+    update_cache: true
   when: not check_pgadmin_repo_url_results.failed

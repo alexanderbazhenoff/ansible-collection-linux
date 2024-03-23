@@ -3,7 +3,7 @@
 - name: "install server debian | Install debian repository and update apt cache"
   ansible.builtin.apt_repository:
     repo: "{{ postgresql_repo_file }}"
-    update_cache: True
+    update_cache: true
   when: not check_postgresql_repo_url_results.failed
 
 - name: "install server debian | Include purge repo tasks when there is no postgresql repo for current linux distro"

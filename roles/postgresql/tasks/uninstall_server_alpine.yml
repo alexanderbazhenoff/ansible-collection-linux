@@ -19,7 +19,7 @@
   ansible.builtin.user:
     name: "{{ postgresql_become_user }}"
     state: absent
-    remove: True
+    remove: true
 
 - name: "uninstall server alpine | Remove {{ postgresql_become_user }} group"
   ansible.builtin.group:

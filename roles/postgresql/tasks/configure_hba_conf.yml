@@ -6,12 +6,12 @@
 - name: "configure hba conf | Get pg_hba.conf path with standard command"
   ansible.builtin.shell: "{{ hba_conf_path_standard_cmd }}"   # noqa command-instead-of-shell
   register: hba_conf_path_results
-  changed_when: False
+  changed_when: false
 
 - name: "configure hba conf | Get pg_hba.conf path alternative way"
   ansible.builtin.shell: "{{ hba_conf_path_alternative_cmd }}"   # noqa command-instead-of-shell
   register: hba_conf_path_retry_results
-  changed_when: False
+  changed_when: false
   when: not ("'pg_hba.conf' in hba_conf_path_results.stdout") or (hba_conf_path_results.stderr is defined and
     hba_conf_path_results.stderr | length > 0)
 
@@ -48,5 +48,5 @@
     owner: "{{ postgresql_become_user }}"
     group: "{{ postgresql_become_user }}"
     mode: 0640
-    backup: True
+    backup: true
   when: pg_conf_content_mode != 'regex' and pg_conf_content_mode != 'block'

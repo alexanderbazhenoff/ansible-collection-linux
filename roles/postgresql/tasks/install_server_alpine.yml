@@ -26,7 +26,7 @@
     state: directory
     owner: "{{ postgresql_become_user }}"
     mode: 0700
-    recurse: True
+    recurse: true
   when: postgresql_data_dir_found.matched == 0
 
 - name: "install server alpine | Create unix socket directory"

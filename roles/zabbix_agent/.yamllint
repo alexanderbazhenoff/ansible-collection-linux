@@ -3,13 +3,7 @@
 # Based on ansible-lint config
 extends: default
 ignore: |
-  templates/
-  files/*.j2
-  README.md
-  LICENSE
-  .yamllint
-  .flake8
-  verify.py
+  !*.ya?ml
 
 rules:
   braces:
@@ -42,5 +36,5 @@ rules:
     type: unix
   trailing-spaces: enable
   truthy:
-    allowed-values: ['True', 'False']
-    check-keys: True
+    allowed-values: ['true', 'false']
+    check-keys: true

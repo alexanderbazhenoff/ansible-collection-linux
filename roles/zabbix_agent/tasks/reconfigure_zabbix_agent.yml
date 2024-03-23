@@ -330,7 +330,7 @@
   ansible.builtin.find:
     path: /etc/zabbix/{{ zabbix_agent_conf_name }}.d/
     file_type: any
-    hidden: True
+    hidden: true
   register: zabbix_agent_confd_files_to_delete
   when: conf_with_dir_clean
 

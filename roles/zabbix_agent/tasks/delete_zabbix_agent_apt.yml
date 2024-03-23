@@ -4,8 +4,8 @@
   ansible.builtin.apt:
     name: "{{ item }}"
     state: absent
-    autoremove: True
-    purge: True
+    autoremove: true
+    purge: true
   with_items:
     - zabbix-agent
     - zabbix-agent2

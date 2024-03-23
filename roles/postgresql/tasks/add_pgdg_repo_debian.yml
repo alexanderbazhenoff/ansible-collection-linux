@@ -11,8 +11,8 @@
     url: "{{ postgresql_apt_key_url }}"
     dest: "{{ postgresql_apt_keys_dir }}/pgdg.asc"
     mode: 0755
-    validate_certs: False
-    force: True
+    validate_certs: false
+    force: true
   register: postgresql_apt_key_results
   until: postgresql_apt_key_results is succeeded
   retries: 5

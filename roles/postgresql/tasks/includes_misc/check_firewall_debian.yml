@@ -2,6 +2,6 @@
 
 - name: "check firewall debian | Check ufw status"
   ansible.builtin.command: ufw status
-  ignore_errors: True
+  ignore_errors: true
   register: ufw_state
-  changed_when: False
+  changed_when: false

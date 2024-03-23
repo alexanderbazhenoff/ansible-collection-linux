@@ -18,7 +18,7 @@
       - { package: "{% if ansible_os_family == 'RedHat' and ansible_facts.selinux.status is defined and
         ansible_facts.selinux.status == 'enabled' %}policycoreutils-python{{ (ansible_python.version.major == 3) |
         ternary('3', '') }}{% endif %}"}
-    firewall_state: True
+    firewall_state: true
 
 - name: "pre-requirements | Ensure required packages are installed"
   ansible.builtin.include_tasks: pkg_management/install_{{ ansible_pkg_mgr }}.yml
@@ -38,7 +38,7 @@
   ansible.builtin.copy:
     src: /usr/share/zoneinfo/{{ postgresql_default_timezone }}
     dest: /etc/localtime
-    remote_src: True
+    remote_src: true
     mode: 0644
   when: etc_timezone_file_found.matched is defined and etc_timezone_file_found.matched == 0
 

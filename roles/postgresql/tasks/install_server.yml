@@ -10,7 +10,7 @@
 - name: "install server | Set facts for firewall control"
   ansible.builtin.set_fact:
     firewall_port: "{{ postgresql_conf.port }}"
-    firewall_state: True
+    firewall_state: true
 
 - name: "install server | Include firewall control {{ ansible_os_family | lower }} tasks"
   ansible.builtin.include_tasks: includes_misc/firewall_control_{{ ansible_os_family | lower }}.yml

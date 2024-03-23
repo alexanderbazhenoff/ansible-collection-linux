@@ -4,7 +4,7 @@
   ansible.builtin.apt:
     name: "{{ item.package }}"
     state: absent
-    autoremove: True
+    autoremove: true
   when: item.package | length > 0
   with_items:
     - "{{ packages_to_install }}"

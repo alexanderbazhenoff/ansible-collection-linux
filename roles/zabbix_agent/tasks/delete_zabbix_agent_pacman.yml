@@ -4,8 +4,8 @@
   community.general.pacman:
     name: "{{ item }}"
     state: absent
-    force: True
-    remove_nosave: True
+    force: true
+    remove_nosave: true
   with_items:
     - zabbix-agent
     - zabbix-agent2

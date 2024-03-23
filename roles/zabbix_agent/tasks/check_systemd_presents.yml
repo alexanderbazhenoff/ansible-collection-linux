@@ -5,5 +5,5 @@
   args:
     executable: /bin/sh
   register: systemctl_check
-  changed_when: False
-  ignore_errors: True
+  changed_when: false
+  ignore_errors: true

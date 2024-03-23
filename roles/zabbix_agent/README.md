@@ -56,8 +56,8 @@ Main parameters:
 | `install_v2_agent`          | true                                   | Install Zabbix agent v2 when possible, otherwise install v1            |
 | `customize_agent`           | true                                   | Configure agent for automatic services discovery and templates add     |
 | `clean_install`             | true                                   | Perform clean install (re-install agent with clean-up)                 |
-| `conf_with_dir_clean`       | True                                   | Configure or perform clean installation with config directory clean-up |
-| `debug_mode`                | True                                   | More outputs                                                           |
+| `conf_with_dir_clean`       | true                                   | Configure or perform clean installation with config directory clean-up |
+| `debug_mode`                | true                                   | More outputs                                                           |
 | `customize_agent_only`      | false                                  | Re-configure agent without Zabbix install                              |
 | `zabbix_repo_url`           | http://repo.zabbix.com                 | Zabbix repo URL                                                        |
 | `archlinux_repo_url_prefix` | https://archive.archlinux.org/packages | Archlinux repo URL prefix                                              |
@@ -119,7 +119,7 @@ Example Playbook
 Install and configure Zabbix v1 agent(s):
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
       roles:
         - role: alexanderbazhenoff.linux.zabbix_agent
@@ -128,20 +128,20 @@ Install and configure Zabbix v1 agent(s):
 Install and configure Zabbix v2 agent(s):
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
       roles:
         - role: alexanderbazhenoff.linux.zabbix_agent
-          install_v2_agent: True
+          install_v2_agent: true
 
 Perform re-configuration of already installed Zabbix agent(s):
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
       roles:
         - role: alexanderbazhenoff.linux.zabbix_agent
-          customize_agent_only: True
+          customize_agent_only: true
 
 Setup on Zabbix Server side
 ---------------------------

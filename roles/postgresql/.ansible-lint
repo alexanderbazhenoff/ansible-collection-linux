@@ -9,7 +9,7 @@
 exclude_paths:
   - .gitignore
   - .gitmodules
-quiet: True
+quiet: true
 verbosity: 1
 
 # skip_list:

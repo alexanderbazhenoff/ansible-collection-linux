@@ -5,7 +5,7 @@
     - name: "| Set facts for pgadmin uninstall"
       ansible.builtin.set_fact:
         firewall_port: 80
-        firewall_state: False
+        firewall_state: false
         packages_to_install: "{{ pgadmin_packages }}"
 
     - name: "| Include purge pgadmin repo {{ ansible_os_family | lower }} tasks"
@@ -20,13 +20,13 @@
       args:
         executable: /bin/sh
       register: postgresql_version_check_results
-      changed_when: False
-      ignore_errors: True
+      changed_when: false
+      ignore_errors: true
 
     - name: "| Check postgresql packages"   # noqa command-instead-of-shell
       ansible.builtin.shell: "{{ check_postgresql_packages_cmd }}"
       register: postgresql_packages_check_results
-      changed_when: False
+      changed_when: false
 
     - name: "| Include purge repo {{ ansible_os_family | lower }} tasks"
       ansible.builtin.include_tasks: purge_pgdg_repo_{{ ansible_os_family | lower }}.yml

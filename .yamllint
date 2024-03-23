@@ -3,17 +3,14 @@
 # Based on ansible-lint config
 extends: default
 ignore: |
-  templates/
-  files/*.j2
-  README.md
-  LICENSE
-  .yamllint
-  .flake8
-  verify.py
+  !*.ya?ml
 
 rules:
   braces:
+    min-spaces-inside: 0
     max-spaces-inside: 1
+    min-spaces-inside-empty: 0
+    max-spaces-inside-empty: 0
     level: error
   brackets:
     max-spaces-inside: 1

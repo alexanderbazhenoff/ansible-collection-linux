@@ -13,7 +13,7 @@
     cat /tmp/zabbix.html | grep "{{ zabbix_release }}"
   args:
     executable: /bin/bash
-  changed_when: False
+  changed_when: false
   register: grep_zabbix_release
 
 - name: "install zabbix agent archlinux | Set fact for extracted package filename"
@@ -54,5 +54,5 @@
   community.general.pacman:
     name: zabbix-agent
     state: absent
-    force: True
+    force: true
   when: zabbix_agent_daemon_name == 'zabbix-agent2'

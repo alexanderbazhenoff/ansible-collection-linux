@@ -4,8 +4,8 @@
   ansible.builtin.dnf:
     name: "{{ item.package }}"
     state: latest   # kics-scan ignore-line
-    update_cache: True
-    disable_gpg_check: "{{ item.disable_gpg_check | default(False) }}"
+    update_cache: true
+    disable_gpg_check: "{{ item.disable_gpg_check | default(false) }}"
   register: install_results
   until: install_results is succeeded
   retries: 5

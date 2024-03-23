@@ -2,8 +2,8 @@
 
 - name: Verify
   hosts: all
-  gather_facts: True
-  become: False
+  gather_facts: true
+  become: false
 
   tasks:
 
@@ -16,6 +16,6 @@
       ansible.builtin.lineinfile:
         dest: /tmp/test_db.dir
         line: "-- PostgreSQL database dump complete"
-      check_mode: True
+      check_mode: true
       register: dump_complete_line_results
       failed_when: dump_complete_line_results.changed

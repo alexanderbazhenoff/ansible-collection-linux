@@ -32,7 +32,7 @@
         grep "{% if ansible_os_family == 'RedHat' %}.rpm{% else %}.deb{% endif %}" || true
       args:
         executable: /bin/bash
-      changed_when: False
+      changed_when: false
       register: zbx_grep_geturl
       with_items:
         - zabbix
@@ -51,7 +51,7 @@
 - name: "install zabbix agent main | Install Zabbix agent package"
   ansible.builtin.package:
     name: "{{ zabbix_agent_daemon_name }}"
-    update_cache: True
+    update_cache: true
   register: install_package_results
   until: install_package_results is succeeded
   retries: 5
@@ -65,7 +65,7 @@
   ansible.builtin.systemd:
     name: "{{ zabbix_agent_daemon_name }}"
     state: started
-    enabled: True
+    enabled: true
   when: systemctl_check.stdout | length > 0
 
 - name: "install zabbix agent main | Get zabbix agent daemon's name and add to autorun using openrc (non-systemd)"
@@ -75,7 +75,7 @@
       args:
         executable: /bin/sh
       register: zabbix_agent_name_openrc
-      changed_when: False
+      changed_when: false
 
     - name: "install zabbix agent main | Add to autorun a received zabbix agent daemon's name via openrc"
       ansible.builtin.command: rc-update add "{{ zabbix_agent_name_openrc.stdout }}"

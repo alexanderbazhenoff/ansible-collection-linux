@@ -3,13 +3,7 @@
 # Based on ansible-lint config
 extends: default
 ignore: |
-  templates/
-  files/*.j2
-  README.md
-  LICENSE
-  .yamllint
-  .flake8
-  verify.py
+  !*.ya?ml
 
 rules:
   braces:

@@ -17,6 +17,6 @@
     ca_cert: "{{ item.ca_cert | default('') }}"
     state: "{% if role_action == 'create' %}present{% elif role_action == 'drop' %}absent{% else %}{{ role_action -}}
       {% endif %}"
-    trust_input: "{{ item.trust_input | default(True) }}"
+    trust_input: "{{ item.trust_input | default(true) }}"
   with_items:
     - "{{ postgresql_databases }}"
