@@ -14,13 +14,13 @@ galaxy_info:
     - name: Debian
       versions:
         - all
-    - name: rhel
+    - name: EL
       versions:
         - all
     - name: Alpine
       versions:
         - all
-    - name: Archlinux
+    - name: ArchLinux
       versions:
         - all
 
