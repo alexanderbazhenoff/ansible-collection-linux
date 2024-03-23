@@ -2,8 +2,8 @@
 
 - name: Verify
   hosts: all
-  gather_facts: True
-  become: True
+  gather_facts: true
+  become: true
   become_method: sudo
 
   tasks:
@@ -119,7 +119,7 @@
           args:
             executable: /bin/bash
           register: zbx_agent_openrc_results
-          changed_when: False
+          changed_when: false
 
         - name: "| Ensure that zabbix-agent2 status is 'running'"
           ansible.builtin.assert:
@@ -167,11 +167,11 @@
       with_items:
         - { key: "Include", value: "{{ zbx_agent_config_subdirectory_found.files[0].path }}/*.conf" }
         - { key: "AllowKey", value: "system.run[*]" }
-      check_mode: True
+      check_mode: true
       register: item_presence
       failed_when: item_presence.changed
 
     - name: "default >>> verify | Check host metadata tag line in zabbix agent configs"
       ansible.builtin.command:
         cmd: grep "UserParameter=hostmetadata,echo 'Linux" {{ zbx_agent_config_found.files[0].path }}
-      changed_when: False
+      changed_when: false

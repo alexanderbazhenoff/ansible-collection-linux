@@ -18,7 +18,7 @@ is no lxcfs for 2.0, only lxc.
 - `lxc_technology` - container technology to install: `lxc` or `lxcfs`.
 - `lxc_gpg_keyserver` - add LXC GPG keyserver (`DOWNLOAD_KEYSERVER`) to environment variables, e.g:
 `keyserver.ubuntu.com`.
-- `check_host_is_lxc_ready` - check host is lxc-ready (run `lxc-checkconfig` command when *True*). Version of lxc may
+- `check_host_is_lxc_ready` - check host is lxc-ready (run `lxc-checkconfig` command when *true*). Version of lxc may
 differ from distribution to distribution where lxc-checkconfig script could be 
 [a bit outdated](https://github.com/lxc/lxc/issues/4070#issuecomment-1374883653).
 - `append_lxc_config` - append config lines to default lxc config. Paste something for default container settings, e.g:
@@ -48,7 +48,7 @@ for LXC2.0. So `append_lxc_config` lines will append to all new created containe
 ## lxc-net settings
 
 - `use_lxc_default_net` - use default lxc bridge-nat network (`lxc-net` daemon) bind to `lxc_default_net_bridge`
-interface. Disable (set `False`) if you want to connect with host bridge, pass-through, etc.
+interface. Disable (set `false`) if you want to connect with host bridge, pass-through, etc.
 - `lxc_default_net_bridge` - name of the interface for bridge-nat network (default: `xcbr0`).
 - `lxc_default_net_addr` - IP address for `xcbr0`, e.g: `"10.0.3.1"`.
 - `lxc_default_net_netmask` - subnet mask for bridge-nat network, e.g.: `"255.255.255.0"`.
@@ -62,9 +62,9 @@ Example Playbook
 Simple lxc role usage with defaults is:
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
-      gather_facts: True
+      gather_facts: true
 
       tasks:
         - name: Include lxc(fs) role
@@ -80,9 +80,9 @@ You can also switch to lxcfs with:
 More complex lxcfs usage with disabled default lxc-net for br0 usage with some static addresses should look like:
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
-      gather_facts: True
+      gather_facts: true
 
       tasks:
 
@@ -93,7 +93,7 @@ More complex lxcfs usage with disabled default lxc-net for br0 usage with some s
             name: alexanderbazhenoff.linux.lxcfs
           vars:
             lxc_technology: lxcfs
-            use_lxc_default_net: False
+            use_lxc_default_net: false
             lxc_append_default_config: |
               lxc.net.0.type = veth
               lxc.net.0.link = br0

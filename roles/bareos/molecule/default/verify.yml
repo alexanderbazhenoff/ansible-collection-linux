@@ -2,8 +2,8 @@
 
 - name: Verify
   hosts: bareos_servers
-  gather_facts: True
-  become: False
+  gather_facts: true
+  become: false
 
   tasks:
 
@@ -18,15 +18,15 @@
         url: "http://127.0.0.1/bareos-webui/"
         dest: "/tmp/{{ inventory_hostname }}_bareos_ansible_molecule_testing"
         mode: 0644
-        force: True
+        force: true
       register: get_url_request_results
-      ignore_errors: True
+      ignore_errors: true
 
     - name: "default >>> verify | Read get_url file content"
       ansible.builtin.slurp:
         src: "/tmp/{{ inventory_hostname }}_bareos_ansible_molecule_testing"
       register: read_get_url_results
-      ignore_errors: True
+      ignore_errors: true
 
     - name: "default >>> verify | Assert bareos Web UI is working"
       ansible.builtin.assert:

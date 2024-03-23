@@ -18,17 +18,17 @@
 - name: "install postgresql main | Check postgresql service is enabled"   # noqa command-instead-of-module
   ansible.builtin.shell: systemctl is-enabled {{ postgresql_service_name }} || exit 0
   register: service_enabled_results
-  changed_when: False
+  changed_when: false
 
 - name: "install postgresql main | Check postgresql service is active"   # noqa command-instead-of-module
   ansible.builtin.shell: systemctl is-active {{ postgresql_service_name }} || exit 0
   register: service_running_results
-  changed_when: False
+  changed_when: false
 
 - name: "install postgresql main | Enable postgresql if not enabled after install"
   ansible.builtin.service:
     name: "{{ postgresql_service_name }}"
-    enabled: True
+    enabled: true
   when: service_enabled_results.stdout is not defined or 'enabled' not in service_enabled_results.stdout
 
 - name: "install postgresql main | Start postgresql if not started after install"

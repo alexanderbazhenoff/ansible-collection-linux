@@ -2,16 +2,16 @@
 
 - name: "main | Check firewalld is running (RedHat)"   # noqa command-instead-of-module
   ansible.builtin.command: systemctl is-active firewalld
-  ignore_errors: True
+  ignore_errors: true
   register: firewalld_state
-  changed_when: False
+  changed_when: false
   when: role_action | regex_search('install') and ansible_os_family == 'RedHat' and firewall_control
 
 - name: "main | Check ufw exists and running (Ubuntu)"
   ansible.builtin.command: ufw status
-  ignore_errors: True
+  ignore_errors: true
   register: ufw_state
-  changed_when: False
+  changed_when: false
   when: role_action | regex_search('install') and ansible_distribution == 'Ubuntu' and firewall_control
 
 - name: "main | Cleanup bareos component(s)"
@@ -20,7 +20,7 @@
       ansible.builtin.include_tasks: "purge_bareos_{{ ansible_os_family | lower }}.yml"
     - name: "| Set swap bareos web packages flag"
       ansible.builtin.set_fact:
-        swap_bareos_web_packages: True
+        swap_bareos_web_packages: true
     - name: "| Cleanup bareos-related files and folders"
       ansible.builtin.file:
         path: "{{ item | trim }}"

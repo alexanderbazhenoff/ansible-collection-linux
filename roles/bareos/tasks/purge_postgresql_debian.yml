@@ -4,8 +4,8 @@
   ansible.builtin.apt:
     name: "{{ item }}"
     state: absent
-    autoremove: True
-    purge: True
+    autoremove: true
+    purge: true
   when: item is defined and item is not none and item | length > 0
   with_items:
     - "{{ postgresql_packages |

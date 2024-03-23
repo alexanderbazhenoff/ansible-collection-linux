@@ -14,7 +14,7 @@
 
 - name: "main | Upgrade apt package cache"
   ansible.builtin.apt:
-    update_cache: True
+    update_cache: true
   when: ansible_pkg_mgr == 'apt'
 
 - name: "main | Install packages tasks (pre-requirements install)"
@@ -42,12 +42,12 @@
 - name: "main | Check firewalld is running"   # noqa command-instead-of-module
   ansible.builtin.shell: systemctl is-active firewalld || true
   register: firewalld_state
-  changed_when: False
+  changed_when: false
 
 - name: "main | Check ufw status"
   ansible.builtin.shell: ufw status || true
   register: ufw_state
-  changed_when: False
+  changed_when: false
 
 - name: "main | Include {{ role_action }} tasks"
   ansible.builtin.include_tasks: "{{ role_action }}.yml"

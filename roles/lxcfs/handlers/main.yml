@@ -4,7 +4,7 @@
   ansible.builtin.service:
     name: "{{ item }}"
     state: restarted
-    enabled: True
+    enabled: true
   when: item | length > 0
   with_items:
     - "{% if ansible_os_family == 'Alpine' %}cgroups{% endif %}"

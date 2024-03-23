@@ -17,7 +17,7 @@
     regexp: "#?{{ item.key }}="
     line: '{{ item.key }}="{{ item.value }}"'
     state: present
-    create: True
+    create: true
     mode: 0644
     owner: root
     group: root
@@ -41,8 +41,8 @@
     recurse: "{{ item.recurse }}"
     mode: 0644
   with_items:
-    - { path: /etc/lxc, state: directory, recurse: True }
-    - { path: /etc/lxc/dnsmasq.conf, state: touch, recurse: False }
+    - { path: /etc/lxc, state: directory, recurse: true }
+    - { path: /etc/lxc/dnsmasq.conf, state: touch, recurse: false }
 
 - name: "install | Include modify lxc conf tasks"
   ansible.builtin.include_tasks: modify_lxc_conf.yml
@@ -65,7 +65,7 @@
     regexp: "^net.ipv4.ip_forward="
     line: net.ipv4.ip_forward=1
     state: present
-    create: True
+    create: true
     mode: 0644
   when: use_lxc_default_net
 
@@ -78,6 +78,6 @@
 - name: "install | Check host is ready for lxc usage (lxc-checkconfig)"   # noqa risky-shell-pipe
   ansible.builtin.shell: lxc-checkconfig | grep -v "CONFIG_NF_NAT_IPV" | grep -iE "(missing|required)"
   register: lxc_check_results
-  changed_when: False
+  changed_when: false
   failed_when: lxc_check_results.stdout | length > 0
   when: check_host_is_lxc_ready

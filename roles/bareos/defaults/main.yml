@@ -21,7 +21,7 @@ role_action: install
 bareos_components: fd
 
 # Perform clean installation
-clean_install: True
+clean_install: true
 
 # Bareos release, e.g.: 'current', 'next' or 'experimental/<postfix>' (https://download.bareos.org/).
 # If you have a valid Bareos subscription, please use the 'bareos/release/<version>' (see
@@ -38,19 +38,19 @@ override_ansible_distribution_major_version:
 bareos_url: https://download.bareos.org
 
 # More output for troubleshooting
-debug_mode: False
+debug_mode: false
 
 
 ### Firewall related parameters:
 
 # Add firewall rules (ufw or firewalld):
-firewall_control: True
+firewall_control: true
 
 
 ### Bareos related parameters:
 
 # Cleanup Bareos storage files on installation or uninstall:
-cleanup_storage_files: True
+cleanup_storage_files: true
 
 # Additional Bareos packages to install: [] or bareos-traymonitor, bareos-vmware-plugin etc...
 install_additional_bareos_packages:
@@ -72,7 +72,7 @@ webui_username: Admin
 webui_password: admin
 # Access profile, e.g: webui-admin, webui-readonly, webui-limited, operator
 webui_profile: webui-admin
-webui_tls_enable: False
+webui_tls_enable: false
 
 # Default data to add a client on Bareos server.
 #
@@ -83,25 +83,25 @@ add_component_password: ''
 # Length of the password to generate.
 add_component_password_gen_length: 16
 # Use TLS to connect between file daemon and server.
-add_component_tls_enable: False
+add_component_tls_enable: false
 # Maximum concurrent jobs on available on file daemon.
 add_component_max_jobs: 1
 # Bareos server IP address or hostname:
 add_component_server: 127.0.0.1
 # Force try to add file daemon when already exists
-add_component_force: False
+add_component_force: false
 
 
 ### Database related parameters:
 
 # If you wish to use already preinstalled PostgreSQL. Mysql or Sqlite installations are not supported in this role.
-preinstalled_postgresql: False
+preinstalled_postgresql: false
 # Enable to use Bareos with PostgreSQL, disable for sqlite.
-use_postgresql: True
+use_postgresql: true
 # PostgreSQL version to install by this role. Leave it '' for a default version.
 postgresql_version: 14
 # Install psycopg2: https://pypi.org/project/psycopg2/
-install_psycopg2: True
+install_psycopg2: true
 # PostgreSQL timezone. Read manual: https://www.postgresql.org/docs/15/datatype-datetime.html
 postgresql_timezone: Europe/Moscow
 # Download PostgreSQL repository URL prefix.
@@ -116,4 +116,4 @@ postgresql_debian_repo: >
 # PostgreSQL default user to init bareos database. Change when required for your custom database setup only.
 postgresql_become_user: postgres
 # Call database and tables creation scripts (required for old versions of Bareos)
-init_bareos_database: True
+init_bareos_database: true

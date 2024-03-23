@@ -2,7 +2,7 @@
 
 - name: Prepare
   hosts: bareos_servers
-  become: True
+  become: true
   become_method: sudo
 
   tasks:

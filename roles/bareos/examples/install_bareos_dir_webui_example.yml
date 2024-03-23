@@ -5,9 +5,9 @@
 # ansible-playbook -i roles/bareos/inventory roles/bareos/install_bareos_fd_example.yml
 
 - hosts: all
-  become: True
+  become: true
   become_method: sudo
-  gather_facts: True
+  gather_facts: true
 
   tasks:
 

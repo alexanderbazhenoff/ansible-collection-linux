@@ -1,8 +1,8 @@
 ---
 
 lxc_technology: lxc
-use_lxc_default_net: True
-check_host_is_lxc_ready: False
+use_lxc_default_net: true
+check_host_is_lxc_ready: false
 append_lxc_config: |
   lxc.net.0.type = veth
   lxc.net.0.link = lxcbr0

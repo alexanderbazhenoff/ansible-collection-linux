@@ -92,9 +92,9 @@ tuning to speed up).
 #### 1. Install Bareos Director, Web UI, Storage, File daemon on the same host
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
-      gather_facts: True
+      gather_facts: true
     
       tasks:
     
@@ -110,9 +110,9 @@ tuning to speed up).
 #### 2. Make client user profile to access Bareos Web UI
 
     - hosts: bareos_server_host
-      become: True
+      become: true
       become_method: sudo
-      gather_facts: True
+      gather_facts: true
 
       tasks:
 
@@ -124,7 +124,7 @@ tuning to speed up).
             webui_username: Admin
             webui_password: your_password_here
             webui_profile: webui-admin
-            webui_tls_enable: False
+            webui_tls_enable: false
 
 You can set `webui-admin`, `operator`, `webui-limited` or `webui-readonly` access level (webui_profile)  
 [your profile needs](https://docs.bareos.org/IntroductionAndTutorial/BareosWebui.html#access-control-configuration).
@@ -139,11 +139,11 @@ If you wish to prompt user and password during playbook execution:
         - name: "webui_username"
           prompt: "Enter username"
           default: ""
-          private: False
+          private: false
         - name: "webui_password"
           prompt: "Enter password"
           default: ""
-          private: True
+          private: true
 
       tasks:
 
@@ -153,7 +153,7 @@ If you wish to prompt user and password during playbook execution:
           vars:
             role_action: access
             webui_profile: webui-admin
-            webui_tls_enable: False
+            webui_tls_enable: false
 
 #### 3. Install Bareos file daemon and add to server
 
@@ -170,9 +170,9 @@ inventory file, e.g.:
 and ansible playbook like:
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
-      gather_facts: True
+      gather_facts: true
     
       tasks:
 
@@ -190,15 +190,15 @@ and ansible playbook like:
           vars:
             role_action: add_client
             add_component_server: "{{ groups.servers[0] }}"
-            debug_mode: True
+            debug_mode: true
           when: inventory_hostname in groups["clients"]
 
 #### 4. Install Bareos components with an additional list of packages
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
-      gather_facts: True
+      gather_facts: true
     
       tasks:
     
@@ -215,9 +215,9 @@ The example below shows how to install a client with only
 [**bareos-traymonitor**](https://docs.bareos.org/Configuration/Monitor.html) in the list of additional packages:
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
-      gather_facts: True
+      gather_facts: true
     
       tasks:
 
@@ -240,9 +240,9 @@ separately using `bareos_components` variable. The next example shows how to uni
 the host(s):
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
-      gather_facts: True
+      gather_facts: true
     
       tasks:
 
@@ -259,9 +259,9 @@ The next example shows how to skip PostgreSQL installation and copy Bareos direc
 role. Put your director configs to `files` folder of this role then run:
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
-      gather_facts: True
+      gather_facts: true
     
       tasks:
     
@@ -270,8 +270,8 @@ role. Put your director configs to `files` folder of this role then run:
             name: alexanderbazhenoff.linux.bareos
           vars:
             bareos_components: dir_webui
-            use_postgresql: True
-            preinstalled_postgresql: True
+            use_postgresql: true
+            preinstalled_postgresql: true
             bareos_configs_to_copy:
               - source: etc/
                 destination: /etc/bareos-dir.d
@@ -282,8 +282,8 @@ Nothing will be additionally copied if `bareos_configs_to_copy` list is empty.
 
 If you wish to use Bareos with an already preinstalled sqlite change set:
 
-            use_postgresql: False
-            preinstalled_postgresql: True
+            use_postgresql: false
+            preinstalled_postgresql: true
 
 #### 7. Copy Bareos configs without reinstalling
 
@@ -292,9 +292,9 @@ component(s) should be restarted to apply configuration change in `bareos_compon
 how to apply bareos-dir, bareos-sd, bareos-fd and Bareos Web UI (by restart Apache web server):
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
-      gather_facts: True
+      gather_facts: true
     
       tasks:
     
@@ -322,7 +322,7 @@ component(s).
 - **bareos_components** *[Default: fd, possible values: fd, sd, dir, webui, dir_webui]*: Bareos components to install or
 uninstall: Bareos file daemon or client *(fd)*, Bareos storage daemon *(sd)*, Bareos Director *(dir)*, Bareos director 
 and Web UI *(dir_webui)*.
-- **clean_install** *[Default: True]*: Perform clean installation. All packages and configs will be purged before
+- **clean_install** *[Default: true]*: Perform clean installation. All packages and configs will be purged before
 install.
 - **bareos_release** *[Default: 21]*: [Bareos release version](https://download.bareos.org/bareos/release/), e.g.: 'current', 'next' or 
 'experimental/<postfix>'. Affects only for Debian and Redhat Linux distribution families.
@@ -332,15 +332,15 @@ install.
 Useful when specified Bareos version repo is not available for your Linux distribution version, but beware package
 dependencies problems (example: Bareos v21 currently is [not available](https://download.bareos.org/bareos/release/21/)
 for any RedHat v9, so try to set `8` here).
-- **debug_mode** *[Default: False]*: Verbose output.
+- **debug_mode** *[Default: false]*: Verbose output.
 
 #### Firewall related variables:
 
-- **firewall_control** *[Default: True]*: Add firewall rules for firewalld and ufw.
+- **firewall_control** *[Default: true]*: Add firewall rules for firewalld and ufw.
 
 #### Bareos related variables:
 
-- **cleanup_storage_files** *[Default: True]*: Cleanup Bareos storage files on installation or uninstall. Please keep in
+- **cleanup_storage_files** *[Default: true]*: Cleanup Bareos storage files on installation or uninstall. Please keep in
 mind these files are useless without an indexes stored in the database.
 - **install_additional_bareos_packages** *[Default: `[bareos-traymonitor]`]*: Additional Bareos packages to install:
 `[]`or `[bareos-traymonitor, bareos-vmware-plugin]`, etc...
@@ -366,7 +366,7 @@ For creating client user profile to access Bareos Web UI (role_action == *'acces
 | webui_username    | Admin         | Profile username to login with.                                            |
 | webui_password    | admin         | Profile password to login with.                                            |
 | webui_profile     | webui-admin   | Access profile, e.g: webui-admin, operator, webui-readonly, webui-limited. |
-| webui_tls_enable  | False         | Use TLS.                                                                   |
+| webui_tls_enable  | false         | Use TLS.                                                                   |
 
 All available profiles are stored in the directory /etc/bareos/bareos-dir.d/profile (read
 [here](https://www.bareos.com/bareos-webui-installation-and-configuration/) for details).
@@ -378,20 +378,20 @@ To add file daemon on Bareos server, you could define the next variables:
 | add_component_name                | ''        | Name to display on Bareos server (leave '' for FQDN or hostname). |
 | add_component_password            | ''        | Password to connect with (leave '' to generate random password).  |
 | add_component_password_gen_length | 16        | Length of the password to generate.                               |
-| add_component_tls_enable          | False     | Use TLS to connect between storage and server.                    |
+| add_component_tls_enable          | false     | Use TLS to connect between storage and server.                    |
 | add_component_max_jobs            | 1         | Maximum concurrent jobs on avalialable on file daemon.            |
 | add_component_server              | 127.0.0.1 | Bareos server IP address, hostname or inventory item to delegate. |
-| add_component_force               | False     | Force try to add file daemon when already exists                  |
+| add_component_force               | false     | Force try to add file daemon when already exists                  |
 
 #### Database related parameters:
 
 The most useful settings are stored in:
 
-- **preinstalled_postgresql** *[Default: False]*: If you wish to use already preinstalled PostgreSQL.
-- **use_postgresql** *[Default: True]*: Enable to use Bareos with PostgreSQL, disable for sqlite.
+- **preinstalled_postgresql** *[Default: false]*: If you wish to use already preinstalled PostgreSQL.
+- **use_postgresql** *[Default: true]*: Enable to use Bareos with PostgreSQL, disable for sqlite.
 - **postgresql_version** *[Default: 14]*: PostgreSQL version to install by this role. Leave it `''` for a default
 version.
-- **install_psycopg2** *[Default: True]*: Install [psycopg2](https://pypi.org/project/psycopg2/).
+- **install_psycopg2** *[Default: true]*: Install [psycopg2](https://pypi.org/project/psycopg2/).
 - **postgresql_timezone** *[Default: 'Europe/Moscow']*: PostgreSQL timezone (read 
 [manual](https://www.postgresql.org/docs/15/datatype-datetime.html)).
 
@@ -412,7 +412,7 @@ URL prefix for apt repo.
 ```
 *]*: Debian PostgreSQL repo file content.
 - **postgresql_become_user: postgres** *[Default: postgres]*: PostgreSQL become user to init Bareos database.
-- **init_bareos_database** *[Default: False]*: Call database and tables creation scripts. Required for old versions of
+- **init_bareos_database** *[Default: false]*: Call database and tables creation scripts. Required for old versions of
 Bareos or CentOS, because install scripts inside the packages are different.
 
 License

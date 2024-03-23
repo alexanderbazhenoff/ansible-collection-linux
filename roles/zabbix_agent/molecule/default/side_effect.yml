@@ -2,7 +2,7 @@
 
 - name: Side effect
   hosts: all
-  become: True
+  become: true
   become_method: sudo
 
   tasks:
@@ -17,7 +17,7 @@
           {% if (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 12) or
           (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22) %}6.0{% else -%}
           5.0{% endif %}
-        install_v2_agent: False
+        install_v2_agent: false
 
     - name: "default >>> side effect | Check there is no zabbix_agent2, but zabbix_agent process is running"
       ansible.builtin.shell: "{{ item }}"   # noqa command-instead-of-shell
@@ -26,6 +26,6 @@
         - ps aux | grep "zabbix_agent" | grep -v "grep"
       args:
         executable: /bin/bash
-      changed_when: False
+      changed_when: false
       register: zabbix_agent2_found
       failed_when: zabbix_agent2_found | trim | length == 0

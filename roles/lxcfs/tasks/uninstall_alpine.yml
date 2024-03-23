@@ -3,7 +3,7 @@
 - name: "uninstall alpine | Count the number of iptables rules"    # noqa risky-shell-pipe
   ansible.builtin.shell: iptables --list --line-numbers | sed '/^num\|^$\|^Chain/d' | wc -l
   register: iptables_rules_number
-  changed_when: False
+  changed_when: false
 
 - name: "uninstall alpine | Stop services via rc-service"
   ansible.builtin.shell: rc-service {{ item }} stop || true
@@ -31,7 +31,7 @@
 - name: "uninstall alpine | Count dummy interfaces number on the host"   # noqa risky-shell-pipe
   ansible.builtin.shell: ip a | grep dummy | wc -l
   register: dummy_eth_results
-  changed_when: False
+  changed_when: false
 
 - name: "uninstall alpine | Remove kernel module(s) from autoload"
   ansible.builtin.lineinfile:

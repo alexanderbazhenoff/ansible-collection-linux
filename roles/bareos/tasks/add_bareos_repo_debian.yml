@@ -14,7 +14,7 @@
 - name: "add bareos repo debian | (debug) Show repo URL"
   ansible.builtin.debug:
     var: repo_url_to_install
-  when: debug_mode | default(False)
+  when: debug_mode | default(false)
 
 - name: "add bareos repo debian | Include check bareos repo url tasks"
   ansible.builtin.include_tasks: check_repo_url.yml
@@ -42,7 +42,7 @@
 
 - name: "add bareos repo debian | Update apt packages cache"
   ansible.builtin.apt:
-    update_cache: True
+    update_cache: true
   register: apt_cache_results
   until: apt_cache_results is succeeded
   retries: 5

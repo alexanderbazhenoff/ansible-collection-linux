@@ -3,7 +3,7 @@
 - name: "install postgresql alpine | heck postgresql version is available to download"
   ansible.builtin.shell: apk info postgresql{{ postgresql_version | default('') }} || true
   register: apk_info_postgresql_results
-  changed_when: False
+  changed_when: false
 
 - name: "install postgresql alpine | Assert availability of postgresql version repo"
   ansible.builtin.assert:
@@ -16,7 +16,7 @@
 - name: "install postgresql alpine | Install postgresql server packages"
   community.general.apk:
     name: "{{ item }}"
-    update_cache: True
+    update_cache: true
   register: postgresql_yum_results
   until: postgresql_yum_results is succeeded
   retries: 5
@@ -37,7 +37,7 @@
     state: directory
     owner: "{{ postgresql_become_user }}"
     mode: 0700
-    recurse: True
+    recurse: true
   when: postgresql_data_files_found.matched == 0
 
 - name: "install postgresql alpine | Create {{ postgresql_become_user }} group"

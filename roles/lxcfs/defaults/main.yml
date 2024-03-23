@@ -5,7 +5,7 @@
 # Role action: install or uninstall
 role_action: install
 # Perform clean install
-clean_install: True
+clean_install: true
 
 # Version of lxc/lxcfs. Affects only on RedHat repository URL. Please note: there is no lxcfs for 2.0, only lxc.
 lxc_version: '3.0'
@@ -16,13 +16,13 @@ lxc_technology: lxcfs
 lxc_gpg_keyserver: keyserver.ubuntu.com
 
 # Check host is ready for lxc usage
-check_host_is_lxc_ready: True
+check_host_is_lxc_ready: true
 
 
 ### lxc-net settings ###
 
 # Disable if you want to connect with host bridge, pass-through, etc..
-use_lxc_default_net: False
+use_lxc_default_net: false
 # Default lxc-net settings:
 lxc_default_net_bridge: "lxcbr0"
 lxc_default_net_addr: "10.0.3.1"

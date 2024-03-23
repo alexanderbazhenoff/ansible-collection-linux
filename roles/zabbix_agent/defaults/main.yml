@@ -4,22 +4,22 @@
 zabbix_release: 5.0
 
 # Install zabbix-agent v2 when possible (v2 is available in zabbix repo for current linux distribution):
-install_v2_agent: True
+install_v2_agent: true
 
 # Customize agent for automatic services discovery and templates add:
-customize_agent: True
+customize_agent: true
 
 # Delete all agents and config before install:
-clean_install: True
+clean_install: true
 
 # Lots of debug outputs:
-debug_mode: False
+debug_mode: false
 
 # Force cleanup zabbix agent directories and files (just to avoid installation/uninstallation scripts bugs):
-conf_with_dir_clean: True
+conf_with_dir_clean: true
 
 # Only customize and configure already installed zabbix agent:
-customize_agent_only: False
+customize_agent_only: false
 
 # Zabbix repo URL:
 zabbix_repo_url: http://repo.zabbix.com
@@ -28,7 +28,7 @@ zabbix_repo_url: http://repo.zabbix.com
 archlinux_repo_url_prefix: https://archive.archlinux.org/packages
 
 # Validate certs when downloading packages (to avoid failure on some outdated virtual machines snapshots):
-repo_dl_validate_certs: False
+repo_dl_validate_certs: false
 
 # Parameters for zabbix agent settings
 zabbix_agent_conf_name: zabbix_agentd

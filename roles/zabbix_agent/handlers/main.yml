@@ -13,7 +13,7 @@
   ansible.builtin.sysvinit:
     name: "{{ zabbix_agent_daemon_name }}"
     state: restarted
-    enabled: True
+    enabled: true
   when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int < 12) or
     (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int < 9) or
     (ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 6)

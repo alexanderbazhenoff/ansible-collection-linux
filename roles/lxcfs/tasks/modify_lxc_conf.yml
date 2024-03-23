@@ -11,7 +11,7 @@
 - name: "modify lxc conf | Read existing lxc config"
   ansible.builtin.shell: cat /etc/lxc/default.conf || true
   register: existing_config_raw
-  changed_when: False
+  changed_when: false
 
 - name: "modify lxc conf | Set fact of config changes"
   ansible.builtin.set_fact:

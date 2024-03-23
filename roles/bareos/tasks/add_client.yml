@@ -12,7 +12,7 @@
   args:
     executable: /bin/bash
   register: bconsole_list_results
-  changed_when: False
+  changed_when: false
   delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
 
 - name: "add client | Cleanup previous client configs (clean install)"
@@ -44,9 +44,9 @@
     (not add_component_force and bconsole_add_results.stdout is defined and bconsole_add_results.stdout |
     regex_search('Resource.*with name.*already exists')) or bconsole_add_results.failed
   changed_when: not bconsole_add_results.failed
-  ignore_errors: True
+  ignore_errors: true
   delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
-  no_log: "{{ not (debug_mode | default(False)) }}"
+  no_log: "{{ not (debug_mode | default(false)) }}"
 
 - name: "add cleint | Warn when file daemon client already exists on bareos server"
   ansible.builtin.debug:
@@ -78,13 +78,13 @@
 - name: "add client | (debug) Show export content of the config from bareos server"
   ansible.builtin.debug:
     msg: "{{ bareos_export_config_data.content | b64decode }}"
-  when: debug_mode | default(False)
+  when: debug_mode | default(false)
 
 - name: "add client | Export content of the config"
   ansible.builtin.copy:
     content: "{{ bareos_export_config_data.content | b64decode }}"
     dest: /etc/bareos/bareos-fd.d/director/bareos-dir.conf
-    force: True
+    force: true
     mode: 0640
     owner: bareos
     group: bareos

@@ -62,9 +62,9 @@ Example Playbooks
 The shortest example playbook of database instance installation should look like:
 
     - hosts: all
-      become: True
+      become: true
       become_method: sudo
-      gather_facts: True
+      gather_facts: true
     
       tasks:
 
@@ -82,13 +82,13 @@ while uninstall of the same version playbook tasks should look like:
 
 Role checks that specified version of PostgreSQL server is available for your Linux distribution: if this version is not
 available, this will install a default version from your distribution repositories or from dnf modules. If you wish to
-install PostgreSQL of a default version for your linux destribution set `postgresql_recommended_version: True`:
+install PostgreSQL of a default version for your linux destribution set `postgresql_recommended_version: true`:
 
         - name: "Install PostgreSQL of default version for your linux destribution"
           ansible.builtin.include_role:
             name: alexanderbazhenoff.linux.postgresql
           vars:
-            postgresql_recommended_version: True
+            postgresql_recommended_version: true
 
 More complex examples may include different customisations:
 
@@ -97,7 +97,7 @@ More complex examples may include different customisations:
             name: alexanderbazhenoff.linux.postgresql
           vars:
             postgresql_version: 16
-            install_pgadmin: True
+            install_pgadmin: true
             pgadmin_email: john.doe@company.com
             pgadmin_password: some_password_here
             postgresql_additional_packages:
@@ -268,7 +268,7 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
             postgresql_users:
               - name: test
                 database: acme
-                fail_on_user: False
+                fail_on_user: false
 
         - name: "Connect to test database and remove an existing user's password"
           ansible.builtin.include_role:

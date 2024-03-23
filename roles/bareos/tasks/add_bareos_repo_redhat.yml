@@ -38,19 +38,19 @@
 - name: "add bareos repo redhat | (debug) Show repo URL"
   ansible.builtin.debug:
     var: bareos_repo_url
-  when: debug_mode | default(False)
+  when: debug_mode | default(false)
 
 - name: "add bareos repo redhat | Add GPG key"
   ansible.builtin.rpm_key:
     key: "{{ repo_url_to_install | replace('bareos.repo', 'RPM-GPG-KEY') }}"
     state: present
-    validate_certs: False
+    validate_certs: false
 
 - name: "add bareos repo redhat | Get bareos.repo file"
   ansible.builtin.get_url:
     url: "{{ repo_url_to_install }}"
     dest: /etc/yum.repos.d/bareos.repo
-    validate_certs: False
+    validate_certs: false
     mode: 0644
     owner: root
     group: root

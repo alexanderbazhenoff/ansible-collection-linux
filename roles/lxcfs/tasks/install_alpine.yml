@@ -2,7 +2,7 @@
 
 - name: "install alpine | Refresh kernel modules available"
   ansible.builtin.command: depmod
-  changed_when: False
+  changed_when: false
 
 - name: "install alpine | Load required kernel modules"
   community.general.modprobe:

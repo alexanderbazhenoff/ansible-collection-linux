@@ -5,7 +5,7 @@
     url: "{{ postgresql_debian_apt_repo_url_prefix }}/dists/{{ ansible_distribution_release -}}
       -pgdg/{{ postgresql_version | default('') }}/"
   register: check_repo_url_results
-  ignore_errors: True
+  ignore_errors: true
   failed_when: check_repo_url_results.status == 404
 
 - name: "install postgresql debian | Assert availability of postgresql version repo"
@@ -28,7 +28,7 @@
     url: "{{ postgresql_debian_key_url }}"
     dest: "{{ postgresql_debian_key_destination }}"
     mode: 0755
-    validate_certs: False
+    validate_certs: false
   register: postgresql_apt_key_results
   until: postgresql_apt_key_results is succeeded
   retries: 5
@@ -37,7 +37,7 @@
 - name: "install postgresql debian | Install debian repository"
   ansible.builtin.apt_repository:
     repo: "{{ postgresql_debian_repo }}"
-    update_cache: True
+    update_cache: true
 
 - name: "install postgresql debian | Install postgresql server packages"
   ansible.builtin.apt:

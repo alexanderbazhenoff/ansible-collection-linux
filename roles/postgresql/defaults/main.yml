@@ -20,10 +20,10 @@ cleanup_data_directory: True
 # Install only a maximum recommended version based on dnf profile (https://www.postgresql.org/download/linux/redhat/)
 # Affects only for systems with dnf package manager. Also read about dnf modules in specified Linux distribution, e.g.:
 # https://docs.fedoraproject.org/en-US/modularity/using-modules/
-postgresql_recommended_version: False
+postgresql_recommended_version: false
 
 # List of additional PostgreSQL related packages, e.g.: 'postgresql-contrib' or 'postgresql14-contrib' for
-# postgresql_recommended_version: False. So there is no automated version handling in this list, you should include
+# postgresql_recommended_version: false. So there is no automated version handling in this list, you should include
 # versions to package names.
 postgresql_additional_packages: []
 
@@ -31,7 +31,7 @@ postgresql_additional_packages: []
 install_psycopg2: True
 
 # Install pgadmin for web mode with postgresql server: https://www.pgadmin.org/
-install_pgadmin: False
+install_pgadmin: false
 
 # Pgadmin installation type: web or desktop. Leave them empty to install both web and desktop.
 pgadmin_installation_type: web

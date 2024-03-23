@@ -120,11 +120,11 @@ postgresql_packages:
     - postgresql{{ '-' ~ postgresql_version | default('') }}
   redhat_psycopg2:
     - postgresql{% if dnf_postgresql_enable_results.stdout is not defined and not check_repo_url_results.failed |
-      default(False) %}{{ postgresql_version | default('') }}{% endif %}-server
+      default(false) %}{{ postgresql_version | default('') }}{% endif %}-server
     - python{{ ansible_python.version.major }}-psycopg2
   redhat:
     - postgresql{% if dnf_postgresql_enable_results.stdout is not defined and not check_repo_url_results.failed |
-      default(False) %}{{ postgresql_version | default('') }}{% endif %}-server
+      default(false) %}{{ postgresql_version | default('') }}{% endif %}-server
   alpine:
     - postgresql{{ postgresql_version | default('') }}
   alpine_psycopg2:

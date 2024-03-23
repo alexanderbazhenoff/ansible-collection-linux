@@ -4,5 +4,5 @@
   ansible.builtin.uri:
     url: "{{ repo_url_to_install }}"
   register: check_repo_url_results
-  ignore_errors: True
+  ignore_errors: true
   failed_when: check_repo_url_results.status == 404

@@ -2,7 +2,7 @@
 
 - name: Side effect
   hosts: all
-  become: True
+  become: true
   become_method: sudo
 
   tasks:
@@ -19,8 +19,8 @@
       vars:
         role_action: install
         bareos_components: fd
-        clean_install: False
-        debug_mode: True
+        clean_install: false
+        debug_mode: true
       when: inventory_hostname in groups["bareos_clients"]
 
     ### DEBUG SECTION (uncomment to troubleshoot)
@@ -29,7 +29,7 @@
     #   ansible.builtin.debug:
     #     msg: "grep by {{ ansible_hostname }} on the host {{ hostvars[inventory_hostname].bareos_dir }}"
     #   delegate_to: "{{ hostvars[inventory_hostname].bareos_dir }}"
-    #   delegate_facts: True
+    #   delegate_facts: true
     #   when: inventory_hostname in groups["bareos_clients"]
 
     - name: "default >>> side effect | Include bareos role to add bareos-client on bareos-dir"
@@ -38,16 +38,16 @@
       vars:
         role_action: add_client
         add_component_server: "{{ hostvars[inventory_hostname].bareos_dir }}"
-        debug_mode: True
+        debug_mode: true
       when: inventory_hostname in groups["bareos_clients"]
 
     - name: "default >>> side effect | Check client was added on the server"
       ansible.builtin.command:
         cmd: "echo 'list clients' | bconsole | grep {{ ansible_hostname }}"
       register: check_client_on_server_results
-      changed_when: False
+      changed_when: false
       failed_when: check_client_on_server_results.stdout is defined and
         check_client_on_server_results.stdout | length == 0
       delegate_to: "{{ hostvars[inventory_hostname].bareos_dir }}"
-      delegate_facts: True
+      delegate_facts: true
       when: inventory_hostname in groups["bareos_clients"]

@@ -8,9 +8,9 @@
 # ansible-playbook -i roles/postgresql/inventory.ini roles/postgresql/install_control_and_reinstall_example.yml
 
 - hosts: all
-  become: True
+  become: true
   become_method: sudo
-  gather_facts: True
+  gather_facts: true
 
   tasks:
 
@@ -20,8 +20,8 @@
       vars:
         role_action: install
         postgresql_version: 15
-        clean_install: True
-        install_pgadmin: True
+        clean_install: true
+        install_pgadmin: true
         role_subject: server
         pg_conf_content_mode: >-
           {% if ansible_os_family == 'RedHat' and ansible_distribution_major_version | int <= 6 %}regex{% else -%}
@@ -58,7 +58,7 @@
       ansible.builtin.lineinfile:
         dest: /tmp/acme.dir
         line: "-- PostgreSQL database dump complete"
-      check_mode: True
+      check_mode: true
       register: dump_complete_line_results
       failed_when: dump_complete_line_results.changed
 
@@ -68,7 +68,7 @@
       vars:
         role_action: uninstall
         postgresql_version: 14
-        clean_install: True
+        clean_install: true
         postgresql_additional_packages:
           - "postgresql{% if ansible_os_family == 'Debian' %}-client-14{% else %}14-contrib{% endif %}"
 
@@ -78,8 +78,8 @@
       vars:
         role_action: uninstall
         postgresql_version: 14
-        postgresql_max_recommended_version: True
-        clean_install: True
+        postgresql_max_recommended_version: true
+        clean_install: true
         postgresql_additional_packages:
           - "postgresql{% if ansible_os_family == 'Debian' %}-client-14{% else %}14-contrib{% endif %}"
 

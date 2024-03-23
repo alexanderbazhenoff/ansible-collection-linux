@@ -7,7 +7,7 @@
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
-  ignore_errors: True
+  ignore_errors: true
   register: install_php_packages
   with_items:
     - "{{ php_package_dependencies }}"
@@ -29,7 +29,7 @@
         epel_repo_package_url: >-
           {% if ansible_distribution != 'Fedora' and ansible_distribution_major_version | int > 6 -%}
           {{ repo_url_to_install }}{% endif %}
-        check_epel_url_results: "{{ check_repo_url_results | default(True) }}"
+        check_epel_url_results: "{{ check_repo_url_results | default(true) }}"
 
     - name: "| Set remi repo package URL"
       ansible.builtin.set_fact:
@@ -60,7 +60,7 @@
 
     - name: "| Get default php version"
       ansible.builtin.command: php --version | head -1
-      changed_when: False
+      changed_when: false
       register: php_version_results
 
     - name: "| Set fact for package list to install repositories"

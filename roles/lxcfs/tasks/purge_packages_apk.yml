@@ -5,10 +5,10 @@
     name: "{{ item }}"
     state: absent
   register: purge_packages_apk
-  ignore_errors: True
+  ignore_errors: true
   when: item | length > 0
   with_items:
-    - "{{ lxc_install_packages | sort(reverse=True) }}"
+    - "{{ lxc_install_packages | sort(reverse=true) }}"
 
 - name: "pure packages apk | Force delete packages (with apk command)"
   ansible.builtin.shell: |

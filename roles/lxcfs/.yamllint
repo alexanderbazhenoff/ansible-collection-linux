@@ -41,5 +41,5 @@ rules:
     type: unix
   trailing-spaces: enable
   truthy:
-    allowed-values: ['True', 'False']
-    check-keys: True
+    allowed-values: ['true', 'false']
+    check-keys: true

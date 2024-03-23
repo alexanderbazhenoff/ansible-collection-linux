@@ -5,7 +5,7 @@
     url: "{{ pgadmin_apt_key_url }}"
     dest: /tmp/pgadmin.gpg
     mode: 0644
-    validate_certs: False
+    validate_certs: false
     force: True
   register: pgadmin_apt_key_results
   until: pgadmin_apt_key_results is succeeded

@@ -3,8 +3,8 @@
 dependency:
   name: galaxy
   options:
-    ignore-certs: True
-    ignore-errors: True
+    ignore-certs: true
+    ignore-errors: true
 driver:
   name: docker
 platforms:
@@ -17,8 +17,8 @@ platforms:
 #    buildargs:
 #      image_platform: jrei/systemd-debian
 #      image_tag: 11
-#    pre_build_image: False
-#    privileged: True
+#    pre_build_image: false
+#    privileged: true
 #    tmpfs:
 #      - /run
 #      - /tmp
@@ -35,8 +35,8 @@ platforms:
 #    buildargs:
 #      image_platform: jrei/systemd-debian
 #      image_tag: 12
-#    pre_build_image: False
-#    privileged: True
+#    pre_build_image: false
+#    privileged: true
 #    tmpfs:
 #      - /run
 #      - /tmp
@@ -53,8 +53,8 @@ platforms:
     buildargs:
       image_platform: jrei/systemd-ubuntu
       image_tag: 16.04
-    pre_build_image: False
-    privileged: True
+    pre_build_image: false
+    privileged: true
     tmpfs:
       - /run
       - /tmp
@@ -71,8 +71,8 @@ platforms:
     buildargs:
       image_platform: jrei/systemd-ubuntu
       image_tag: 18.04
-    pre_build_image: False
-    privileged: True
+    pre_build_image: false
+    privileged: true
     tmpfs:
       - /run
       - /tmp
@@ -89,8 +89,8 @@ platforms:
     buildargs:
       image_platform: jrei/systemd-ubuntu
       image_tag: 20.04
-    pre_build_image: False
-    privileged: True
+    pre_build_image: false
+    privileged: true
     tmpfs:
       - /run
       - /tmp
@@ -108,8 +108,8 @@ platforms:
 #    buildargs:
 #      image_platform: jrei/systemd-ubuntu
 #      image_tag: 22.04
-#    pre_build_image: False
-#    privileged: True
+#    pre_build_image: false
+#    privileged: true
 #    tmpfs:
 #      - /run
 #      - /tmp
@@ -127,8 +127,8 @@ platforms:
 #    buildargs:
 #      image_platform: oraclelinux
 #      image_tag: 8
-#    pre_build_image: False
-#    privileged: True
+#    pre_build_image: false
+#    privileged: true
 #    tmpfs:
 #      - /run
 #      - /tmp
@@ -144,8 +144,8 @@ platforms:
     buildargs:
       image_platform: oraclelinux
       image_tag: 9
-    pre_build_image: False
-    privileged: True
+    pre_build_image: false
+    privileged: true
     tmpfs:
       - /run
       - /tmp
@@ -161,8 +161,8 @@ platforms:
     buildargs:
       image_platform: alpine
       image_tag: latest
-    pre_build_image: False
-    privileged: True
+    pre_build_image: false
+    privileged: true
     tmpfs:
       - /run
       - /tmp

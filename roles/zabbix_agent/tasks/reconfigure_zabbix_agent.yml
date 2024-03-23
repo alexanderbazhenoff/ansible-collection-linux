@@ -65,19 +65,19 @@
 - name: "reconfigure zabbix agents | Set selinux permissive for zabbix_agent_t (Redhat)"
   selinux_permissive:
     name: zabbix_agent_t
-    permissive: True
+    permissive: true
   when: ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled' and
     ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 7
 
 - name: "reconfigure zabbix agents | Set selinux booleans to allow zabbix user networking and sudo (Redhat)"
   ansible.builtin.seboolean:
     name: "{{ item }}"
-    state: True
-    persistent: True
+    state: true
+    persistent: true
   with_items:
     - zabbix_can_network
     - zabbix_run_sudo
-  ignore_errors: True    # noqa ignore-errors
+  ignore_errors: true    # noqa ignore-errors
   when: ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled' and
     ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 7
 
@@ -221,7 +221,7 @@
   args:
     executable: /bin/bash
   register: services_hashes
-  changed_when: False
+  changed_when: false
   with_items:
     - "{{ services_enabled.results }}"
   when: item.changed
@@ -255,7 +255,7 @@
   args:
     executable: /bin/bash
   register: detected_zabbix_release
-  changed_when: False
+  changed_when: false
 
 - name: "reconfigure zabbix agents | Zabbix release debug"
   ansible.builtin.debug:
@@ -295,7 +295,7 @@
   args:
     executable: /bin/sh
   register: grep_allow_root_line_results
-  changed_when: False
+  changed_when: false
 
 - name: "reconfigure zabbix agents | Change AllowRoot parameter in config (if exists)"
   ansible.builtin.lineinfile:
@@ -303,7 +303,7 @@
     regexp: "{{ item.var }}="
     line: "{{ item.var }}={{ item.value }}"
     insertafter: "{{ item.insert_after }}"
-    backrefs: True
+    backrefs: true
   with_items:
     - { var: "AllowRoot", insert_after: "# AllowRoot=0", value: "1" }
   notify:

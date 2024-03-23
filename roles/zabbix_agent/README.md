@@ -53,15 +53,15 @@ Main parameters:
 | Variable                    | default                                | Comment                                                                |
 |-----------------------------|----------------------------------------|------------------------------------------------------------------------|
 | `zabbix_release`            | 5.0                                    | Zabbix release (not effective for Alpine)                              |
-| `install_v2_agent`          | True                                   | Install Zabbix agent v2 when possible, otherwise install v1            |
-| `customize_agent`           | True                                   | Configure agent for automatic services discovery and templates add     |
-| `clean_install`             | True                                   | Perform clean install (re-install agent with clean-up)                 |
+| `install_v2_agent`          | true                                   | Install Zabbix agent v2 when possible, otherwise install v1            |
+| `customize_agent`           | true                                   | Configure agent for automatic services discovery and templates add     |
+| `clean_install`             | true                                   | Perform clean install (re-install agent with clean-up)                 |
 | `conf_with_dir_clean`       | True                                   | Configure or perform clean installation with config directory clean-up |
 | `debug_mode`                | True                                   | More outputs                                                           |
-| `customize_agent_only`      | False                                  | Re-configure agent without Zabbix install                              |
+| `customize_agent_only`      | false                                  | Re-configure agent without Zabbix install                              |
 | `zabbix_repo_url`           | http://repo.zabbix.com                 | Zabbix repo URL                                                        |
 | `archlinux_repo_url_prefix` | https://archive.archlinux.org/packages | Archlinux repo URL prefix                                              |
-| `repo_dl_validate_certs`    | False                                  | Check certificates on Zabbix repo package download (required on        |
+| `repo_dl_validate_certs`    | false                                  | Check certificates on Zabbix repo package download (required on        |
 |                             |                                        | outdated virtual machines snapshots)                                   |
 
 Zabbix agent settings:
@@ -123,7 +123,7 @@ Install and configure Zabbix v1 agent(s):
       become_method: sudo
       roles:
         - role: alexanderbazhenoff.linux.zabbix_agent
-          install_v2_agent: False
+          install_v2_agent: false
 
 Install and configure Zabbix v2 agent(s):
 

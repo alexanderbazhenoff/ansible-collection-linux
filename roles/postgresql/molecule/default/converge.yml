@@ -2,7 +2,7 @@
 
 - name: Converge
   hosts: all
-  become: True
+  become: true
   become_method: sudo
 
   tasks:
@@ -13,8 +13,8 @@
       vars:
         role_action: install
         role_subject: server
-        install_pgadmin: True
-        debug_mode: True
+        install_pgadmin: true
+        debug_mode: true
         postgresql_additional_packages:
           - postgresql{% if ansible_os_family == 'Debian' %}-client-{{ postgresql_version }}{% else -%}
             {{ postgresql_version }}-contrib{% endif %}

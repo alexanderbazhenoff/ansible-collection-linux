@@ -4,7 +4,7 @@
   ansible.builtin.dnf:
     name: "{{ item }}"
     state: latest
-    update_cache: True
+    update_cache: true
   register: install_yum_results
   until: install_yum_results is succeeded
   retries: 5

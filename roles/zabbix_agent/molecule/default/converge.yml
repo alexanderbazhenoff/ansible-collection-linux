@@ -2,7 +2,7 @@
 
 - name: Converge
   hosts: all
-  become: True
+  become: true
   become_method: sudo
 
   tasks:
@@ -17,4 +17,4 @@
           {% if (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 12) or
           (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22) %}6.0{% else -%}
           5.0{% endif %}
-        clean_install: False
+        clean_install: false

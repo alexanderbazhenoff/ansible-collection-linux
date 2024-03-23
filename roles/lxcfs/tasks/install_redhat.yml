@@ -4,8 +4,8 @@
   ansible.posix.firewalld:
     service: "{{ item }}"
     state: enabled
-    permanent: True
-    immediate: True
+    permanent: true
+    immediate: true
   when: firewalld_state.stdout is defined and firewalld_state.stdout == 'active'
   with_items:
     - dhcp

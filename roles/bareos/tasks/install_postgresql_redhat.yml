@@ -4,7 +4,7 @@
   ansible.builtin.rpm_key:
     key: "{{ postgresql_url }}repos/yum/RPM-GPG-KEY-PGDG"
     state: present
-    validate_certs: False
+    validate_certs: false
 
 - name: "install postgresql redhat | Include check repo url tasks"
   ansible.builtin.include_tasks: check_postgresql_repo_url_redhat.yml
@@ -13,7 +13,7 @@
   ansible.builtin.shell: dnf -qy module list | grep 'postgresql' {% if postgresql_version | string | length > 0 %} |
     grep {{ postgresql_version }}{% endif %} || true
   register: dnf_postgresql_module_results
-  changed_when: False
+  changed_when: false
   when: ansible_pkg_mgr == 'dnf'
 
 - name: "install postgresql redhat | Enable postgresql module version"
@@ -21,7 +21,7 @@
     dnf -qy module enable postgresql{% if postgresql_version | string in dnf_postgresql_module_results.stdout and
     postgresql_version | int > 0 %}:{{ postgresql_version }}{% endif -%}
   register: dnf_postgresql_enable_results
-  changed_when: True
+  changed_when: true
   when: ansible_pkg_mgr == 'dnf'
 
 - name: "install postgresql redhat | Assert availability of postgresql version repo or dnf module"

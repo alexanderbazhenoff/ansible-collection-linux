@@ -2,8 +2,8 @@
 
 - name: Verify
   hosts: all
-  gather_facts: True
-  become: True
+  gather_facts: true
+  become: true
   become_method: sudo
 
   tasks:
@@ -31,12 +31,12 @@
 
     - name: "default >>> verify | Start container"
       ansible.builtin.command: lxc-start ubuntu-focal
-      changed_when: True
+      changed_when: true
 
     - name: "default >>> verify | Get container state"   # noqa risky-shell-pipe
       ansible.builtin.shell: lxc-ls -f | tail -1
       register: lxc_container_results
-      changed_when: False
+      changed_when: false
 
     - name: "default >>> verify | Make sure the container is running"
       ansible.builtin.assert:

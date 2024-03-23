@@ -7,7 +7,7 @@
   ansible.builtin.rpm_key:
     key: "{{ postgresql_url }}repos/yum/RPM-GPG-KEY-PGDG"
     state: absent
-    validate_certs: False
+    validate_certs: false
 
 - name: "purge postgresql redhat | Set postgresql server package(s) list"
   ansible.builtin.set_fact:

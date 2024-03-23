@@ -1,9 +1,9 @@
 ---
 
 - hosts: all
-  become: True
+  become: true
   become_method: sudo
-  gather_facts: True
+  gather_facts: true
 
   tasks:
 
@@ -11,8 +11,8 @@
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.lxcfs
       vars:
-        use_lxc_default_net: True
-        clean_install: True
+        use_lxc_default_net: true
+        clean_install: true
         lxc_technology: lxc
         lxc_version: '2.0'
         append_lxc_config: |

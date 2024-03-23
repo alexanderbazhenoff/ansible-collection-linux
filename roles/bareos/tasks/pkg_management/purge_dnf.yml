@@ -4,7 +4,7 @@
   ansible.builtin.dnf:
     name: "{{ item }}"
     state: absent
-    autoremove: True
+    autoremove: true
   when: item | length > 0
   with_items:
     - "{{ packages_to_install }}"

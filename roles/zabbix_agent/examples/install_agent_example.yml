@@ -3,10 +3,10 @@
 # This is an example of zabbix agent default version install
 
 - hosts: zabbix_clients
-  become: True
+  become: true
   become_method: sudo
   roles:
     - role: alexanderbazhenoff.linux.zabbix_agent
-      install_v2_agent: True
-      force_install_agent_v1: False
-      customize_agent_only: False
+      install_v2_agent: true
+      force_install_agent_v1: false
+      customize_agent_only: false
