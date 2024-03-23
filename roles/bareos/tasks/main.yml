@@ -1,6 +1,5 @@
 ---
-
-- name: "main | Check firewalld is running (RedHat)"   # noqa command-instead-of-module
+- name: "main | Check firewalld is running (RedHat)" # noqa command-instead-of-module
   ansible.builtin.command: systemctl is-active firewalld
   ignore_errors: true
   register: firewalld_state
@@ -37,7 +36,8 @@
 
 - name: "main | Include purge postgresql tasks"
   ansible.builtin.include_tasks: "purge_postgresql_{{ ansible_os_family | lower }}.yml"
-  when: bareos_components | regex_search('dir') and role_action | regex_search('install') and clean_install and
+  when:
+    bareos_components | regex_search('dir') and role_action | regex_search('install') and clean_install and
     not preinstalled_postgresql
 
 - name: "main | Include firewall control tasks (reject connections)"

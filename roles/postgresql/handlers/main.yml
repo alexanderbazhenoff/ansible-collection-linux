@@ -1,5 +1,4 @@
 ---
-
 - name: Postgresql restart
   ansible.builtin.service:
     name: "{{ postgresql_daemon_name | default('postgresql') }}"

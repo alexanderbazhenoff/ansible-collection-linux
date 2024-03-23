@@ -1,5 +1,4 @@
 ---
-
 - name: "install redhat | Add firewalld dhcp rules"
   ansible.posix.firewalld:
     service: "{{ item }}"

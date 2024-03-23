@@ -1,5 +1,4 @@
 ---
-
 - name: "purge yum | Purge packages"
   ansible.builtin.yum:
     name: "{{ item }}"

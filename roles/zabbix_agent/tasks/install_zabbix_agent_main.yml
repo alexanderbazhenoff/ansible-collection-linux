@@ -1,10 +1,10 @@
 ---
-
 - name: "install zabbix agent main | Get info about zabbix-release package and agent v2 availability (RedHat/Debian)"
   block:
     - name: "| Setting fact for URL prefix for index page with packages"
       ansible.builtin.set_fact:
-        zabbix_packages_url: "{% if ansible_os_family == 'RedHat' %}{{ zabbix_repo_url }}/zabbix/{{ zabbix_release -}}
+        zabbix_packages_url:
+          "{% if ansible_os_family == 'RedHat' %}{{ zabbix_repo_url }}/zabbix/{{ zabbix_release -}}
           /rhel/{{ ansible_distribution_major_version }}/{{ ansible_architecture -}}
           {% elif ansible_os_family == 'Debian' %}{{ zabbix_repo_url }}/zabbix/{{ zabbix_release -}}
           /{{ ansible_distribution | lower }}{% if ansible_distribution == 'Ubuntu' and
@@ -26,7 +26,7 @@
         - url: "{{ zabbix_packages_url }}{% if ansible_os_family == 'Debian' %}-release{% endif %}"
           file: zabbix-release
 
-    - name: "| Filter index page for required zabbix agent and release packages"   # noqa risky-shell-pipe
+    - name: "| Filter index page for required zabbix agent and release packages" # noqa risky-shell-pipe
       ansible.builtin.shell: >-
         cat /tmp/{{ item }}.html | grep "{{ zabbix_release }}" |
         grep "{% if ansible_os_family == 'RedHat' %}.rpm{% else %}.deb{% endif %}" || true

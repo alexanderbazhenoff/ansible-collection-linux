@@ -1,5 +1,4 @@
 ---
-
 postgresql_repo_file: >
   deb [signed-by={{ postgresql_apt_keys_dir }}/pgdg.asc] {{ postgresql_url }}repos/apt/
   {{ ansible_distribution_release }}-pgdg main
@@ -17,7 +16,8 @@ postgresql_packages:
     length > 0 %}-{{ postgresql_version | default('') }}{% endif %}
 
 pgadmin_packages:
-  - package: pgadmin4{% if pgadmin_installation_type is defined and pgadmin_installation_type is not none and
+  - package:
+      pgadmin4{% if pgadmin_installation_type is defined and pgadmin_installation_type is not none and
       pgadmin_installation_type | length > 0 %}-{% if pgadmin_installation_type == 'web' %}web{% else -%}
       desktop{% endif %}{% endif -%}
 

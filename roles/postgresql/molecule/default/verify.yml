@@ -1,16 +1,14 @@
 ---
-
 - name: Verify
   hosts: all
   gather_facts: True
   become: False
 
   tasks:
-
-#  DEBUG SECTION (uncomment to troubleshoot)
-#    - name: "default >>> verify | Pause to troubleshoot"
-#      ansible.builtin.pause:
-#        prompt: "Make sure everything was installed"
+    #  DEBUG SECTION (uncomment to troubleshoot)
+    #    - name: "default >>> verify | Pause to troubleshoot"
+    #      ansible.builtin.pause:
+    #        prompt: "Make sure everything was installed"
 
     - name: "default >>> verify | Check dumping database complete"
       ansible.builtin.lineinfile:

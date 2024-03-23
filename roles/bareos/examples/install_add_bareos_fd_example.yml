@@ -1,5 +1,4 @@
 ---
-
 # An example playbook to test and troubleshoot on developing. Try also:
 # rm -f *.tar.gz; ansible-galaxy collection build; ansible-galaxy collection install $(ls -1 | grep ".tar.gz") -f
 # ansible-playbook -i roles/bareos/inventory roles/bareos/install_bareos_fd_example.yml
@@ -10,7 +9,6 @@
   gather_facts: true
 
   tasks:
-
     - name: "install bareos fd example | Include bareos role to install file daemon"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.bareos

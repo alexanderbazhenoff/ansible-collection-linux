@@ -1,5 +1,4 @@
 ---
-
 - name: "server packages debian | Check required apt repo is available"
   ansible.builtin.uri:
     url: "{{ (postgresql_repo_file.split(' '))[2] }}dists/{{ (postgresql_repo_file.split(' '))[3] }}/Release"
@@ -9,7 +8,8 @@
 
 - name: "server packages debian | Check required postgresql version is available in apt repo"
   ansible.builtin.uri:
-    url: "{{ (postgresql_repo_file.split(' '))[2] }}dists/{{ (postgresql_repo_file.split(' '))[3] -}}
+    url:
+      "{{ (postgresql_repo_file.split(' '))[2] }}dists/{{ (postgresql_repo_file.split(' '))[3] -}}
       /{{ postgresql_version | default('') }}"
   register: check_postgresql_version_url_results
   ignore_errors: True

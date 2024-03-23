@@ -1,5 +1,4 @@
 ---
-
 - name: bconsole reload
   ansible.builtin.shell: |
     set -e -o pipefail
@@ -7,7 +6,8 @@
   args:
     executable: /bin/bash
   register: bconsole_reload_results
-  changed_when: not bconsole_reload_results.failed and bconsole_reload_results is defined and
+  changed_when:
+    not bconsole_reload_results.failed and bconsole_reload_results is defined and
     'reloaded' in bconsole_reload_results.stdout
   failed_when: not ('reloaded' in bconsole_reload_results.stdout) or bconsole_reload_results.failed
 

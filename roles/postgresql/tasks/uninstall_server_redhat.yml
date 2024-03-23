@@ -1,6 +1,5 @@
 ---
-
-- name: "uninstall server redhat | Get postgresql dnf modules list"   # noqa risky-shell-pipe
+- name: "uninstall server redhat | Get postgresql dnf modules list" # noqa risky-shell-pipe
   ansible.builtin.shell: dnf -qy module list | grep 'postgresql' || true
   register: dnf_postgresql_module_results
   changed_when: False

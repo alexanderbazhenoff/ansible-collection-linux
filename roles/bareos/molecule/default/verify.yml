@@ -1,12 +1,10 @@
 ---
-
 - name: Verify
   hosts: bareos_servers
   gather_facts: true
   become: false
 
   tasks:
-
     ### DEBUG SECTION (uncomment to troubleshoot)
     #
     # - name: "default >>> verify | Pause to troubleshoot"

@@ -1,5 +1,4 @@
 ---
-
 - name: "install bareos main | Install pre-requirements"
   ansible.builtin.include_tasks: install_pre_requirements.yml
 
@@ -15,12 +14,12 @@
       {% if ansible_facts.services is defined and ansible_os_family != 'Alpine' -%}
       {{ (ansible_facts.services | select('regex', '^postgresql'))[0] }}{% else %}postgresql{% endif %}
 
-- name: "install postgresql main | Check postgresql service is enabled"   # noqa command-instead-of-module
+- name: "install postgresql main | Check postgresql service is enabled" # noqa command-instead-of-module
   ansible.builtin.shell: systemctl is-enabled {{ postgresql_service_name }} || exit 0
   register: service_enabled_results
   changed_when: false
 
-- name: "install postgresql main | Check postgresql service is active"   # noqa command-instead-of-module
+- name: "install postgresql main | Check postgresql service is active" # noqa command-instead-of-module
   ansible.builtin.shell: systemctl is-active {{ postgresql_service_name }} || exit 0
   register: service_running_results
   changed_when: false

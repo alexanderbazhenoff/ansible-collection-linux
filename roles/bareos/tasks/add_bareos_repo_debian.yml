@@ -1,5 +1,4 @@
 ---
-
 - name: "add bareos repo debian | Set fact for bareos repo URL"
   ansible.builtin.set_fact:
     repo_url_to_install: >-

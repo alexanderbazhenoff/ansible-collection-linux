@@ -1,12 +1,10 @@
 ---
-
 - name: Converge
   hosts: all
   become: true
   become_method: sudo
 
   tasks:
-
     - name: "default >>> converge | Include of zabbix_agent role"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.zabbix_agent

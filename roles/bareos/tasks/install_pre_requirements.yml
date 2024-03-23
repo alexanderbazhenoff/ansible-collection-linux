@@ -1,5 +1,4 @@
 ---
-
 - name: "install pre-requirements | Set pre-required packages list"
   ansible.builtin.set_fact:
     packages_to_install:

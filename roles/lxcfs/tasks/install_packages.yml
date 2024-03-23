@@ -1,5 +1,4 @@
 ---
-
 - name: "install packages | Install lxc(fs) packages depending on linux distribution"
   ansible.builtin.package:
     name: "{{ item }}"

@@ -1,5 +1,4 @@
 ---
-
 - name: "install | Include uninstall tasks"
   ansible.builtin.include_tasks: uninstall.yml
   when: clean_install
@@ -23,14 +22,35 @@
     group: root
   when: item.value is defined and item.value | length > 0
   with_items:
-    - { key: LXC_BRIDGE, value: "{{ lxc_default_net_bridge | default('lxcbr0') }}" }
-    - { key: LXC_ADDR, value: "{{ lxc_default_net_addr | default('10.0.3.1') }}" }
-    - { key: LXC_NETMASK, value: "{{ lxc_default_net_netmask | default('255.255.255.0') }}" }
-    - { key: LXC_NETWORK, value: "{{ lxc_default_net_network | default('10.0.3.0/24') }}" }
-    - { key: LXC_DHCP_RANGE, value: "{{ lxc_default_net_dhcp_range | default('10.0.3.2,10.0.3.254') }}" }
-    - { key: LXC_DHCP_MAX, value: "{{ lxc_default_net_dhcp_max | default('253') }}" }
+    - {
+        key: LXC_BRIDGE,
+        value: "{{ lxc_default_net_bridge | default('lxcbr0') }}",
+      }
+    - {
+        key: LXC_ADDR,
+        value: "{{ lxc_default_net_addr | default('10.0.3.1') }}",
+      }
+    - {
+        key: LXC_NETMASK,
+        value: "{{ lxc_default_net_netmask | default('255.255.255.0') }}",
+      }
+    - {
+        key: LXC_NETWORK,
+        value: "{{ lxc_default_net_network | default('10.0.3.0/24') }}",
+      }
+    - {
+        key: LXC_DHCP_RANGE,
+        value: "{{ lxc_default_net_dhcp_range | default('10.0.3.2,10.0.3.254') }}",
+      }
+    - {
+        key: LXC_DHCP_MAX,
+        value: "{{ lxc_default_net_dhcp_max | default('253') }}",
+      }
     - { key: USE_LXC_BRIDGE, value: "{{ use_lxc_default_net | lower }}" }
-    - { key: LXC_DHCP_CONFILE, value: "{% if use_lxc_default_net %}/etc/lxc/dnsmasq.conf{% endif %}" }
+    - {
+        key: LXC_DHCP_CONFILE,
+        value: "{% if use_lxc_default_net %}/etc/lxc/dnsmasq.conf{% endif %}",
+      }
   notify:
     - Enable and start daemons
 
@@ -75,7 +95,7 @@
   changed_when: sysctl_apply_results.stdout is defined and "'net.ipv4.ip_forward' in sysctl_apply_results.stdout"
   when: use_lxc_default_net
 
-- name: "install | Check host is ready for lxc usage (lxc-checkconfig)"   # noqa risky-shell-pipe
+- name: "install | Check host is ready for lxc usage (lxc-checkconfig)" # noqa risky-shell-pipe
   ansible.builtin.shell: lxc-checkconfig | grep -v "CONFIG_NF_NAT_IPV" | grep -iE "(missing|required)"
   register: lxc_check_results
   changed_when: false

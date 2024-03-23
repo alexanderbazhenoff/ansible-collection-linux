@@ -6,13 +6,13 @@ Installs and manages PostgreSQL database instance.
 Specification
 -------------
 
-### 1. Install, uninstall and configuring.
+### 1. Install, uninstall and configuring
 
 This role provides the following install, uninstall and/or configuring operations:
 
 - Install or uninstall a specified version of PostgreSQL database server (or database instance). When specified
 PostgreSQL version repository is not available for your Linux distribution, this will install a default (or recommended)
-version for your Linux distribution (see [example playbooks](#1-install-or-uninstall-postgresql-server-instance) for 
+version for your Linux distribution (see [example playbooks](#1-install-or-uninstall-postgresql-server-instance) for
 details).
 - Install or uninstall [pgadmin4](https://www.pgadmin.org/) alongside or single from database instance: pgadmin4 web
 version with Apache, pgadmin desktop version or both (see [example playbook tasks](#2-install-or-uninstall-pgadmin4) for
@@ -20,7 +20,7 @@ details).
 - Applies firewall rules (ufw and firewalld) for database instance and/or pgadmin4 web version installation. Removes
 firewall rules during uninstalling.
 - Configure `pg_hba.conf` on already installed database instance (see [example playbook tasks](#3-configure-pghbaconf)).
-- Configure `postgresql.conf` on already installed database instance 
+- Configure `postgresql.conf` on already installed database instance
 ([example playbook tasks](#4-configure-postgresqlconf)).
 
 Limitations:
@@ -28,7 +28,7 @@ Limitations:
 - Alpine Linux is not supported for pgadmin4 installation.
 - Configuring iptables for Debian systems is not supported.
 
-### 2. Management.
+### 2. Management
 
 - Create, alter, or remove a user (role) from a PostgreSQL server instance (see
 [example playbook tasks](#5-user--role--management) for details).
@@ -815,13 +815,13 @@ Using this role all `postgresql.conf` change actions ends up with postgresql dae
 Role Variables
 --------------
 
-### Role parameters:
+### Role parameters
 
-| Variable                       | Default | Comment                                                                                                                |
-|--------------------------------|---------|------------------------------------------------------------------------------------------------------------------------|
-| role_action                    | install | Role action: uninstall, install, configure, create, grant, drop, revoke, dump, rename, restore                         |
-| role_subject                   | server  | Role subject to perform with: server, pgadmin, hba_conf, postgresql_conf, users, databases, privileges, schemas, slots |
-| clean_install                  | True    | Perform clean install                                                                                                  |
+ | Variable                       | Default | Comment                                                                                                                |
+ |--------------------------------|---------|------------------------------------------------------------------------------------------------------------------------|
+ | role_action                    | install | Role action: uninstall, install, configure, create, grant, drop, revoke, dump, rename, restore                         |
+ | role_subject                   | server  | Role subject to perform with: server, pgadmin, hba_conf, postgresql_conf, users, databases, privileges, schemas, slots |
+ | clean_install                  | True    | Perform clean install                                                                                                  |
  | postgresql_version             | 15      | Version of pgsql repository                                                                                            |
  | cleanup_data_directory         | True    | Clean-up PostgreSQL data directory                                                                                     |
  | postgresql_recommended_version | False   | Install recommended version for current Linux distribution (1)                                                         |
@@ -831,17 +831,17 @@ Role Variables
  | pgadmin_installation_type      | web     | pgadmin installation type: web or desktop. Leave them empty to install both web and desktop.                           |
  | firewall_control               | True    | Add or remove firewalld and/or ufw rules on install or uninstall. Will be skipped when firewall disabled.              |
 
-* (1) Recommended version install based on distribution repository or 
+* (1) Recommended version install based on distribution repository or
 [dnf modules](https://docs.fedoraproject.org/en-US/modularity/using-modules/). Useful when the current version of
 PostgreSQL server instance is not available for your Linux distribution (e.g. check
 [RedHat repository](https://www.postgresql.org/download/linux/redhat/)).
 
 * (2) List of additional PostgreSQL related packages, e.g: 'postgresql-contrib' or 'postgresql14-contrib' for
 `postgresql_recommended_version: True` (explore what packages available
-[here](https://www.postgresql.org/download/linux/)). There is no automated version handling in this list, include 
+[here](https://www.postgresql.org/download/linux/)). There is no automated version handling in this list, include
 versions to package names.
 
-### PostgreSQL server (or database instance) parameters:
+### PostgreSQL server (or database instance) parameters
 
 * **postgresql_default_timezone**. PostgreSQL timezone. Required for PostgreSQL v14+, especially for init server
 instance data directory on Alpine Linux. You can change it later, e.g: `SET TIME ZONE 'America/Montreal';` and/or add:
@@ -849,7 +849,7 @@ instance data directory on Alpine Linux. You can change it later, e.g: `SET TIME
 [list of timezone names](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)). Defaults: 'Europe/Moscow'
 
 * **postgresql_conf** (dict). Parameters from postgresql.conf with the same name here (see
-[documentation](https://www.postgresql.org/docs/current/config-setting.html)). Double quotes to keep single 
+[documentation](https://www.postgresql.org/docs/current/config-setting.html)). Double quotes to keep single
 `'quotes of value'`. Defaults:
 ```yaml
   port: 5432
@@ -858,27 +858,27 @@ instance data directory on Alpine Linux. You can change it later, e.g: `SET TIME
   listen_addresses: "'*'"
 ```
 * **pg_conf_content_mode** (string). `pg_hba.conf` write content mode to perform configure hba_conf (see
-[documentation](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html)): `regex` (ensure line(s) presents) or 
+[documentation](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html)): `regex` (ensure line(s) presents) or
 `block` (replace original file with), otherwise set template filename here (from /templates sub-folder) or full path to
 replace with (e.g. `pg_hba.conf.j2`). Defaults: `pg_hba.conf.j2`
 
 * **hba_conf_content** (string). pg_hba.conf block or lines for regex mode. Defaults: `''`
 
-### Pgadmin4 parameters:
+### Pgadmin4 parameters
 
 Both parameters are affects only for pgadmin4 web version:
 
-| Variable         | Default             | Comment                                              |
-|------------------|---------------------|------------------------------------------------------|
-| pgadmin_email    | my.name@company.com | pgadmin4 email for administrator login via web UI    |
-| pgadmin_password | my_password         | pgadmin4 password for administrator login via web UI |                                          
+| Variable         | Default               | Comment                                              |
+|------------------|-----------------------|------------------------------------------------------|
+| pgadmin_email    | <my.name@company.com> | pgadmin4 email for administrator login via web UI    |
+| pgadmin_password | my_password           | pgadmin4 password for administrator login via web UI |
 
-### PostgreSQL management parameters:
+### PostgreSQL management parameters
 
-#### User (role) management.
+#### User (role) management
 
 * **postgresql_users** (list of dicts). List of postgresql users (roles) parameters to perform role action (create,
-alter or drop) from database instance (see also 
+alter or drop) from database instance (see also
 [postgresql_user module documentation](https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_user_module.html)).
 Defaults:
 ```yaml
@@ -889,16 +889,16 @@ Defaults:
 | Parameter           | Type      | Default | Comment                                                                                   |
 |---------------------|-----------|---------|-------------------------------------------------------------------------------------------|
 | name                | mandatory |         | Name of the user (role) to add or remove.                                                 |
-| comment             | optional  | (omit)  | Adds a comment on the user (equivalent to the COMMENT ON ROLE statement)                  |  
+| comment             | optional  | (omit)  | Adds a comment on the user (equivalent to the COMMENT ON ROLE statement)                  |
 | password            | optional  | (omit)  | Set the user's password                                                                   |
 | conn_limit          | optional  | (omit)  | Specifies the user (role) connection limit.                                               |
 | no_password_changes | optional  | False   | If True, does not inspect the database for password changes (1)                           |
- | database            | optional  | ''      | Name of database to connect to and where user's permissions are granted.                  |
- | encrypted           | optional  | True    | Whether the password is stored hashed in the database (2)                                 |
- | role_attr_flags     | optional  | ''      | PostgreSQL user attributes string in the format: CREATEDB,CREATEROLE,SUPERUSER (3)        |
- | ssl_mode            | optional  | prefer  | Determines how an SSL session is negotiated with the server (4)                           |
- | ca_cert             | optional  | ''      | Specifies the name of a file containing SSL certificate authority (CA) certificate(s) (5) |
- | trust_input         | optional  | True    | It makes sense to use False only when SQL injections through the options are possible (6) |
+| database            | optional  | ''      | Name of database to connect to and where user's permissions are granted.                  |
+| encrypted           | optional  | True    | Whether the password is stored hashed in the database (2)                                 |
+| role_attr_flags     | optional  | ''      | PostgreSQL user attributes string in the format: CREATEDB,CREATEROLE,SUPERUSER (3)        |
+| ssl_mode            | optional  | prefer  | Determines how an SSL session is negotiated with the server (4)                           |
+| ca_cert             | optional  | ''      | Specifies the name of a file containing SSL certificate authority (CA) certificate(s) (5) |
+| trust_input         | optional  | True    | It makes sense to use False only when SQL injections through the options are possible (6) |
 
 * (1) If true, does not inspect the database for password changes. If the user already exists, skips all password
 related checks. Useful when `pg_authid` is not accessible (such as in AWS RDS). Otherwise, makes password changes as
@@ -915,7 +915,7 @@ information on the modes. Default of prefer matches libpq default. Choices: "all
 * (6) If False, checks whether values of options name, password, privs, expires, role_attr_flags, groups, comment,
 session_role are potentially dangerous.
 
-#### Database management.
+#### Database management
 
 * **postgresql_databases** (list of dicts). List of postgresql databases parameters to perform role action: create,
 drop, dump, rename, restore (see also
@@ -926,9 +926,9 @@ Defaults:
     owner: username
 ```
 
-| Parameter       | Type      | Default | Comment                                                                      |
-|-----------------|-----------|---------|------------------------------------------------------------------------------|
-| name            | mandatory |         | Name of the database to add or remove                                        |
+ | Parameter       | Type      | Default | Comment                                                                      |
+ |-----------------|-----------|---------|------------------------------------------------------------------------------|
+ | name            | mandatory |         | Name of the database to add or remove                                        |
  | owner           | optional  | ''      | Name of the role to set as owner of the database                             |
  | encoding        | optional  | (omit)  | Encoding of the database                                                     |
  | lc_collate      | optional  | (omit)  | Collation order (LC_COLLATE) to use in the database (1)                      |
@@ -943,7 +943,7 @@ Defaults:
  | ca_cert         | optional  | ''      | Specifies the name of a file containing SSL certificate authority (CA) (6)   |
  | trust_input     | optional  | True    | It makes sense only when SQL injections through the options are possible (7) |
 
-* (1) Collation order (LC_COLLATE) to use in the database must match collation order of a template database unless 
+* (1) Collation order (LC_COLLATE) to use in the database must match collation order of a template database unless
 `template0` is used as template.
 * (2) The tablespace to set for the database (see
 [documentation](https://www.postgresql.org/docs/current/sql-alterdatabase.html)). If you want to move the database back
@@ -954,13 +954,13 @@ role_action is `dump` or `restore`.
 * (5) Determines whether or with what priority a secure SSL TCP/IP connection will be negotiated with the server. See
 [libpq-ssl documentation] for more information on the modes. Default of `prefer` matches libpq default. Choices:
 "allow", "disable", "prefer", "require", "verify-ca", "verify-full".
-* (6) The name of a file containing SSL certificate authority (CA) certificate(s). If the file exists, the server's 
+* (6) The name of a file containing SSL certificate authority (CA) certificate(s). If the file exists, the server's
 certificate will be verified to be signed by one of these authorities.
 * (7) If `False`, check whether values of parameters owner, conn_limit, encoding, db, template, tablespace,
 session_role are potentially dangerous. It makes sense to use `False` only when SQL injections via the parameters are
 possible.
 
-#### Schema management.
+#### Schema management
 
 * **postgresql_schemas** (list of dicts). List of parameters to add or remove schemas (see also
 [postgresql_schema module documentation](https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_schema_module.html)).
@@ -971,9 +971,9 @@ Defaults:
     owner: username
 ```
 
-| Parameter    | Type      | Default  | Comment                                                                               |
-|--------------|-----------|----------|---------------------------------------------------------------------------------------|
-| name         | mandatory |          | Name of the schema to add or remove                                                   |
+ | Parameter    | Type      | Default  | Comment                                                                               |
+ |--------------|-----------|----------|---------------------------------------------------------------------------------------|
+ | name         | mandatory |          | Name of the schema to add or remove                                                   |
  | cascade_drop | optional  | (omit)   | Drop schema with CASCADE to remove child objects. Choices: False/True                 |
  | database     | optional  | postgres | Name of the database to connect to and add or remove the schema                       |
  | owner        | optional  | (omit)   | Name of the role to set as owner of the schema                                        |
@@ -981,7 +981,7 @@ Defaults:
  | ca_cert      | optional  | ''       | Specifies the name of a file containing SSL certificate authority (CA) certificate(s) |
  | trust_input  | optional  | True     | It makes sense only when SQL injections through the options are possible              |
 
-#### Privileges management.
+#### Privileges management
 
 * **postgresql_privileges** (list of dicts). List of privileges to grant or revoke on database objects (see also
 [postgresql_privs module documentation](https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_privs_module.html)).
@@ -992,27 +992,27 @@ Defaults:
     privs: ALL
 ```
 
-| Parameter    | Type      | Default  | Comment                                                                                  |
-|--------------|-----------|----------|------------------------------------------------------------------------------------------|
-| database     | mandatory |          | Name of database to connect to                                                           |
-| roles        | mandatory |          | Comma separated list of role (user/group) names to set permissions for (1)               |
-| grant_option | optional  | (omit)   | Whether `role` may grant/revoke the specified privileges/group memberships to others (2) | 
-| objs         | optional  | (omit)   | Comma separated list of database objects to set privileges on (3)                        |
-| privs        | optional  | (omit)   | Comma separated list of privileges to grant/revoke                                       |
-| schema       | optional  | (omit)   | Schema that contains the database objects specified via objs                             |
-| target_roles | optional  | (omit)   | A list of existing role names to set as the default permissions for database objects (4) |
- | type         | optional  | (omit)   | Type of database object to set privileges on (5)                                         |
- | ssl_mode     | optional  | prefer   | Determines how an SSL session is negotiated with the server                              |
- | ca_cert      | optional  | ''       | Specifies the name of a file containing SSL certificate authority (CA) certificate(s)    |
- | trust_input  | optional  | True     | It makes sense only when SQL injections through the options are possible                 |
+| Parameter    | Type      | Default | Comment                                                                                  |
+|--------------|-----------|---------|------------------------------------------------------------------------------------------|
+| database     | mandatory |         | Name of database to connect to                                                           |
+| roles        | mandatory |         | Comma separated list of role (user/group) names to set permissions for (1)               |
+| grant_option | optional  | (omit)  | Whether `role` may grant/revoke the specified privileges/group memberships to others (2) |
+| objs         | optional  | (omit)  | Comma separated list of database objects to set privileges on (3)                        |
+| privs        | optional  | (omit)  | Comma separated list of privileges to grant/revoke                                       |
+| schema       | optional  | (omit)  | Schema that contains the database objects specified via objs                             |
+| target_roles | optional  | (omit)  | A list of existing role names to set as the default permissions for database objects (4) |
+| type         | optional  | (omit)  | Type of database object to set privileges on (5)                                         |
+| ssl_mode     | optional  | prefer  | Determines how an SSL session is negotiated with the server                              |
+| ca_cert      | optional  | ''      | Specifies the name of a file containing SSL certificate authority (CA) certificate(s)    |
+| trust_input  | optional  | True    | It makes sense only when SQL injections through the options are possible                 |
 
 * (1) The special value `PUBLIC` can be provided instead to set permissions for the implicitly defined PUBLIC group.
-* (2) Set to `False` to revoke GRANT OPTION, leave unspecified to make no changes. grant_option only has an effect if 
+* (2) Set to `False` to revoke GRANT OPTION, leave unspecified to make no changes. grant_option only has an effect if
 `role_action` is `grant`. Choices: `True`, `False`.
 * (3) If type is `table`, `partition table`, `sequence`, `function` or `procedure`, the special value `ALL_IN_SCHEMA`
 can be provided instead to specify all database objects of type in the schema specified via schema. (This also works
 with PostgreSQL < 9.0). `procedure` is supported since PostgreSQL 11 and community.postgresql collection 1.3.0. If type
-is `database`, this parameter can be omitted, in which case privileges are set for the database specified via 
+is `database`, this parameter can be omitted, in which case privileges are set for the database specified via
 *database*. If type is `function` or `procedure`, colons (":") in object names will be replaced with commas (needed to
 specify signatures, see examples).
 * (4) A list of existing role (user/group) names to set as the default permissions for database objects subsequently
@@ -1021,7 +1021,7 @@ created by them. Parameter *target_roles* is only available with `type=default_p
 1.3.0 and PostgreSQL 11. Choices: "database", "default_privs", "foreign_data_wrapper", "foreign_server", "function",
 "group", "language", "table" (default), "tablespace", "schema", "sequence", "type", "procedure".
 
-#### Slots management.
+#### Slots management
 
 * **postgresql_slots** (list of dicts). List of parameters to add or remove replication slots from a database (see also
 [postgresql_slot module documentation](https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_slot_module.html)).
@@ -1038,15 +1038,15 @@ Defaults:
 | immediately_reserve | optional  | False    | Specifies that the LSN slot be reserved immediately, otherwise on the first connection (1) |
 | slot_type           | optional  | physical | Slot type: logical or physical                                                             |
 | output_plugin       | optional  | (omit)   | All logical slots must indicate which output plugin decoder they're using (2)              |
- | ssl_mode            | optional  | prefer   | Determines how an SSL session is negotiated with the server                                |
- | ca_cert             | optional  | ''       | Specifies the name of a file containing SSL certificate authority (CA) certificate(s)      |
- | trust_input         | optional  | True     | It makes sense only when SQL injections through the options are possible                   |
+| ssl_mode            | optional  | prefer   | Determines how an SSL session is negotiated with the server                                |
+| ca_cert             | optional  | ''       | Specifies the name of a file containing SSL certificate authority (CA) certificate(s)      |
+| trust_input         | optional  | True     | It makes sense only when SQL injections through the options are possible                   |
 
 * (1) Optional parameter that when `True` specifies that the LSN for this replication slot be reserved immediately,
 otherwise the default, `False`, specifies that the LSN is reserved on the first connection from a streaming replication
-client. Is available from PostgreSQL version 9.6. Uses only with *slot_type=physical*. Mutually exclusive with 
+client. Is available from PostgreSQL version 9.6. Uses only with *slot_type=physical*. Mutually exclusive with
 *slot_type=logical*.
-* (2) This parameter does not apply to physical slots. It will be ignored with *slot_type=physical*. If it wasn't set 
+* (2) This parameter does not apply to physical slots. It will be ignored with *slot_type=physical*. If it wasn't set
 (ommited) *"test_decoding"* will be set by default.
 
 License

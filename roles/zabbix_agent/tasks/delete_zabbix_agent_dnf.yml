@@ -1,5 +1,4 @@
 ---
-
 - name: "delete zabbix agent dnf | Remove zabbix agent packages"
   ansible.builtin.dnf:
     name: "{{ item }}"

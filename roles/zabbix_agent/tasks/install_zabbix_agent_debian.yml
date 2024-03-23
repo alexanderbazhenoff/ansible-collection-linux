@@ -1,5 +1,4 @@
 ---
-
 - name: "install zabbix agent debian | Set facts for release package filename and zabbix daemon name"
   ansible.builtin.set_fact:
     zabbix_agent_daemon_name: >-

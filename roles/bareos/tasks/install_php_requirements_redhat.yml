@@ -1,5 +1,4 @@
 ---
-
 # (Some RedHat family distribution repositories (e.g. Oracle Linux 7.x) are not contains php-intl and php-mbstring
 # packages which are required for bareos-webui. Installing remi repository is a solution, but RHEL remi repo package
 # also requires epel repo package).
@@ -33,7 +32,8 @@
 
     - name: "| Set remi repo package URL"
       ansible.builtin.set_fact:
-        repo_url_to_install: https://rpms.remirepo.net/{% if ansible_distribution == 'Fedora' %}fedora{% else -%}
+        repo_url_to_install:
+          https://rpms.remirepo.net/{% if ansible_distribution == 'Fedora' %}fedora{% else -%}
           enterprise{% endif %}/remi-release-{{ ansible_distribution_major_version }}.rpm
 
     - name: "| Include check repo url tasks with remi repo package URL"
@@ -72,12 +72,13 @@
     - name: "| Include install tasks depending on package manager"
       ansible.builtin.include_tasks: pkg_management/install_{{ ansible_pkg_mgr }}.yml
 
-    - name: "| Enable remi repository"   # noqa command-instead-of-shell
+    - name: "| Enable remi repository" # noqa command-instead-of-shell
       ansible.builtin.shell: >-
         {% if ansible_pkg_mgr == 'yum' %}yum-config-manager --enable {% else %}dnf config-manager --set-enabled
         {% endif %}remi-php{{ (php_version_results.stdout.split(' ') | list)[1] | regex_replace('(.[0-9]{2})', '') |
         regex_replace('\.', '') }}
       register: remi_repo_enable_results
       changed_when: remi_repo_enable_results.stdout | length > 0
-  when: (install_php_packages.results[0] is defined and install_php_packages.results[0].failed) or
+  when:
+    (install_php_packages.results[0] is defined and install_php_packages.results[0].failed) or
     (install_php_packages.results[1] is defined and install_php_packages.results[1].failed)

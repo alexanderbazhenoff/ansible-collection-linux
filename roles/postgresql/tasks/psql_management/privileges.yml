@@ -1,5 +1,4 @@
 ---
-
 - name: "privileges | Grant or revoke privileges on database objects"
   community.postgresql.postgresql_privs:
     database: "{{ item.database | mandatory }}"

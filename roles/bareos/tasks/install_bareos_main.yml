@@ -1,5 +1,4 @@
 ---
-
 - name: "install bareos main | Set fact for repository linux distribution major version"
   ansible.builtin.set_fact:
     linux_distro_major_version: >-
@@ -38,7 +37,10 @@
     mode: 0644
   with_items:
     - { source: directors.ini, destination: /etc/bareos-webui/directors.ini }
-    - { source: configuration.ini, destination: /etc/bareos-webui/configuration.ini }
+    - {
+        source: configuration.ini,
+        destination: /etc/bareos-webui/configuration.ini,
+      }
   when: ansible_os_family == 'Debian' and bareos_components == 'dir_webui'
 
 - name: "install bareos main | Set facts for firewall rule(s)"
@@ -56,7 +58,8 @@
     cmd: setsebool -P httpd_can_network_connect on
   register: setsebool_results
   changed_when: not setsebool_results.failed
-  when: bareos_components | regex_search('webui') and ansible_facts.selinux.status is defined and
+  when:
+    bareos_components | regex_search('webui') and ansible_facts.selinux.status is defined and
     ansible_facts.selinux.status == 'enabled' and ansible_os_family == 'RedHat'
 
 - name: "install bareos main | Create Bareos database, make Bareos tables, grant privileges"

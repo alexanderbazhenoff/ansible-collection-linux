@@ -1,5 +1,4 @@
 ---
-
 - name: "enable and start alpine | Autorun postgresql service"
   ansible.builtin.command: rc-update add postgresql
   register: postgresql_rc_enable_results

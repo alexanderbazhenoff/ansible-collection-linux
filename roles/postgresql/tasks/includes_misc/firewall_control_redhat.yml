@@ -1,5 +1,4 @@
 ---
-
 - name: "firewall control redhat | Add firewalld rule"
   ansible.posix.firewalld:
     port: "{{ firewall_port | default(postgresql_conf.port) }}/tcp"

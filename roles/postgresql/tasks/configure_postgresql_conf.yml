@@ -1,15 +1,14 @@
 ---
-
 - name: "configure postgresql conf | Include get daemon name tasks"
   ansible.builtin.include_tasks: includes_misc/get_daemon_name.yml
 
 - name: "configure postgresql conf | Get postgresql.conf path with standard command"
-  ansible.builtin.shell: "{{ postgresql_conf_path_standard_cmd }}"   # noqa command-instead-of-shell
+  ansible.builtin.shell: "{{ postgresql_conf_path_standard_cmd }}" # noqa command-instead-of-shell
   register: postgresql_conf_path_results
   changed_when: False
 
 - name: "configure postgresql conf | Get postgresql.conf path alternative way"
-  ansible.builtin.shell: "{{ postgresql_conf_path_alternative_cmd }}"   # noqa command-instead-of-shell
+  ansible.builtin.shell: "{{ postgresql_conf_path_alternative_cmd }}" # noqa command-instead-of-shell
   register: postgresql_conf_path_retry_results
   changed_when: False
   when: not ("'postgresql.conf' in postgresql_conf_path_results.stdout") or

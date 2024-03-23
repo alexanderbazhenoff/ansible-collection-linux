@@ -1,5 +1,4 @@
 ---
-
 - name: "purge pgdg repo debian | Remove PostgreSQL asc key"
   ansible.builtin.file:
     path: "{{ postgresql_apt_keys_dir }}/pgdg.asc"

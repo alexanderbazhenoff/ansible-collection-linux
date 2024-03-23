@@ -1,5 +1,4 @@
 ---
-
 - name: "add client | Get fqdn or hostname for add_component_name when undefined"
   ansible.builtin.set_fact:
     add_component_name: >-
@@ -19,7 +18,8 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
-  when: bconsole_list_results.stdout is defined and add_component_name not in bconsole_list_results.stdout and
+  when:
+    bconsole_list_results.stdout is defined and add_component_name not in bconsole_list_results.stdout and
     not add_component_force
   with_items:
     - /etc/bareos/bareos-dir.d/client/{{ add_component_name }}.conf
@@ -40,7 +40,8 @@
   args:
     executable: /bin/bash
   register: bconsole_add_results
-  failed_when: (bconsole_add_results.stdout is defined and 'configure error:' in bconsole_add_results.stdout) or
+  failed_when:
+    (bconsole_add_results.stdout is defined and 'configure error:' in bconsole_add_results.stdout) or
     (not add_component_force and bconsole_add_results.stdout is defined and bconsole_add_results.stdout |
     regex_search('Resource.*with name.*already exists')) or bconsole_add_results.failed
   changed_when: not bconsole_add_results.failed
@@ -65,7 +66,7 @@
 - name: "add client | Insert TLS option in export content of the config on bareos server"
   ansible.builtin.lineinfile:
     path: /etc/bareos/bareos-dir-export/client/{{ add_component_name }}/bareos-fd.d/director/bareos-dir.conf
-    insertbefore: '^}'
+    insertbefore: "^}"
     line: "  TlsEnable = {{ add_component_tls_enable | lower }}"
   delegate_to: "{{ add_component_server | default(ansible_default_ipv4.address) }}"
 

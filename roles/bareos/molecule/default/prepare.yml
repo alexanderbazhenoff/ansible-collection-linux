@@ -1,12 +1,10 @@
 ---
-
 - name: Prepare
   hosts: bareos_servers
   become: true
   become_method: sudo
 
   tasks:
-
     - name: "default >>> prepare | Create postgres group"
       ansible.builtin.group:
         name: postgres

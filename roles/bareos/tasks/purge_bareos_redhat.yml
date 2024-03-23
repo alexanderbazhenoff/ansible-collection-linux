@@ -1,5 +1,4 @@
 ---
-
 - name: "purge bareos redhat | Set bareos packages list to uninstall"
   ansible.builtin.set_fact:
     packages_to_install:

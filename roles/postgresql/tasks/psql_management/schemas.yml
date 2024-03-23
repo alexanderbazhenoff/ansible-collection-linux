@@ -1,5 +1,4 @@
 ---
-
 - name: "schemas | Add or remove schema"
   community.postgresql.postgresql_schema:
     name: "{{ item.name | mandatory }}"
@@ -8,7 +7,8 @@
     owner: "{{ item.owner | default(omit) }}"
     ssl_mode: "{{ item.ssl_mode | default('prefer') }}"
     ca_cert: "{{ item.ca_cert | default('') }}"
-    state: "{% if role_action == 'create' or role_action == 'grant' %}present{% elif role_action == 'revoke' or
+    state:
+      "{% if role_action == 'create' or role_action == 'grant' %}present{% elif role_action == 'revoke' or
       role_action == 'drop' %}absent{% endif %}"
     trust_input: "{{ item.trust_input | default(True) }}"
   with_items:

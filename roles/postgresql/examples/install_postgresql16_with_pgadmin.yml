@@ -1,12 +1,10 @@
 ---
-
 - hosts: all
   become: true
   become_method: sudo
   gather_facts: true
 
   tasks:
-
     - name: "Install PostgreSQL v16 with postgresql.conf change and pgadmin4 web"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.postgresql
@@ -14,7 +12,7 @@
         postgresql_version: 16
         install_pgadmin: true
         pgadmin_email: admin@domain.com
-        pgadmin_password: my_pgadmin_password   # kics-scan ignore-line
+        pgadmin_password: my_pgadmin_password # kics-scan ignore-line
         postgresql_conf:
           port: 5432
           max_connections: 1000

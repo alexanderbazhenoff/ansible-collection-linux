@@ -1,5 +1,4 @@
 ---
-
 - name: "users | Create, alter, or remove a user (role) from database instance"
   community.postgresql.postgresql_user:
     name: "{{ item.name | mandatory }}"

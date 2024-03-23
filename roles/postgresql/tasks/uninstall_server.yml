@@ -1,5 +1,4 @@
 ---
-
 - name: "uninstall server | Include purge repo {{ ansible_os_family | lower }} tasks"
   ansible.builtin.include_tasks: purge_pgdg_repo_{{ ansible_os_family | lower }}.yml
   when: ansible_os_family != 'Alpine'

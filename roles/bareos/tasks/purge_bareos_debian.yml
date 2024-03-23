@@ -1,5 +1,4 @@
 ---
-
 - name: "purge bareos debian | Cleanup bareos packages depending on components to install selection"
   ansible.builtin.apt:
     name: "{{ item }}"

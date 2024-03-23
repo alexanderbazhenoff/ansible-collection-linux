@@ -1,5 +1,4 @@
 ---
-
 - name: "install server | Include uninstall tasks"
   ansible.builtin.include_tasks: uninstall_server.yml
   when: clean_install

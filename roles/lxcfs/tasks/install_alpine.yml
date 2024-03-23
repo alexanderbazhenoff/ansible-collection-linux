@@ -1,5 +1,4 @@
 ---
-
 - name: "install alpine | Refresh kernel modules available"
   ansible.builtin.command: depmod
   changed_when: false

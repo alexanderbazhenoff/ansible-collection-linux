@@ -1,5 +1,4 @@
 ---
-
 - name: "add pgadmin repo debian | Download pgadmin packages signing key"
   ansible.builtin.get_url:
     url: "{{ pgadmin_apt_key_url }}"
@@ -12,7 +11,7 @@
   retries: 5
   delay: 5
 
-- name: "add pgadmin repo debian | Install pgadmin packages signing key"   # noqa risky-shell-pipe
+- name: "add pgadmin repo debian | Install pgadmin packages signing key" # noqa risky-shell-pipe
   ansible.builtin.shell: >-
     cat /tmp/pgadmin.gpg | sudo gpg --dearmor --yes -o {{ pgadmin_apt_keys_dir }}/pgadmin.gpg; rm -f /tmp/pgadmin.gpg
   changed_when: True

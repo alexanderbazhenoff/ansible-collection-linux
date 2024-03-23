@@ -1,5 +1,4 @@
 ---
-
 - name: "purge pgadmin repo debian | Remove pgadmin key"
   ansible.builtin.file:
     path: "{{ pgadmin_apt_keys_dir }}/pgadmin.gpg"

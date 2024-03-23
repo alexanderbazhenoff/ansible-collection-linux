@@ -1,5 +1,4 @@
 ---
-
 - name: "add pgdg repo alpine | Ensure all required repos are enabled"
   ansible.builtin.replace:
     path: /etc/apk/repositories

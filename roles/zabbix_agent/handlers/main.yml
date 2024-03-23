@@ -1,10 +1,10 @@
 ---
-
 - name: restart zabbix-agent svc
   ansible.builtin.service:
     name: "{{ zabbix_agent_daemon_name }}"
     state: restarted
-  when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 12) or
+  when:
+    (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 12) or
     (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 9) or
     (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 6) or
     ansible_os_family == "Archlinux"
@@ -14,6 +14,7 @@
     name: "{{ zabbix_agent_daemon_name }}"
     state: restarted
     enabled: true
-  when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int < 12) or
+  when:
+    (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int < 12) or
     (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int < 9) or
     (ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 6)

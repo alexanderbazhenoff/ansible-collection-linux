@@ -1,12 +1,10 @@
 ---
-
 - name: Side effect
   hosts: all
   become: true
   become_method: sudo
 
   tasks:
-
     ### DEBUG SECTION (uncomment to troubleshoot)
     #
     # - name: "default >>> verify | Pause to troubleshoot"

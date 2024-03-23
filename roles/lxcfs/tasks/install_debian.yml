@@ -1,5 +1,4 @@
 ---
-
 - name: "install debian | Add dhcp ufw rules"
   community.general.ufw:
     rule: allow

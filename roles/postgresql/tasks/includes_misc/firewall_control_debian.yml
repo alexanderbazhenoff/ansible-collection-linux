@@ -1,5 +1,4 @@
 ---
-
 - name: "firewall control debian | Add ufw rule"
   community.general.ufw:
     rule: "{{ firewall_state | default(False) | ternary('allow', 'deny') }}"

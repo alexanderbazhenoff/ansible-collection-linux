@@ -1,5 +1,4 @@
 ---
-
 # Changes zabbix-agent config: re-configure, detect services and add related hostMetadata hashes:
 # - 1. ff<platform_or_hardware_type> is for bare-metal, containerization or virtualization subscription:
 #      bare-metal server: ff6e6f6e65
@@ -14,7 +13,6 @@
 #   etc...
 # - 3. dd<environment_name> is for runtime environments, binaries, daemons, languages (e.g., java, mysql):
 #      check hm_* variables
-
 
 # Check/install required packages.
 
@@ -66,7 +64,8 @@
   selinux_permissive:
     name: zabbix_agent_t
     permissive: true
-  when: ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled' and
+  when:
+    ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled' and
     ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 7
 
 - name: "reconfigure zabbix agents | Set selinux booleans to allow zabbix user networking and sudo (Redhat)"
@@ -77,8 +76,9 @@
   with_items:
     - zabbix_can_network
     - zabbix_run_sudo
-  ignore_errors: true    # noqa ignore-errors
-  when: ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled' and
+  ignore_errors: true # noqa ignore-errors
+  when:
+    ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled' and
     ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 7
 
 # Services/platform discovery section: hardware, ipmi, vendor
@@ -88,14 +88,14 @@
     path: /usr/bin/systemd-detect-virt
   register: systemd_detect_virt_package
 
-- name: "reconfigure zabbix agents | Detect virtualization/containerization by systemd"   # noqa risky-shell-pipe
+- name: "reconfigure zabbix agents | Detect virtualization/containerization by systemd" # noqa risky-shell-pipe
   ansible.builtin.shell: systemd-detect-virt | tr -d '\n' | xxd -ps -c 200
   args:
     executable: /bin/bash
   register: detect_virt
   when: systemd_detect_virt_package.stat.exists
 
-- name: "reconfigure zabbix agents | Detect virtualization/containerization by lscpu"   # noqa risky-shell-pipe
+- name: "reconfigure zabbix agents | Detect virtualization/containerization by lscpu" # noqa risky-shell-pipe
   ansible.builtin.shell: |
     lscpu | grep "Hypervisor vendor:" | awk '{print tolower($3)}' | tr -d '\n' | xxd -ps -c 200 || true
   args:
@@ -146,7 +146,7 @@
     var: detect_ipmi
   when: debug_mode
 
-- name: "reconfigure zabbix agents | Detect vendor via IPMI tool"   # noqa risky-shell-pipe
+- name: "reconfigure zabbix agents | Detect vendor via IPMI tool" # noqa risky-shell-pipe
   ansible.builtin.shell: |
     ipmitool mc info | grep 'Manufacturer Name' | awk '{print $4$5$6}' | tr -d '\n' | xxd -ps -c 200 || true
   args:
@@ -190,7 +190,7 @@
   ansible.builtin.include_tasks: check_systemd_presents.yml
 
 - name: "reconfigure zabbix agents | Check enabled daemons via systemctl"
-  ansible.builtin.shell: systemctl is-enabled {{ item.name }} 2> /dev/null || true   # noqa command-instead-of-module
+  ansible.builtin.shell: systemctl is-enabled {{ item.name }} 2> /dev/null || true # noqa command-instead-of-module
   args:
     executable: /bin/bash
   with_items:
@@ -200,7 +200,7 @@
   when: systemctl_check.stdout | length > 0
 
 - name: "reconfigure zabbix agents | Check enabled daemons via openrc"
-  ansible.builtin.shell: rc-service {{ item.name }} status 2> /dev/null || true   # noqa command-instead-of-shell
+  ansible.builtin.shell: rc-service {{ item.name }} status 2> /dev/null || true # noqa command-instead-of-shell
   args:
     executable: /bin/bash
   with_items:
@@ -214,7 +214,7 @@
     var: services_enabled.results
   when: debug_mode
 
-- name: "reconfigure zabbix agents | Getting hash tags of existing services names"   # noqa: no-handler
+- name: "reconfigure zabbix agents | Getting hash tags of existing services names" # noqa: no-handler
   ansible.builtin.shell: |
     set -e -o pipefail
     echo "{{ item.item.tag }}" | tr -d '\n' | xxd -ps -c 200
@@ -269,7 +269,8 @@
     line: "{{ item.var }}={{ item.value }}"
   with_items:
     - { var: "HostMetadata", value: "{{ zabbix_host_metadata }}" }
-  when: detected_zabbix_release.stdout is defined and zabbix_host_metadata != "Linux" and
+  when:
+    detected_zabbix_release.stdout is defined and zabbix_host_metadata != "Linux" and
     detected_zabbix_release.stdout | int >= 2.2
 
 - name: "reconfigure zabbix agents | Set EnableRemoteCommands/AllowKey line in zabbix configs"
@@ -284,7 +285,10 @@
     regexp: "{{ item.var }}"
     line: "{{ item.var }},{{ item.value }}"
   with_items:
-    - { var: "UserParameter=hostmetadata", value: "echo '{{ zabbix_host_metadata }}'"}
+    - {
+        var: "UserParameter=hostmetadata",
+        value: "echo '{{ zabbix_host_metadata }}'",
+      }
   notify:
     - restart zabbix-agent svc
     - restart zabbix-agent sysv
@@ -309,7 +313,8 @@
   notify:
     - restart zabbix-agent svc
     - restart zabbix-agent sysv
-  when: detected_zabbix_release.stdout is defined and detected_zabbix_release.stdout | int >= 2.2 and
+  when:
+    detected_zabbix_release.stdout is defined and detected_zabbix_release.stdout | int >= 2.2 and
     grep_allow_root_line_results.stdout is defined and grep_allow_root_line_results.stdout | length > 0
 
 - name: "reconfigure zabbix agents | Check zabbix_agent_conf includes directory"
@@ -356,7 +361,10 @@
     - { var: "HostMetadataItem", value: "system.uname" }
     - { var: "{{ remote_cmd_key }}", value: "{{ remote_cmd_value }}" }
     - { var: "{{ logfile_size_key }}", value: "{{ logfile_size_value }}" }
-    - { var: "Include", value: "/etc/zabbix/{{ zabbix_agent_conf_name }}.d/*.conf" }
+    - {
+        var: "Include",
+        value: "/etc/zabbix/{{ zabbix_agent_conf_name }}.d/*.conf",
+      }
   notify:
     - restart zabbix-agent svc
     - restart zabbix-agent sysv

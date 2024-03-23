@@ -1,12 +1,10 @@
 ---
-
 - name: Converge
   hosts: all
   become: true
   become_method: sudo
 
   tasks:
-
     - name: "default >>> converge | Include postgresql role to install version 15 instance with additional packages"
       ansible.builtin.include_role:
         name: alexanderbazhenoff.linux.postgresql

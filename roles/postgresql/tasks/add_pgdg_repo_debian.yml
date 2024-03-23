@@ -1,5 +1,4 @@
 ---
-
 - name: "add pgdg repo debian | Create folder for keyring"
   ansible.builtin.file:
     path: "{{ postgresql_apt_keys_dir }}"

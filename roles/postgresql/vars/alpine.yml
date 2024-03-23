@@ -1,5 +1,4 @@
 ---
-
 postgresql_repo:
   - '^#(.*http(s?):\/\/dl-cdn\.alpinelinux\.org\/alpine\/v[0-9].+)'
   - '^#(.*http(s?):\/\/dl-cdn\.alpinelinux\.org\/alpine\/edge\/.+)'
@@ -14,7 +13,8 @@ default_socket_path: /run/postgresql
 hba_conf_path_alternative_cmd: >-
   printf "%s/pg_hba.conf" "$(grep -rn 'pgdata' /run/openrc/daemons/postgresql | sed -r 's/.*pgdata=//')"
 
-postgresql_data_path: /var/lib/postgresql/{% if not (postgresql_version_regex is defined and postgresql_version_regex |
+postgresql_data_path:
+  /var/lib/postgresql/{% if not (postgresql_version_regex is defined and postgresql_version_regex |
   length > 0) %}{{ postgresql_version }}/{% endif %}/data
 
 postgresql_conf_path_alternative_cmd: >-

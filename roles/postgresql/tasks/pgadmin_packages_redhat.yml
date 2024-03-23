@@ -1,5 +1,4 @@
 ---
-
 - name: "pgadmin packages redhat | Check required pgadmin rpm repo is available"
   ansible.builtin.uri:
     url: >-

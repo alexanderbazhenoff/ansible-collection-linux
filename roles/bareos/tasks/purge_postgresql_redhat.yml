@@ -1,5 +1,4 @@
 ---
-
 - name: "purge postgresql redhat | Include check repo url tasks"
   ansible.builtin.include_tasks: check_postgresql_repo_url_redhat.yml
 
