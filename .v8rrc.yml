@@ -1,5 +1,5 @@
 ---
-verbose: 2
+verbose: 0
 customCatalog:
   schemas:
     - name: Example Playbooks Inside Roles Schema
