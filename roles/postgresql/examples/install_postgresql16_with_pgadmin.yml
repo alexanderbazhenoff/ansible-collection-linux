@@ -16,6 +16,7 @@
         pgadmin_email: admin@domain.com
         # kics-scan ignore-line
         pgadmin_password: my_pgadmin_password
+        # checkov:skip=CKV_SECRET_6 because of example
         postgresql_conf:
           port: 5432
           max_connections: 1000
