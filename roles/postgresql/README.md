@@ -19,7 +19,7 @@ version with Apache, pgadmin desktop version or both (see [example playbook task
 details).
 - Applies firewall rules (ufw and firewalld) for database instance and/or pgadmin4 web version installation. Removes
 firewall rules during uninstalling.
-- Configure `pg_hba.conf` on already installed database instance (see [example playbook tasks](#3-configure-pghbaconf)).
+- Configure `pg_hba.conf` on already installed database instance (see [example playbook tasks](#3-configure-pg_hbaconf)).
 - Configure `postgresql.conf` on already installed database instance
 ([example playbook tasks](#4-configure-postgresqlconf)).
 
@@ -31,7 +31,7 @@ Limitations:
 ### 2. Management.
 
 - Create, alter, or remove a user (role) from a PostgreSQL server instance (see
-[example playbook tasks](#5-user--role--management) for details).
+[example playbook tasks](#5-user-role-management) for details).
 - Create, drop, dump, rename or restore PostgreSQL databases (see [example playbook tasks](#6-database-management) for
 details).
 - Add or remove PostgreSQL schemas ([example playbook tasks](#7-schemas-management)).
@@ -817,19 +817,19 @@ Role Variables
 
 ### Role parameters:
 
-| Variable                       | Default | Comment                                                                                                                |
-|--------------------------------|---------|------------------------------------------------------------------------------------------------------------------------|
-| role_action                    | install | Role action: uninstall, install, configure, create, grant, drop, revoke, dump, rename, restore                         |
-| role_subject                   | server  | Role subject to perform with: server, pgadmin, hba_conf, postgresql_conf, users, databases, privileges, schemas, slots |
-| clean_install                  | true    | Perform clean install                                                                                                  |
- | postgresql_version             | 15      | Version of pgsql repository                                                                                            |
- | cleanup_data_directory         | true    | Clean-up PostgreSQL data directory                                                                                     |
- | postgresql_recommended_version | false   | Install recommended version for current Linux distribution (1)                                                         |
- | postgresql_additional_packages | []      | List of additional PostgreSQL related packages to install (2)                                                          |
- | install_psycopg2               | true    | Install [psycopg2](https://pypi.org/project/psycopg2/)                                                                 |
- | install_pgadmin                | false   | Install [pgadmin4](https://www.pgadmin.org/) for web mode alongside with postgresql server                             |
- | pgadmin_installation_type      | web     | pgadmin installation type: web or desktop. Leave them empty to install both web and desktop.                           |
- | firewall_control               | true    | Add or remove firewalld and/or ufw rules on install or uninstall. Will be skipped when firewall disabled.              |
+| Variable                       | Default | Comment                                                                                                                 |
+|--------------------------------|---------|-------------------------------------------------------------------------------------------------------------------------|
+| role_action                    | install | Role action: uninstall, install, configure, create, grant, drop, revoke, dump, rename, restore                          |
+| role_subject                   | server  | Role subject to perform with: server, pgadmin, hba_conf, postgresql_conf, users, databases, privileges, schemas, slots  |
+| clean_install                  | true    | Perform clean install                                                                                                   |
+| postgresql_version             | 15      | Version of pgsql repository                                                                                             |
+| cleanup_data_directory         | true    | Clean-up PostgreSQL data directory                                                                                      |
+| postgresql_recommended_version | false   | Install recommended version for current Linux distribution (1)                                                          |
+| postgresql_additional_packages | []      | List of additional PostgreSQL related packages to install (2)                                                           |
+| install_psycopg2               | true    | Install [psycopg2](https://pypi.org/project/psycopg2/)                                                                  |
+| install_pgadmin                | false   | Install [pgadmin4](https://www.pgadmin.org/) for web mode alongside with postgresql server                              |
+| pgadmin_installation_type      | web     | pgadmin installation type: web or desktop. Leave them empty to install both web and desktop.                            |
+| firewall_control               | true    | Add or remove firewalld and/or ufw rules on install or uninstall. Will be skipped when firewall disabled.               |
 
 * (1) Recommended version install based on distribution repository or
 [dnf modules](https://docs.fedoraproject.org/en-US/modularity/using-modules/). Useful when the current version of
@@ -893,12 +893,12 @@ Defaults:
 | password            | optional  | (omit)  | Set the user's password                                                                   |
 | conn_limit          | optional  | (omit)  | Specifies the user (role) connection limit.                                               |
 | no_password_changes | optional  | false   | If true, does not inspect the database for password changes (1)                           |
- | database            | optional  | ''      | Name of database to connect to and where user's permissions are granted.                  |
- | encrypted           | optional  | true    | Whether the password is stored hashed in the database (2)                                 |
- | role_attr_flags     | optional  | ''      | PostgreSQL user attributes string in the format: CREATEDB,CREATEROLE,SUPERUSER (3)        |
- | ssl_mode            | optional  | prefer  | Determines how an SSL session is negotiated with the server (4)                           |
- | ca_cert             | optional  | ''      | Specifies the name of a file containing SSL certificate authority (CA) certificate(s) (5) |
- | trust_input         | optional  | true    | It makes sense to use false only when SQL injections through the options are possible (6) |
+| database            | optional  | ''      | Name of database to connect to and where user's permissions are granted.                  |
+| encrypted           | optional  | true    | Whether the password is stored hashed in the database (2)                                 |
+| role_attr_flags     | optional  | ''      | PostgreSQL user attributes string in the format: CREATEDB,CREATEROLE,SUPERUSER (3)        |
+| ssl_mode            | optional  | prefer  | Determines how an SSL session is negotiated with the server (4)                           |
+| ca_cert             | optional  | ''      | Specifies the name of a file containing SSL certificate authority (CA) certificate(s) (5) |
+| trust_input         | optional  | true    | It makes sense to use false only when SQL injections through the options are possible (6) |
 
 * (1) If true, does not inspect the database for password changes. If the user already exists, skips all password
 related checks. Useful when `pg_authid` is not accessible (such as in AWS RDS). Otherwise, makes password changes as
