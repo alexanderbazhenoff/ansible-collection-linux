@@ -11,7 +11,7 @@ permissions: read-all
 env:
   APPLY_FIXES: all
   APPLY_FIXES_EVENT: all
-  APPLY_FIXES_MODE: commit
+  APPLY_FIXES_MODE: pull_request
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
@@ -54,7 +54,6 @@ jobs:
 
       # Set APPLY_FIXES_IF var for use in future steps
       - name: Set APPLY_FIXES_IF var
-        if: success() || failure()
         run: |
           printf 'APPLY_FIXES_IF=%s\n' "${{
             steps.ml.outputs.has_updated_sources == 1 &&
@@ -70,7 +69,6 @@ jobs:
 
       # Set APPLY_FIXES_IF_* vars for use in future steps
       - name: Set APPLY_FIXES_IF_* vars
-        if: success() || failure()
         run: |
           printf 'APPLY_FIXES_IF_PR=%s\n' "${{
             env.APPLY_FIXES_IF == 'true' &&

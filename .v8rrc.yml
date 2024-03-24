@@ -5,6 +5,6 @@ customCatalog:
   schemas:
     - name: Example Playbooks Inside Roles Schema
       description: Example Playbooks Inside Roles Schema
-      fileMatch: ["./roles/bareos/examples/*.yml"]
+      fileMatch: ["roles/bareos/examples/*.yml"]
       location: |
         https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/playbook
