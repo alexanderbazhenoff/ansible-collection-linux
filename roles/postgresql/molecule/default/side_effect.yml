@@ -16,7 +16,7 @@
         postgresql_users:
           - name: test
             # kics-scan ignore-line
-            password: my_password
+            password: my_password # checkov:skip=CKV_SECRET_6 for test only
 
     - name: "default >>> side effect | Include postgresql role to create database"
       ansible.builtin.include_role:

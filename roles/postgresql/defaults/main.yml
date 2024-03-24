@@ -72,7 +72,7 @@ hba_conf_content: |
 # https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_user_module.html
 postgresql_users:
   - name: username
-    password: my_password
+    password: my_password # checkov:skip=CKV_SECRET_6 because of example defaults
 
 # List of postgresql databases parameters to perform role action (create, drop, dump, rename, restore).
 # https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_db_module.html
@@ -105,4 +105,4 @@ postgresql_slots:
 
 # pgadmin email and password for administrator login via web UI
 pgadmin_email: my.name@company.com
-pgadmin_password: my_password
+pgadmin_password: my_password # checkov:skip=CKV_SECRET_6 because of example defaults
