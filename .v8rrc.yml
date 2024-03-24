@@ -1,0 +1,9 @@
+---
+verbose: 2
+customCatalog:
+  schemas:
+    - name: Example Playbooks Inside Roles Schema
+      description: Example Playbooks Inside Roles Schema
+      fileMatch: ["/roles/**/examples/*.yml"]
+      location: |
+        https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/playbook
