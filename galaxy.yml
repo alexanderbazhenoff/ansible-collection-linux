@@ -18,6 +18,8 @@ tags:
 dependencies:
   "community.general": "*"
   "community.postgresql": "*"
+  "community.docker": '*'
+  "ansible.posix": "*"
 repository: https://github.com/alexanderbazhenoff/ansible-collection-linux
 documentation: https://github.com/alexanderbazhenoff/ansible-collection-linux/wiki
 homepage: https://galaxy.ansible.com/alexanderbazhenoff/ansible-collection-linux

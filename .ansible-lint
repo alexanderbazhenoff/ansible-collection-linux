@@ -5,12 +5,10 @@
 # https://ansible.readthedocs.io/projects/lint/usage/#muting-warnings-to-avoid-false-positives
 
 exclude_paths:
-  - .idea/
-  - .git/
-  - .scripts/
+  - .idea
+  - .git
+  - .github
   - .gilab-ci.yml
-  - .gitignore
-  - .gitmodules
 quiet: true
 verbosity: 1
 
