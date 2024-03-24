@@ -3,9 +3,9 @@
 galaxy_info:
   author: Aleksandr Bazhenov
   description: Installs and configures lxc/lxcfs on linux system
-  license: MIT-0
+  license: BSD-3-Clause
   namespace: alexanderbazhenoff
-  min_ansible_version: 2.9.0
+  min_ansible_version: 2.10.0
 
   platforms:
     - name: Ubuntu

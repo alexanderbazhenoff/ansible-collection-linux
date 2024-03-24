@@ -5,8 +5,8 @@ galaxy_info:
   namespace: alexanderbazhenoff
   author: Aleksandr Bazhenov
   description: Install and configure PostgreSQL database instance and pgadmin.
-  license: MIT-0
-  min_ansible_version: 2.9.0
+  license: BSD-3-Clause
+  min_ansible_version: 2.10.0
   platforms:
     - name: Ubuntu
       versions:

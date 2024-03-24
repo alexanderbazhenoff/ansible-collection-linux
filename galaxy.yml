@@ -8,7 +8,7 @@ authors:
   - Aleksandr Bazhenov <>
 description: Various roles for Linux
 license:
-  - MIT-0
+  - BSD-3-Clause
 tags:
   - linux
   - monitoring
